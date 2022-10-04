@@ -1,0 +1,15 @@
+[general]
+name=天地图
+qgisMinimumVersion=3.0
+description=天地图底图加载
+about=天地图底图加载，使用天地图官方API
+version=0.1.0
+tags=basemap, tianditu, 天地图
+icon=reload.png
+experimental=False
+deprecated=False
+author=liu XS
+email=liuxsmail@126.com
+homepage=https://github.com/liuxsdev/TianDiTu
+tracker=https://github.com/liuxsdev/TianDiTu/issues
+repository=https://github.com/liuxsdev/TianDiTu
