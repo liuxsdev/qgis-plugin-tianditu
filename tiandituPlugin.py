@@ -13,7 +13,7 @@ def run():
     print("running")
     dlg = settingDialog()
     dlg.show()
-    r = dlg.exec_()
+    dlg.exec_()
 
 
 def add_xyz_layer(uri, name):
@@ -51,34 +51,31 @@ class TianDiTu:
         self.toolbar = self.iface.addToolBar('TianDiTu Toolbar')
         self.toolbar.setObjectName('TianDiTuToolbar')
         self.toolbar.setToolTip('天地图工具栏')
+        self.plugin_dir = os.path.dirname(__file__)
+        # 定义实例变量,摆脱烦人的Pylint警报
+        self.addTiandituToolbar = None
+        self.addTiandituButton = None
+        self.action_setting = None
 
     def initGui(self):
         # 图标
-        icon_setting = QIcon(os.path.dirname(__file__) + "/images/setting.svg")
-        icon_logo = QIcon(os.path.dirname(__file__) + "/images/logo.svg")
+        icon_setting = QIcon(self.plugin_dir + "/images/setting.svg")
+        icon_logo = QIcon(self.plugin_dir + "/images/logo.svg")
         icon_add = QIcon(os.path.dirname(__file__) + "/images/Add.svg")
 
         # 底图添加 Action
         menu = QMenu()
         menu.setObjectName('TianDiTuAddMap')
-        menu.addAction(icon_logo, TianMapInfo['vec'],
-                       lambda: add_tianditu_basemap('vec'))
-        menu.addAction(icon_logo, TianMapInfo['cva'],
-                       lambda: add_tianditu_basemap('cva'))
-        menu.addAction(icon_logo, TianMapInfo['img'],
-                       lambda: add_tianditu_basemap('img'))
-        menu.addAction(icon_logo, TianMapInfo['cia'],
-                       lambda: add_tianditu_basemap('cia'))
-        menu.addAction(icon_logo, TianMapInfo['ter'],
-                       lambda: add_tianditu_basemap('ter'))
-        menu.addAction(icon_logo, TianMapInfo['cta'],
-                       lambda: add_tianditu_basemap('cta'))
-        menu.addAction(icon_logo, TianMapInfo['eva'],
-                       lambda: add_tianditu_basemap('eva'))
-        menu.addAction(icon_logo, TianMapInfo['eia'],
-                       lambda: add_tianditu_basemap('eia'))
-        menu.addAction(icon_logo, TianMapInfo['ibo'],
-                       lambda: add_tianditu_basemap('ibo'))
+        menu.addAction(icon_logo, TianMapInfo['vec'], lambda: add_tianditu_basemap('vec'))
+        menu.addAction(icon_logo, TianMapInfo['cva'], lambda: add_tianditu_basemap('cva'))
+        menu.addAction(icon_logo, TianMapInfo['img'], lambda: add_tianditu_basemap('img'))
+        menu.addAction(icon_logo, TianMapInfo['cia'], lambda: add_tianditu_basemap('cia'))
+        menu.addAction(icon_logo, TianMapInfo['ter'], lambda: add_tianditu_basemap('ter'))
+        menu.addAction(icon_logo, TianMapInfo['cta'], lambda: add_tianditu_basemap('cta'))
+        menu.addAction(icon_logo, TianMapInfo['eva'], lambda: add_tianditu_basemap('eva'))
+        menu.addAction(icon_logo, TianMapInfo['eia'], lambda: add_tianditu_basemap('eia'))
+        menu.addAction(icon_logo, TianMapInfo['ibo'], lambda: add_tianditu_basemap('ibo'))
+
         self.addTiandituButton = QToolButton()
         self.addTiandituButton.setMenu(menu)
         self.addTiandituButton.setPopupMode(QToolButton.MenuButtonPopup)
@@ -86,6 +83,7 @@ class TianDiTu:
         self.addTiandituButton.setIcon(icon_add)
         self.addTiandituButton.setToolTip('添加底图')
         self.addTiandituToolbar = self.toolbar.addWidget(self.addTiandituButton)
+
         # 设置 Action
         self.action_setting = QAction(icon_setting, "设置", self.iface.mainWindow())
         self.action_setting.triggered.connect(run)
