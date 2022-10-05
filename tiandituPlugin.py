@@ -4,12 +4,16 @@ from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction, QMenu, QToolButton
 from qgis.core import Qgis, QgsRasterLayer, QgsProject
 from .tiandituConfig import TianMapInfo
+from .settingDialog import settingDialog
 
 current_qgis_version = Qgis.versionInt()
 
 
 def run():
     print("running")
+    dlg = settingDialog()
+    dlg.show()
+    r = dlg.exec_()
 
 
 def add_xyz_layer(uri, name):
@@ -52,35 +56,35 @@ class TianDiTu:
         # 图标
         icon_setting = QIcon(os.path.dirname(__file__) + "/images/setting.svg")
         icon_logo = QIcon(os.path.dirname(__file__) + "/images/logo.svg")
+        icon_add = QIcon(os.path.dirname(__file__) + "/images/Add.svg")
 
         # 底图添加 Action
         menu = QMenu()
         menu.setObjectName('TianDiTuAddMap')
-        self.action_addTianditu_vec = menu.addAction(icon_logo, TianMapInfo['vec'],
-                                                     lambda: add_tianditu_basemap('vec'))
-        self.action_addTianditu_cva = menu.addAction(icon_logo, TianMapInfo['cva'],
-                                                     lambda: add_tianditu_basemap('cva'))
-        self.action_addTianditu_img = menu.addAction(icon_logo, TianMapInfo['img'],
-                                                     lambda: add_tianditu_basemap('img'))
-        self.action_addTianditu_cia = menu.addAction(icon_logo, TianMapInfo['cia'],
-                                                     lambda: add_tianditu_basemap('cia'))
-        self.action_addTianditu_ter = menu.addAction(icon_logo, TianMapInfo['ter'],
-                                                     lambda: add_tianditu_basemap('ter'))
-        self.action_addTianditu_cta = menu.addAction(icon_logo, TianMapInfo['cta'],
-                                                     lambda: add_tianditu_basemap('cta'))
-        self.action_addTianditu_eva = menu.addAction(icon_logo, TianMapInfo['eva'],
-                                                     lambda: add_tianditu_basemap('eva'))
-        self.action_addTianditu_eia = menu.addAction(icon_logo, TianMapInfo['eia'],
-                                                     lambda: add_tianditu_basemap('eia'))
-        self.action_addTianditu_ibo = menu.addAction(icon_logo, TianMapInfo['ibo'],
-                                                     lambda: add_tianditu_basemap('ibo'))
-        self.action_addTiandutu = QAction(icon_setting, '添加底图', self.iface.mainWindow())
-        self.action_addTiandutu.setMenu(menu)
-
+        menu.addAction(icon_logo, TianMapInfo['vec'],
+                       lambda: add_tianditu_basemap('vec'))
+        menu.addAction(icon_logo, TianMapInfo['cva'],
+                       lambda: add_tianditu_basemap('cva'))
+        menu.addAction(icon_logo, TianMapInfo['img'],
+                       lambda: add_tianditu_basemap('img'))
+        menu.addAction(icon_logo, TianMapInfo['cia'],
+                       lambda: add_tianditu_basemap('cia'))
+        menu.addAction(icon_logo, TianMapInfo['ter'],
+                       lambda: add_tianditu_basemap('ter'))
+        menu.addAction(icon_logo, TianMapInfo['cta'],
+                       lambda: add_tianditu_basemap('cta'))
+        menu.addAction(icon_logo, TianMapInfo['eva'],
+                       lambda: add_tianditu_basemap('eva'))
+        menu.addAction(icon_logo, TianMapInfo['eia'],
+                       lambda: add_tianditu_basemap('eia'))
+        menu.addAction(icon_logo, TianMapInfo['ibo'],
+                       lambda: add_tianditu_basemap('ibo'))
         self.addTiandituButton = QToolButton()
         self.addTiandituButton.setMenu(menu)
-        self.addTiandituButton.setDefaultAction(self.action_addTianditu_vec)
         self.addTiandituButton.setPopupMode(QToolButton.MenuButtonPopup)
+        self.addTiandituButton.setText('添加底图')
+        self.addTiandituButton.setIcon(icon_add)
+        self.addTiandituButton.setToolTip('添加底图')
         self.addTiandituToolbar = self.toolbar.addWidget(self.addTiandituButton)
         # 设置 Action
         self.action_setting = QAction(icon_setting, "设置", self.iface.mainWindow())
