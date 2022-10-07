@@ -9,3 +9,13 @@ TianMapInfo = {
     'eia': '天地图-英文影像注记',
     'ibo': '天地图-全球境界'
 }
+
+extra_map = {
+    'Google Map - Satellite': {
+        'name': 'Google Map - Satellite',
+        'url': 'http://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
+        'zmin': 0,
+        'zmax': 21,
+        'referer': ''
+    }
+}

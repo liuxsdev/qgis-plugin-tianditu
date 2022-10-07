@@ -3,7 +3,7 @@ import requests
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction, QMenu, QToolButton
 from qgis.core import Qgis, QgsRasterLayer, QgsProject
-from .tiandituConfig import TianMapInfo
+from .tiandituConfig import TianMapInfo, extra_map
 from .settingDialog import settingDialog
 
 current_qgis_version = Qgis.versionInt()
@@ -29,9 +29,11 @@ def tianditu_map_url(maptype, token):
     return url
 
 
-def get_map_uri(url, zmin=0, zmax=18, referer='https://www.tianditu.gov.cn/'):
+def get_map_uri(url, zmin=0, zmax=18, referer=''):
     url_quote = requests.utils.quote(url, safe=':/')
-    if current_qgis_version >= 32600:
+    if referer == '':
+        uri = f'type=xyz&url={url_quote}&zmin={zmin}&zmax={zmax}'
+    elif current_qgis_version >= 32600:
         uri = f'type=xyz&url={url_quote}&zmin={zmin}&zmax={zmax}&http-header:referer={referer}'
     else:
         uri = f'type=xyz&url={url_quote}&zmin={zmin}&zmax={zmax}&referer={referer}'
@@ -39,9 +41,17 @@ def get_map_uri(url, zmin=0, zmax=18, referer='https://www.tianditu.gov.cn/'):
 
 
 def add_tianditu_basemap(maptype):
+    # TODO Token save to config file
     token = 'cfcbc282308686d26782fcb4e11b32a4'
-    uri = get_map_uri(tianditu_map_url(maptype, token))
+    uri = get_map_uri(tianditu_map_url(maptype, token), zmin=1, referer='https://www.tianditu.gov.cn/')
     add_xyz_layer(uri, TianMapInfo[maptype])
+
+
+def add_extra_map(name):
+    map_data = extra_map[name]
+    name = map_data['name']
+    uri = get_map_uri(map_data['url'], map_data['zmin'], map_data['zmax'], map_data['referer'])
+    add_xyz_layer(uri, name)
 
 
 class TianDiTu:
@@ -63,6 +73,7 @@ class TianDiTu:
         icon_logo = QIcon(self.plugin_dir + "/images/logo.svg")
         icon_add = QIcon(self.plugin_dir + "/images/Add.svg")
         icon_map = QIcon(self.plugin_dir + "/images/logo_map.svg")
+        icon_googlemap_sat = QIcon(self.plugin_dir + "/images/googlemap_satellite.png")
 
         # 底图添加 Action
         menu = QMenu()
@@ -76,6 +87,12 @@ class TianDiTu:
         menu.addAction(icon_map, TianMapInfo['eva'], lambda: add_tianditu_basemap('eva'))
         menu.addAction(icon_map, TianMapInfo['eia'], lambda: add_tianditu_basemap('eia'))
         menu.addAction(icon_map, TianMapInfo['ibo'], lambda: add_tianditu_basemap('ibo'))
+        menu.addSeparator()
+        extra_map_action = menu.addAction(icon_map, '其他图源')
+        extra_map_menu = QMenu()
+        extra_map_menu.addAction(icon_googlemap_sat, 'Google Map - Satellite',
+                                 lambda: add_extra_map('Google Map - Satellite'))
+        extra_map_action.setMenu(extra_map_menu)
 
         self.addTiandituButton = QToolButton()
         self.addTiandituButton.setMenu(menu)
