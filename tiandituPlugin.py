@@ -4,14 +4,14 @@ from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction, QMenu, QToolButton
 from qgis.core import Qgis, QgsRasterLayer, QgsProject
 from .tiandituConfig import TianMapInfo, extra_map
-from .settingDialog import settingDialog
+from .settingDialog import SettingDialog
 
 current_qgis_version = Qgis.versionInt()
 
 
 def run():
     print("running")
-    dlg = settingDialog()
+    dlg = SettingDialog()
     dlg.show()
     dlg.exec_()
 
