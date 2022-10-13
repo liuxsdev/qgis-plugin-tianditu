@@ -1,7 +1,8 @@
 import configparser
 import os
-plugin_dir = os.path.dirname(__file__)
-CONFIG_FILE_PATH = os.path.join(plugin_dir, 'config.ini')
+from .utils import PluginDir
+
+CONFIG_FILE_PATH = os.path.join(PluginDir, 'config.ini')
 
 
 class ConfigFile:

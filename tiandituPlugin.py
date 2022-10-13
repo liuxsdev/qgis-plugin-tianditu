@@ -1,16 +1,16 @@
-import os
 import requests
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction, QMenu, QToolButton
 from qgis.core import Qgis, QgsRasterLayer, QgsProject
-from .tiandituConfig import TianMapInfo, extra_map
+
 from .settingDialog import SettingDialog
+from .tiandituConfig import TianMapInfo, extra_map
+from .utils import tianditu_map_url, TianDiTuHomeURL, PluginDir
 
 current_qgis_version = Qgis.versionInt()
 
 
 def run():
-    print("running")
     dlg = SettingDialog()
     dlg.show()
     dlg.exec_()
@@ -19,14 +19,6 @@ def run():
 def add_xyz_layer(uri, name):
     raster_layer = QgsRasterLayer(uri, name, 'wms')
     QgsProject.instance().addMapLayer(raster_layer)
-
-
-def tianditu_map_url(maptype, token):
-    url = 'https://t2.tianditu.gov.cn/'
-    url += f'{maptype}_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER={maptype}'
-    url += '&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TileCol={x}&TileRow={y}&TileMatrix={z}'
-    url += f'&tk={token}'
-    return url
 
 
 def get_map_uri(url, zmin=0, zmax=18, referer=''):
@@ -43,7 +35,7 @@ def get_map_uri(url, zmin=0, zmax=18, referer=''):
 def add_tianditu_basemap(maptype):
     # TODO Token save to config file
     token = 'cfcbc282308686d26782fcb4e11b32a4'
-    uri = get_map_uri(tianditu_map_url(maptype, token), zmin=1, referer='https://www.tianditu.gov.cn/')
+    uri = get_map_uri(tianditu_map_url(maptype, token), zmin=1, referer=TianDiTuHomeURL)
     add_xyz_layer(uri, TianMapInfo[maptype])
 
 
@@ -61,7 +53,7 @@ class TianDiTu:
         self.toolbar = self.iface.addToolBar('TianDiTu Toolbar')
         self.toolbar.setObjectName('TianDiTuToolbar')
         self.toolbar.setToolTip('天地图工具栏')
-        self.plugin_dir = os.path.dirname(__file__)
+        self.plugin_dir = PluginDir
         # 定义实例变量,摆脱烦人的Pylint警报
         self.addTiandituToolbar = None
         self.addTiandituButton = None
