@@ -31,6 +31,14 @@ class ConfigFile:
             value = None
         return value
 
+    def getValueBoolean(self, section, key):
+        try:
+            value = self.cfg.getboolean(section, key)
+        except (configparser.NoSectionError, configparser.NoOptionError):
+            print("section or key do not exists")
+            value = None
+        return value
+
     def initConfigFile(self):
         current_sections = self.cfg.sections()
         for s in current_sections:
