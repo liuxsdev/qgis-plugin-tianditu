@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'untitled.ui'
+# Form implementation generated from reading ui file 'setting.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.4
 #
@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Form(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
-        Form.resize(400, 300)
+        Form.resize(452, 299)
         self.verticalLayout = QtWidgets.QVBoxLayout(Form)
         self.verticalLayout.setObjectName("verticalLayout")
         self.groupBox = QtWidgets.QGroupBox(Form)
@@ -29,16 +29,30 @@ class Ui_Form(object):
         self.label = QtWidgets.QLabel(self.groupBox)
         self.label.setObjectName("label")
         self.horizontalLayout.addWidget(self.label)
-        self.lineEdit = QtWidgets.QLineEdit(self.groupBox)
-        self.lineEdit.setObjectName("lineEdit")
-        self.horizontalLayout.addWidget(self.lineEdit)
+        self.mLineEdit_key = QgsPasswordLineEdit(self.groupBox)
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        self.mLineEdit_key.setFont(font)
+        self.mLineEdit_key.setClearButtonEnabled(False)
+        self.mLineEdit_key.setShowLockIcon(False)
+        self.mLineEdit_key.setObjectName("mLineEdit_key")
+        self.horizontalLayout.addWidget(self.mLineEdit_key)
         self.pushButton = QtWidgets.QPushButton(self.groupBox)
         self.pushButton.setObjectName("pushButton")
         self.horizontalLayout.addWidget(self.pushButton)
         self.horizontalLayout.setStretch(0, 1)
-        self.horizontalLayout.setStretch(1, 8)
+        self.horizontalLayout.setStretch(1, 10)
         self.horizontalLayout.setStretch(2, 2)
         self.verticalLayout_2.addLayout(self.horizontalLayout)
+        self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
+        self.label_2 = QtWidgets.QLabel(self.groupBox)
+        self.label_2.setObjectName("label_2")
+        self.horizontalLayout_2.addWidget(self.label_2)
+        self.label_keystatus = QtWidgets.QLabel(self.groupBox)
+        self.label_keystatus.setObjectName("label_keystatus")
+        self.horizontalLayout_2.addWidget(self.label_keystatus)
+        self.verticalLayout_2.addLayout(self.horizontalLayout_2)
         self.verticalLayout.addWidget(self.groupBox)
         self.groupBox_2 = QtWidgets.QGroupBox(Form)
         font = QtGui.QFont()
@@ -48,6 +62,7 @@ class Ui_Form(object):
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.groupBox_2)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
         self.checkBox = QtWidgets.QCheckBox(self.groupBox_2)
+        self.checkBox.setEnabled(False)
         font = QtGui.QFont()
         font.setFamily("微软雅黑")
         self.checkBox.setFont(font)
@@ -64,7 +79,11 @@ class Ui_Form(object):
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(_translate("Form", "设置"))
         self.groupBox.setTitle(_translate("Form", "天地图设置"))
-        self.label.setText(_translate("Form", "Key"))
+        self.label.setText(_translate("Form", "Key:"))
+        self.mLineEdit_key.setPlaceholderText(_translate("Form", "输入天地图key"))
         self.pushButton.setText(_translate("Form", "保存并检查有效性"))
+        self.label_2.setText(_translate("Form", "Key状态:"))
+        self.label_keystatus.setText(_translate("Form", "未知"))
         self.groupBox_2.setTitle(_translate("Form", "其他"))
         self.checkBox.setText(_translate("Form", "启用其他图源"))
+from qgspasswordlineedit import QgsPasswordLineEdit

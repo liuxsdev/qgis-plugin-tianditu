@@ -11,7 +11,7 @@ from .utils import tianditu_map_url, TianDiTuHomeURL, PluginDir
 current_qgis_version = Qgis.versionInt()
 
 
-def run():
+def showSettingDialog():
     dlg = SettingDialog()
     dlg.show()
     dlg.exec_()
@@ -90,7 +90,7 @@ class TianDiTu:
 
         # 设置 Action
         self.action_setting = QAction(icon_setting, "设置", self.iface.mainWindow())
-        self.action_setting.triggered.connect(run)
+        self.action_setting.triggered.connect(showSettingDialog)
         self.toolbar.addAction(self.action_setting)
 
     def add_tianditu_basemap(self, maptype):
