@@ -57,7 +57,7 @@ class TianDiTu:
         # 图标
         icon_setting = QIcon(self.plugin_dir + "/images/setting.svg")
         icon_logo = QIcon(self.plugin_dir + "/images/logo.svg")
-        icon_add = QIcon(self.plugin_dir + "/images/Add.svg")
+        icon_add = QIcon(self.plugin_dir + "/images/logo_map_add.svg")
         icon_map = QIcon(self.plugin_dir + "/images/logo_map.svg")
         icon_googlemap_sat = QIcon(self.plugin_dir + "/images/googlemap_satellite.png")
 
