@@ -45,8 +45,8 @@ class ConfigFile:
             self.cfg.remove_section(s)
         self.cfg.add_section('Tianditu')
         self.cfg.set('Tianditu', 'key', '')
-        self.cfg.set('Tianditu', 'keyisvalid', 'Fasle')
+        self.cfg.set('Tianditu', 'keyisvalid', 'False')
         self.cfg.add_section('Other')
-        self.cfg.set('Other', 'extramap', 'Fasle')
+        self.cfg.set('Other', 'extramap', 'False')
         self.saveConfig()
 
