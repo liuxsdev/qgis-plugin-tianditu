@@ -11,10 +11,14 @@ from .utils import tianditu_map_url, TianDiTuHomeURL, PluginDir
 current_qgis_version = Qgis.versionInt()
 
 
-def showSettingDialog():
+def show_setting_dialog():
     dlg = SettingDialog()
     dlg.show()
     dlg.exec_()
+
+
+def show_search_dialog():
+    pass
 
 
 def add_xyz_layer(uri, name):
@@ -52,14 +56,15 @@ class TianDiTu:
         self.addTiandituToolbar = None
         self.addTiandituButton = None
         self.action_setting = None
+        self.action_search = None
 
     def initGui(self):
         # 图标
         icon_setting = QIcon(self.plugin_dir + "/images/setting.svg")
-        icon_logo = QIcon(self.plugin_dir + "/images/logo.svg")
-        icon_add = QIcon(self.plugin_dir + "/images/logo_map_add.svg")
-        icon_map = QIcon(self.plugin_dir + "/images/logo_map.svg")
+        icon_add = QIcon(self.plugin_dir + "/images/add_map.svg")
+        icon_map = QIcon(self.plugin_dir + "/images/map_tianditu.svg")
         icon_googlemap_sat = QIcon(self.plugin_dir + "/images/googlemap_satellite.png")
+        icon_search = QIcon(self.plugin_dir + "/images/search.svg")
 
         # 底图添加 Action
         menu = QMenu()
@@ -90,8 +95,13 @@ class TianDiTu:
 
         # 设置 Action
         self.action_setting = QAction(icon_setting, "设置", self.iface.mainWindow())
-        self.action_setting.triggered.connect(showSettingDialog)
+        self.action_setting.triggered.connect(show_setting_dialog)
         self.toolbar.addAction(self.action_setting)
+
+        # 查询 Action
+        self.action_search = QAction(icon_search, "查询", self.iface.mainWindow())
+        # self.action_search.triggered.connect(show_search_dialog())
+        self.toolbar.addAction(self.action_search)
 
     def add_tianditu_basemap(self, maptype):
         cfg = ConfigFile(CONFIG_FILE_PATH)
@@ -105,5 +115,6 @@ class TianDiTu:
             add_xyz_layer(uri, TianMapInfo[maptype])
 
     def unload(self):
+        """Unload from the QGIS interface"""
         self.iface.removeToolBarIcon(self.action_setting)
-        self.iface.removeToolBarIcon(self.addTiandituToolbar)
+
