@@ -1,20 +1,11 @@
 import os
 from qgis.core import QgsProject, QgsVectorLayer, QgsGeometry, QgsFeature, QgsPointXY
-from qgis.PyQt import QtWidgets, uic
+from qgis.PyQt import QtWidgets
 from qgis.PyQt.QtCore import QStringListModel, Qt
 from qgis.PyQt.QtWidgets import QMessageBox
 from .utils import PluginDir, api_search_v2
+from .ui.search import Ui_SearchDockWidget
 from .configSetting import ConfigFile, CONFIG_FILE_PATH
-
-FORM_CLASS, _ = uic.loadUiType(os.path.join(PluginDir, './ui/search.ui'))
-
-
-def add_numbers_to_items(items):
-    a = []
-    for i, data in enumerate(items):
-        item = f'{i + 1}. {data}'
-        a.append(item)
-    return a
 
 
 def addPoint(name, x, y):
@@ -38,17 +29,17 @@ def addPoint(name, x, y):
 def on_item_double_clicked(index, r):
     text = index.data(Qt.DisplayRole).split('. ')[1]
     pois = r['pois']
-    current = [x for x in pois if x['name'] == text][0]
+    current = next((x for x in pois if x['name'] == text), None)
+    if current:
+        lonlat = current['lonlat']
+        lon, lat = map(float, lonlat.split(','))
+        addPoint(current['name'], lon, lat)
     # print([x for x in pois if x['name'] == text])
     # TODO 有bug
     # print(current)
-    lonlat = current['lonlat']
-    lon = float(lonlat.split(',')[0])
-    lat = float(lonlat.split(',')[1])
-    addPoint(current['name'], lon, lat)
 
 
-class SearchDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
+class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
     def __init__(self, parent=None):
         super(SearchDockWidget, self).__init__(parent)
         self.setupUi(self)
@@ -59,15 +50,17 @@ class SearchDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         cfg = ConfigFile(CONFIG_FILE_PATH)
         token = cfg.getValue('Tianditu', 'key')
         keyisvalid = cfg.getValueBoolean('Tianditu', 'keyisvalid')
-        if token == '' or keyisvalid is False:
+        if not token or not keyisvalid:
             QMessageBox.warning(self.toolbar, '错误', '天地图Key未设置或Key无效', QMessageBox.Yes, QMessageBox.Yes)
         else:
             keyword = self.lineEdit.text()
             r = api_search_v2(keyword, token)
-            if r['resultType'] == 1:
-                pois = r['pois']
-                names = [x['name'] for x in pois]
-                model = QStringListModel()
-                model.setStringList(add_numbers_to_items(names))
-                self.listView.setModel(model)
-                self.listView.doubleClicked.connect(lambda index: on_item_double_clicked(index, r))
+            print(r)
+            if r['status']['infocode'] !=0:
+                if r['resultType'] == 1:
+                    pois = r['pois']
+                    names = [f"{i + 1}. {data['name']}" for i, data in enumerate(pois)]
+                    model = QStringListModel()
+                    model.setStringList(names)
+                    self.listView.setModel(model)
+                    self.listView.doubleClicked.connect(lambda index: on_item_double_clicked(index, r))

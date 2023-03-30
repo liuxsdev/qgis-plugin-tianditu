@@ -1,15 +1,13 @@
-import os
-
 from qgis.PyQt import QtWidgets
 
 from .configSetting import ConfigFile, CONFIG_FILE_PATH
-from .ui.setting import Ui_Form
+from .ui.setting import Ui_SettingDialog
 from .utils import tianditu_map_url, check_url_status
 
 cfg = ConfigFile(CONFIG_FILE_PATH)
 
 
-class SettingDialog(QtWidgets.QDialog, Ui_Form):
+class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
     def __init__(self, parent=None):
         super(SettingDialog, self).__init__(parent)
         self.key = cfg.getValue('Tianditu', 'key')

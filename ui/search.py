@@ -11,13 +11,13 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class Ui_DockWidget(object):
-    def setupUi(self, DockWidget):
-        DockWidget.setObjectName("DockWidget")
-        DockWidget.resize(415, 343)
+class Ui_SearchDockWidget(object):
+    def setupUi(self, SearchDockWidget):
+        SearchDockWidget.setObjectName("SearchDockWidget")
+        SearchDockWidget.resize(415, 343)
         font = QtGui.QFont()
         font.setFamily("微软雅黑")
-        DockWidget.setFont(font)
+        SearchDockWidget.setFont(font)
         self.dockWidgetContents = QtWidgets.QWidget()
         self.dockWidgetContents.setObjectName("dockWidgetContents")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.dockWidgetContents)
@@ -39,6 +39,9 @@ class Ui_DockWidget(object):
         self.horizontalLayout_3.addWidget(self.pushButton)
         self.verticalLayout_2.addLayout(self.horizontalLayout_3)
         self.listView = QtWidgets.QListView(self.tab)
+        self.listView.setEnabled(True)
+        self.listView.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+        self.listView.setSelectionRectVisible(True)
         self.listView.setObjectName("listView")
         self.verticalLayout_2.addWidget(self.listView)
         self.tabWidget.addTab(self.tab, "")
@@ -46,15 +49,15 @@ class Ui_DockWidget(object):
         self.tab_2.setObjectName("tab_2")
         self.tabWidget.addTab(self.tab_2, "")
         self.verticalLayout.addWidget(self.tabWidget)
-        DockWidget.setWidget(self.dockWidgetContents)
+        SearchDockWidget.setWidget(self.dockWidgetContents)
 
-        self.retranslateUi(DockWidget)
+        self.retranslateUi(SearchDockWidget)
         self.tabWidget.setCurrentIndex(0)
-        QtCore.QMetaObject.connectSlotsByName(DockWidget)
+        QtCore.QMetaObject.connectSlotsByName(SearchDockWidget)
 
-    def retranslateUi(self, DockWidget):
+    def retranslateUi(self, SearchDockWidget):
         _translate = QtCore.QCoreApplication.translate
-        DockWidget.setWindowTitle(_translate("DockWidget", "天地图API-搜索"))
-        self.pushButton.setText(_translate("DockWidget", "搜索"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("DockWidget", "地名搜索"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("DockWidget", "逆地理编码查询"))
+        SearchDockWidget.setWindowTitle(_translate("SearchDockWidget", "天地图API-搜索"))
+        self.pushButton.setText(_translate("SearchDockWidget", "搜索"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("SearchDockWidget", "地名搜索"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("SearchDockWidget", "逆地理编码查询"))

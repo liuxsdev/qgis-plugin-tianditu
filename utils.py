@@ -4,7 +4,7 @@ import requests
 
 TianDiTuHomeURL = 'https://www.tianditu.gov.cn/'
 PluginDir = os.path.dirname(__file__)
-HEADER = {'User-Agent': 'Mozilla/5.0 QGIS/32400/Windows 10 Version 2009','Referer': 'https://www.tianditu.gov.cn/'}
+HEADER = {'User-Agent': 'Mozilla/5.0 QGIS/32400/Windows 10 Version 2009', 'Referer': 'https://www.tianditu.gov.cn/'}
 
 
 def tianditu_map_url(maptype, token):
@@ -33,7 +33,4 @@ def api_search_v2(keyword, token):
     }
     payload = {'postStr': str(data), 'type': 'query', 'tk': token}
     r = requests.get('http://api.tianditu.gov.cn/v2/search', headers=HEADER, params=payload)
-    if r.ok:
-        return r.json()
-    else:
-        return {'status': {'cndesc': '服务异常:', 'infocode': 0}}
+    return r.json() if r.ok else {'status': {'cndesc': '服务异常:', 'infocode': 0}}
