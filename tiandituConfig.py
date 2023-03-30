@@ -17,5 +17,26 @@ extra_map = {
         'zmin': 0,
         'zmax': 21,
         'referer': ''
+    },
+    'Google Map - Satellite(国内)': {
+        'name': 'Google Map - Satellite',
+        'url': 'https://gac-geo.googlecnapps.cn/maps/vt?lyrs=s&x={x}&y={y}&z={z}',
+        'zmin': 0,
+        'zmax': 21,
+        'referer': ''
+    },
+    'Openstreetmap': {
+        'name': 'Openstreetmap',
+        'url': 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+        'zmin': 0,
+        'zmax': 21,
+        'referer': ''
+    },
+    '高德地图(有偏移)': {
+        'name': '高德地图',
+        'url': 'http://webrd03.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}',
+        'zmin': 0,
+        'zmax': 21,
+        'referer': ''
     }
 }

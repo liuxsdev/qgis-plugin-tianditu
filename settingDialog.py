@@ -1,14 +1,13 @@
 import os
 
-from qgis.PyQt import QtWidgets
+from qgis.PyQt import QtWidgets, uic
 
 from .configSetting import ConfigFile, CONFIG_FILE_PATH
 from .ui.setting import Ui_Form
-from .utils import tianditu_map_url, check_url_status
-
-plugin_dir = os.path.dirname(__file__)
+from .utils import tianditu_map_url, check_url_status, PluginDir
 
 cfg = ConfigFile(CONFIG_FILE_PATH)
+
 
 
 class SettingDialog(QtWidgets.QDialog, Ui_Form):
