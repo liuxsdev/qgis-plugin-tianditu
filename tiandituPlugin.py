@@ -5,7 +5,7 @@ from qgis.PyQt.QtWidgets import QAction, QMenu, QToolButton, QMessageBox
 from qgis.core import Qgis, QgsRasterLayer, QgsProject
 
 from .configSetting import ConfigFile, CONFIG_FILE_PATH
-from .searchDialog import SearchDialogWidget
+from .searchDockWidget import SearchDockWidget
 from .settingDialog import SettingDialog
 from .tiandituConfig import TianMapInfo, extra_map
 from .utils import tianditu_map_url, TianDiTuHomeURL, PluginDir
@@ -50,12 +50,12 @@ class TianDiTu:
         self.toolbar.setObjectName('TianDiTuToolbar')
         self.toolbar.setToolTip('天地图工具栏')
         self.plugin_dir = PluginDir
-        # 定义实例变量,摆脱烦人的Pylint警报
+        # 定义实例变量
         self.addTiandituToolbar = None
         self.addTiandituButton = None
         self.action_setting = None
         self.action_search = None
-        self.dockwidget = None
+        self.searchdockwidget = None
 
     def initGui(self):
         # 图标
@@ -99,7 +99,7 @@ class TianDiTu:
         cfg = ConfigFile(CONFIG_FILE_PATH)
         token = cfg.getValue('Tianditu', 'key')
         keyisvalid = cfg.getValueBoolean('Tianditu', 'keyisvalid')
-        print(token, keyisvalid)
+        # print(token, keyisvalid)
         if token == '' or keyisvalid is False:
             QMessageBox.warning(self.toolbar, '错误', '天地图Key未设置或Key无效', QMessageBox.Yes, QMessageBox.Yes)
         else:
@@ -107,10 +107,10 @@ class TianDiTu:
             add_xyz_layer(uri, TianMapInfo[maptype])
 
     def openSearch(self):
-        if self.dockwidget is None:
-            self.dockwidget = SearchDialogWidget()
-        self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dockwidget)
-        self.dockwidget.show()
+        if self.searchdockwidget is None:
+            self.searchdockwidget = SearchDockWidget()
+        self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.searchdockwidget)
+        self.searchdockwidget.show()
 
     def unload(self):
         """Unload from the QGIS interface"""
