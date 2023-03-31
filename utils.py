@@ -20,17 +20,19 @@ def check_url_status(url):
     return r.ok
 
 
-def api_search_v2(keyword, token):
+def api_search_v2(keyword, token, specify=None):
     # 天地图地名搜索API说明：http://lbs.tianditu.gov.cn/server/search2.html
     data = {
-        "keyWord": keyword,
-        "level": 18,
-        "mapBound": "-180,-90,180,90",
-        "queryType": 1,
-        "start": 0,
-        "count": 10,
-        "show": 1,
+        "keyWord": keyword,  # 搜索的关键字
+        "mapBound": "-180,-90,180,90",  # 查询的地图范围(minx,miny,maxx,maxy) | -180,-90至180,90。(似乎不起作用，specify指定行政区有效)
+        "level": 18,  # 目前查询的级别 | 1-18级
+        "queryType": 1,  # 搜索类型 | 1:普通搜索（含地铁公交） 7：地名搜索
+        "start": 0,  # 返回结果起始位（用于分页和缓存）默认0 | 0-300，表示返回结果的起始位置。
+        "count": 10,  # 返回的结果数量（用于分页和缓存）| 1-300，返回结果的条数。
+        "show": 1,  # 返回poi结果信息类别 | 取值为1，则返回基本poi信息;取值为2，则返回详细poi信息
     }
+    if specify:
+        data['specify'] = specify
     payload = {'postStr': str(data), 'type': 'query', 'tk': token}
     r = requests.get('http://api.tianditu.gov.cn/v2/search', headers=HEADER, params=payload)
     return r.json() if r.ok else {'status': {'cndesc': '服务异常:', 'infocode': 0}}

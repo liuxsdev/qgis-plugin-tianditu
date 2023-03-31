@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'search.ui'
+# Form implementation generated from reading ui file '.\search.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.9
 #
@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_SearchDockWidget(object):
     def setupUi(self, SearchDockWidget):
         SearchDockWidget.setObjectName("SearchDockWidget")
-        SearchDockWidget.resize(415, 343)
+        SearchDockWidget.resize(486, 298)
         font = QtGui.QFont()
         font.setFamily("微软雅黑")
         SearchDockWidget.setFont(font)
@@ -38,12 +38,6 @@ class Ui_SearchDockWidget(object):
         self.pushButton.setObjectName("pushButton")
         self.horizontalLayout_3.addWidget(self.pushButton)
         self.verticalLayout_2.addLayout(self.horizontalLayout_3)
-        self.listView = QtWidgets.QListView(self.tab)
-        self.listView.setEnabled(True)
-        self.listView.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
-        self.listView.setSelectionRectVisible(True)
-        self.listView.setObjectName("listView")
-        self.verticalLayout_2.addWidget(self.listView)
         self.tabWidget.addTab(self.tab, "")
         self.tab_2 = QtWidgets.QWidget()
         self.tab_2.setObjectName("tab_2")

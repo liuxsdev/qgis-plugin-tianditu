@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>415</width>
-    <height>343</height>
+    <width>478</width>
+    <height>303</height>
    </rect>
   </property>
   <property name="font">
@@ -46,19 +46,6 @@
            </widget>
           </item>
          </layout>
-        </item>
-        <item>
-         <widget class="QListView" name="listView">
-          <property name="enabled">
-           <bool>true</bool>
-          </property>
-          <property name="editTriggers">
-           <set>QAbstractItemView::NoEditTriggers</set>
-          </property>
-          <property name="selectionRectVisible">
-           <bool>true</bool>
-          </property>
-         </widget>
         </item>
        </layout>
       </widget>
