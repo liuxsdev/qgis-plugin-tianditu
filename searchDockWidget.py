@@ -1,7 +1,6 @@
 import os
 from qgis.core import QgsProject, QgsVectorLayer, QgsGeometry, QgsFeature, QgsPointXY
 from qgis.PyQt import QtWidgets
-from qgis.PyQt.QtCore import QStringListModel, Qt
 from qgis.PyQt.QtWidgets import QMessageBox, QTreeWidget, QTreeWidgetItem
 from .utils import PluginDir, api_search_v2
 from .ui.search import Ui_SearchDockWidget
@@ -26,19 +25,6 @@ def addPoint(name, x, y):
     # TODO：画布缩放到点
 
 
-def on_treeWidget_item_double_clicked(item, _, search_result):
-    # _表示column,指点击的第几列，这里用不到
-    # 只有子节点响应双击事件
-    if item.childCount() == 0:
-        print(item.text(0), item.text(1))
-        num = int(item.text(0)) - 1
-        current = search_result['pois'][num]
-        print(current)
-        lonlat = current['lonlat']
-        lon, lat = map(float, lonlat.split(','))
-        addPoint(current['name'], lon, lat)
-
-
 class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
     def __init__(self, parent=None):
         super(SearchDockWidget, self).__init__(parent)
@@ -53,41 +39,38 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
         self.pushButton.clicked.connect(self.search)
         self.treeWidget = QTreeWidget(self.tab)
         self.treeWidget.setObjectName("treeWidget")
-        self.treeWidget.setColumnCount(3)
-        self.treeWidget.setHeaderLabels(['行政区', '地点', 'lonlat'])
-        # self.treeWidget.setColumnHidden(2, True)
+        self.treeWidget.setColumnCount(4)
+        self.treeWidget.setHeaderLabels(['行政区', '地点', 'lonlat', 'admin_code'])
+        self.treeWidget.setColumnHidden(2, True)
+        self.treeWidget.setColumnHidden(3, True)
         self.treeWidget.setAlternatingRowColors(True)
         self.verticalLayout_2.addWidget(self.treeWidget)
 
-    def on_treeWidget_root_item_double_clicked(self, item, _, search_result):
-        all_admins = search_result['statistics']['allAdmins']
-        admin_index = int(item.text(0).split(' ')[0])
+    def on_treeWidget_item_double_clicked(self, item, _):
         # 没有子节点的根节点,根据根节点的行政区划进行搜索
-        if item.childCount() == 0 and item.parent() is None:
-            print(item.text(0), item.text(1))
-            admin_code = all_admins[admin_index - 1]['adminCode']
-            keyword = self.lineEdit.text()
-            r = api_search_v2(keyword, self.token, specify=admin_code)
-            if r['resultType'] == 1:
-                pois = r['pois']
-                # names = [x['name'] for x in pois]
-                for index, poi in enumerate(pois):
-                    child = QTreeWidgetItem(item)
-                    child.setText(0, str(index + 1))
-                    child.setText(1, poi['name'])
-                    child.setText(2, poi['lonlat'])
-        if item.childCount() == 0 and item.parent() is not None:
-            print("点击了子节点,", item.text(0), item.text(1))
-            poi_index = int(item.text(0)) - 1
-            current = r['pois'][poi_index]
-            lonlat = current['lonlat']
-            lon, lat = map(float, lonlat.split(','))
-            addPoint(current['name'], lon, lat)
+        if item.childCount() == 0:
+            if item.parent() is None:
+                admin_code = item.text(3)
+                keyword = self.lineEdit.text()
+                r = api_search_v2(keyword, self.token, specify=admin_code)
+                if r['resultType'] == 1:
+                    pois = r['pois']
+                    for index, poi in enumerate(pois):
+                        child = QTreeWidgetItem(item)
+                        child.setText(0, str(index + 1))
+                        child.setText(1, poi['name'])
+                        child.setText(2, poi['lonlat'])
+            else:
+                name = item.text(1)
+                lonlat = item.text(2)
+                lon, lat = map(float, lonlat.split(','))
+                addPoint(name, lon, lat)
 
     def search(self):
         keyword = self.lineEdit.text()
-        # 清除treeview
+        # 清除treeview数据
         self.treeWidget.clear()
+        # TODO 加载中 使用 QThread, pyqtSignal
         # 搜索
         r = api_search_v2(keyword, self.token)
         print(r)
@@ -95,7 +78,6 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
             # 直接返回POI的情况
             if r['resultType'] == 1:
                 pois = r['pois']
-                names = [x['name'] for x in pois]
                 # 获取当前搜索结果所在的行政区,作为根节点
                 admins = r['prompt'][0]['admins'][0]['adminName']
                 root = QTreeWidgetItem(self.treeWidget)
@@ -108,24 +90,22 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
                     child.setText(2, poi['lonlat'])
                 # 展开所有节点
                 self.treeWidget.expandAll()
-                # model = self.treeWidget.model()
-                # print("count", self.treeWidget.topLevelItemCount())
-                # for i in range(self.treeWidget.topLevelItemCount()):
-                #     item = self.treeWidget.topLevelItem(i)
-                #     for j in range(self.treeWidget.columnCount()):
-                #         index = model.index(i, j)
-                #         value = model.data(index)
-                #         print(value)
                 # item双击信号
-                self.treeWidget.itemDoubleClicked.connect(
-                    lambda item, _: on_treeWidget_item_double_clicked(item, _, r))
+                self.treeWidget.itemDoubleClicked.connect(self.on_treeWidget_item_double_clicked)
             # 返回统计集合的情况
             elif r['resultType'] == 2:
+                print()
                 all_admins = r['statistics']['allAdmins']
                 for index, admins in enumerate(all_admins):
                     print(admins)
                     root = QTreeWidgetItem(self.treeWidget)
                     root.setText(0, f"{index + 1} {admins['adminName']}")
                     root.setText(1, f"{admins['count']}个结果")
-                self.treeWidget.itemDoubleClicked.connect(
-                    lambda item, _: self.on_treeWidget_root_item_double_clicked(item, _, r))
+                    root.setText(3, f"{admins['adminCode']}")
+                self.treeWidget.itemDoubleClicked.connect(self.on_treeWidget_item_double_clicked)
+            else:
+                root = QTreeWidgetItem(self.treeWidget)
+                root.setText(0, f"无结果")
+        else:
+            root = QTreeWidgetItem(self.treeWidget)
+            root.setText(0, f"服务异常，无结果")
