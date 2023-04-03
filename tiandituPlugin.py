@@ -99,7 +99,6 @@ class TianDiTu:
         cfg = ConfigFile(CONFIG_FILE_PATH)
         token = cfg.getValue('Tianditu', 'key')
         keyisvalid = cfg.getValueBoolean('Tianditu', 'keyisvalid')
-        # print(token, keyisvalid)
         if token == '' or keyisvalid is False:
             QMessageBox.warning(self.toolbar, '错误', '天地图Key未设置或Key无效', QMessageBox.Yes, QMessageBox.Yes)
         else:
