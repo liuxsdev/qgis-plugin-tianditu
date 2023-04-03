@@ -28,11 +28,14 @@ class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
         self.check_thread = None
         self.key = cfg.getValue('Tianditu', 'key')
         self.keyisvalid = cfg.getValueBoolean('Tianditu', 'keyisvalid')
+        self.extramap_enabled = cfg.getValueBoolean('Other', 'extramap')
         self.setupUi(self)
         self.mLineEdit_key.setText(self.key)
         if self.keyisvalid:
             self.label_keystatus.setText('正常')
         self.pushButton.clicked.connect(self.check)
+        self.checkBox.setChecked(self.extramap_enabled)
+        self.checkBox.stateChanged.connect(self.enable_extramap)
 
     def check(self):
         # save
@@ -42,3 +45,11 @@ class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
         self.check_thread.key = self.mLineEdit_key.text()
         self.check_thread.check_finished.connect(self.label_keystatus.setText)
         self.check_thread.start()
+
+    def enable_extramap(self):
+        print(self.checkBox.isChecked())
+        if self.checkBox.isChecked():
+            cfg.setValue('Other', 'extramap', 'True')
+            # TODO:实现其他图源的启用
+        else:
+            cfg.setValue('Other', 'extramap', 'False')

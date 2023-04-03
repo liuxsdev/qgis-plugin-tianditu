@@ -69,12 +69,12 @@ class TianDiTu:
         menu = QMenu()
         menu.setObjectName('TianDiTuAddMap')
         for maptype in TianMapInfo:
-            menu.addAction(icon_map, TianMapInfo[maptype], lambda maptype=maptype: self.add_tianditu_basemap(maptype))
+            menu.addAction(icon_map, TianMapInfo[maptype], lambda maptype_=maptype: self.add_tianditu_basemap(maptype_))
         menu.addSeparator()
         extra_map_action = menu.addAction(icon_map, '其他图源')
         extra_map_menu = QMenu()
         for name in extra_map:
-            extra_map_menu.addAction(icon_googlemap_sat, name, lambda name=name: add_extra_map(name))
+            extra_map_menu.addAction(icon_googlemap_sat, name, lambda name_=name: add_extra_map(name_))
         extra_map_action.setMenu(extra_map_menu)
 
         self.addTiandituButton = QToolButton()
@@ -107,7 +107,7 @@ class TianDiTu:
 
     def openSearch(self):
         if self.searchdockwidget is None:
-            self.searchdockwidget = SearchDockWidget()
+            self.searchdockwidget = SearchDockWidget(self.iface)
         self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.searchdockwidget)
         self.searchdockwidget.show()
 

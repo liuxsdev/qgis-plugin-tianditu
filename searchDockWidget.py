@@ -7,34 +7,18 @@ from .ui.search import Ui_SearchDockWidget
 from .configSetting import ConfigFile, CONFIG_FILE_PATH
 
 
-def addPoint(name, x, y):
-    # 定义图层
-    layer = QgsVectorLayer('point?crs=epsg:4326&field=Name:string', name, 'memory')
-    pr = layer.dataProvider()
-    # 定义要素
-    geom = QgsGeometry.fromPointXY(QgsPointXY(x, y))
-    point = QgsFeature()
-    point.setGeometry(geom)
-    point.setAttributes([name])
-    # 添加要素到图层
-    pr.addFeature(point)
-    # 加载图层样式
-    layer.loadNamedStyle(os.path.join(PluginDir, "PointStyle.qml"))
-    layer.updateExtents()
-    QgsProject.instance().addMapLayer(layer)
-    # TODO：画布缩放到点
-
-
 class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
-    def __init__(self, parent=None):
+    def __init__(self, iface, parent=None):
         super(SearchDockWidget, self).__init__(parent)
         self.setupUi(self)
+        self.iface = iface
         # 读取token
         self.cfg = ConfigFile(CONFIG_FILE_PATH)
         self.token = self.cfg.getValue('Tianditu', 'key')
         self.keyisvalid = self.cfg.getValueBoolean('Tianditu', 'keyisvalid')
         if not self.token or not self.keyisvalid:
-            QMessageBox.warning(self.toolbar, '错误', '天地图Key未设置或Key无效', QMessageBox.Yes, QMessageBox.Yes)
+            self.iface.messageBar().pushMessage("天地图Key未设置或Key无效")
+            QMessageBox.warning(self.iface.mainWindow(), '错误', '天地图Key未设置或Key无效', QMessageBox.Yes, QMessageBox.Yes)
 
         self.pushButton.clicked.connect(self.search)
         self.treeWidget = QTreeWidget(self.tab)
@@ -64,7 +48,35 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
                 name = item.text(1)
                 lonlat = item.text(2)
                 lon, lat = map(float, lonlat.split(','))
-                addPoint(name, lon, lat)
+                self.addPoint(name, lon, lat)
+
+    def addPoint(self, name, x, y):
+        # 创建一个图层组，用于存放地名搜索结果
+        root = QgsProject.instance().layerTreeRoot()
+        group_name = '地名搜索结果'
+        group = root.findGroup(group_name)
+        if group is None:
+            group = root.addGroup(group_name)
+        # 定义图层
+        layer = QgsVectorLayer('point?crs=epsg:4326&field=Name:string', name, 'memory')
+        pr = layer.dataProvider()
+        # 定义要素
+        geom = QgsGeometry.fromPointXY(QgsPointXY(x, y))
+        point = QgsFeature()
+        point.setGeometry(geom)
+        point.setAttributes([name])
+        # 添加要素到图层
+        group.addLayer(layer)
+        pr.addFeature(point)
+        # 加载图层样式
+        layer.loadNamedStyle(os.path.join(PluginDir, "PointStyle.qml"))
+        layer.updateExtents()
+        QgsProject.instance().addMapLayer(layer, False)
+        # 画布缩放到点 TODO：Bug 只能缩放到经纬度坐标，其他坐标系需要转成对应的坐标
+        rect = layer.extent()
+        # print(rect)
+        self.iface.mapCanvas().setExtent(rect)
+        self.iface.mapCanvas().refresh()
 
     def search(self):
         keyword = self.lineEdit.text()

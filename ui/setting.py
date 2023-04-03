@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_SettingDialog(object):
     def setupUi(self, SettingDialog):
         SettingDialog.setObjectName("SettingDialog")
-        SettingDialog.resize(470, 299)
+        SettingDialog.resize(470, 186)
         self.verticalLayout = QtWidgets.QVBoxLayout(SettingDialog)
         self.verticalLayout.setObjectName("verticalLayout")
         self.groupBox = QtWidgets.QGroupBox(SettingDialog)
@@ -62,7 +62,7 @@ class Ui_SettingDialog(object):
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.groupBox_2)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
         self.checkBox = QtWidgets.QCheckBox(self.groupBox_2)
-        self.checkBox.setEnabled(False)
+        self.checkBox.setEnabled(True)
         font = QtGui.QFont()
         font.setFamily("微软雅黑")
         self.checkBox.setFont(font)
