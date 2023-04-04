@@ -36,3 +36,13 @@ def api_search_v2(keyword, token, specify=None):
     payload = {'postStr': str(data), 'type': 'query', 'tk': token}
     r = requests.get('http://api.tianditu.gov.cn/v2/search', headers=HEADER, params=payload)
     return r.json() if r.ok else {'status': {'cndesc': '服务异常:', 'infocode': 0}}
+
+
+def api_geocoder(keyword, token):
+    # 天地图地名搜索API说明：http://lbs.tianditu.gov.cn/server/search2.html
+    data = {
+        "keyWord": keyword,  # 搜索的关键字
+    }
+    payload = {'ds': str(data), 'tk': token}
+    r = requests.get('http://api.tianditu.gov.cn/geocoder', headers=HEADER, params=payload)
+    return r.json() if r.ok else {'status': {'cndesc': '服务异常:', 'infocode': 0}}

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '.\search.ui'
+# Form implementation generated from reading ui file 'search.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.9
 #
@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_SearchDockWidget(object):
     def setupUi(self, SearchDockWidget):
         SearchDockWidget.setObjectName("SearchDockWidget")
-        SearchDockWidget.resize(486, 298)
+        SearchDockWidget.resize(478, 303)
         font = QtGui.QFont()
         font.setFamily("微软雅黑")
         SearchDockWidget.setFont(font)
@@ -41,12 +41,42 @@ class Ui_SearchDockWidget(object):
         self.tabWidget.addTab(self.tab, "")
         self.tab_2 = QtWidgets.QWidget()
         self.tab_2.setObjectName("tab_2")
+        self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.tab_2)
+        self.verticalLayout_3.setObjectName("verticalLayout_3")
+        self.horizontalLayout = QtWidgets.QHBoxLayout()
+        self.horizontalLayout.setObjectName("horizontalLayout")
+        self.lineEdit_2 = QtWidgets.QLineEdit(self.tab_2)
+        self.lineEdit_2.setInputMask("")
+        self.lineEdit_2.setText("")
+        self.lineEdit_2.setObjectName("lineEdit_2")
+        self.horizontalLayout.addWidget(self.lineEdit_2)
+        self.pushButton_2 = QtWidgets.QPushButton(self.tab_2)
+        self.pushButton_2.setObjectName("pushButton_2")
+        self.horizontalLayout.addWidget(self.pushButton_2)
+        self.verticalLayout_3.addLayout(self.horizontalLayout)
+        self.label = QtWidgets.QLabel(self.tab_2)
+        self.label.setTextFormat(QtCore.Qt.MarkdownText)
+        self.label.setOpenExternalLinks(True)
+        self.label.setTextInteractionFlags(QtCore.Qt.LinksAccessibleByMouse|QtCore.Qt.TextSelectableByMouse)
+        self.label.setObjectName("label")
+        self.verticalLayout_3.addWidget(self.label)
+        self.label_2 = QtWidgets.QLabel(self.tab_2)
+        self.label_2.setText("")
+        self.label_2.setTextFormat(QtCore.Qt.MarkdownText)
+        self.label_2.setTextInteractionFlags(QtCore.Qt.LinksAccessibleByMouse|QtCore.Qt.TextSelectableByMouse)
+        self.label_2.setObjectName("label_2")
+        self.verticalLayout_3.addWidget(self.label_2)
+        spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout_3.addItem(spacerItem)
         self.tabWidget.addTab(self.tab_2, "")
+        self.tab_3 = QtWidgets.QWidget()
+        self.tab_3.setObjectName("tab_3")
+        self.tabWidget.addTab(self.tab_3, "")
         self.verticalLayout.addWidget(self.tabWidget)
         SearchDockWidget.setWidget(self.dockWidgetContents)
 
         self.retranslateUi(SearchDockWidget)
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(SearchDockWidget)
 
     def retranslateUi(self, SearchDockWidget):
@@ -54,4 +84,8 @@ class Ui_SearchDockWidget(object):
         SearchDockWidget.setWindowTitle(_translate("SearchDockWidget", "天地图API-搜索"))
         self.pushButton.setText(_translate("SearchDockWidget", "搜索"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("SearchDockWidget", "地名搜索"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("SearchDockWidget", "逆地理编码查询"))
+        self.lineEdit_2.setPlaceholderText(_translate("SearchDockWidget", "请输入地名"))
+        self.pushButton_2.setText(_translate("SearchDockWidget", "搜索"))
+        self.label.setText(_translate("SearchDockWidget", "### 搜索结果："))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("SearchDockWidget", "地理编码查询"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), _translate("SearchDockWidget", "逆地理编码查询"))

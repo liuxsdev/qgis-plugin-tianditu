@@ -1,8 +1,8 @@
 import os
 from qgis.core import QgsProject, QgsVectorLayer, QgsGeometry, QgsFeature, QgsPointXY
 from qgis.PyQt import QtWidgets
-from qgis.PyQt.QtWidgets import QMessageBox, QTreeWidget, QTreeWidgetItem
-from .utils import PluginDir, api_search_v2
+from qgis.PyQt.QtWidgets import QMessageBox, QTreeWidget, QTreeWidgetItem, QLabel
+from .utils import PluginDir, api_search_v2, api_geocoder
 from .ui.search import Ui_SearchDockWidget
 from .configSetting import ConfigFile, CONFIG_FILE_PATH
 
@@ -18,7 +18,8 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
         self.keyisvalid = self.cfg.getValueBoolean('Tianditu', 'keyisvalid')
         if not self.token or not self.keyisvalid:
             self.iface.messageBar().pushMessage("天地图Key未设置或Key无效")
-            QMessageBox.warning(self.iface.mainWindow(), '错误', '天地图Key未设置或Key无效', QMessageBox.Yes, QMessageBox.Yes)
+            QMessageBox.warning(self.iface.mainWindow(), '错误', '天地图Key未设置或Key无效', QMessageBox.Yes,
+                                QMessageBox.Yes)
 
         self.pushButton.clicked.connect(self.search)
         self.treeWidget = QTreeWidget(self.tab)
@@ -29,6 +30,11 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
         self.treeWidget.setColumnHidden(3, True)
         self.treeWidget.setAlternatingRowColors(True)
         self.verticalLayout_2.addWidget(self.treeWidget)
+        # 地理编码查询
+        self.geocoder_result_label = QLabel(self.tab_2)
+        self.verticalLayout_3.addWidget(self.geocoder_result_label)
+        self.pushButton_2.clicked.connect(self.geocoder)
+        self.label_2.linkActivated.connect(self.addtest)
 
     def on_treeWidget_item_double_clicked(self, item, _):
         # 没有子节点的根节点,根据根节点的行政区划进行搜索
@@ -121,3 +127,19 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
         else:
             root = QTreeWidgetItem(self.treeWidget)
             root.setText(0, f"服务异常，无结果")
+
+    def geocoder(self):
+        self.geocoder_result_label.setText('')
+        keyword = self.lineEdit_2.text()
+        r = api_geocoder(keyword, self.token)
+        print(r)
+        if r['msg'] == 'ok':
+            location = r['location']
+            level = location['level']
+            lon = round(location['lon'], 6)
+            lat = round(location['lat'], 6)
+            t = f"关键词：{location['keyWord']}\n\n类别名称：{level}\n\n经纬度：{lon}, {lat}  [添加到地图中]()"
+            self.label_2.setText(t)
+
+    def addtest(self):
+        print(self.label_2.text())
