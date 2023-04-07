@@ -23,9 +23,10 @@ class CheckThread(QThread):
 
 
 class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
-    def __init__(self, parent=None):
+    def __init__(self, extra_map_action, parent=None):
         super(SettingDialog, self).__init__(parent)
         self.check_thread = None
+        self.extra_map_action = extra_map_action
         self.key = cfg.getValue('Tianditu', 'key')
         self.keyisvalid = cfg.getValueBoolean('Tianditu', 'keyisvalid')
         self.extramap_enabled = cfg.getValueBoolean('Other', 'extramap')
@@ -47,9 +48,9 @@ class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
         self.check_thread.start()
 
     def enable_extramap(self):
-        print(self.checkBox.isChecked())
         if self.checkBox.isChecked():
             cfg.setValue('Other', 'extramap', 'True')
-            # TODO:实现其他图源的启用
+            self.extra_map_action.setEnabled(True)
         else:
             cfg.setValue('Other', 'extramap', 'False')
+            self.extra_map_action.setEnabled(False)

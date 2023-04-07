@@ -13,12 +13,6 @@ from .utils import tianditu_map_url, TianDiTuHomeURL, PluginDir
 current_qgis_version = Qgis.versionInt()
 
 
-def show_setting_dialog():
-    dlg = SettingDialog()
-    dlg.show()
-    dlg.exec_()
-
-
 def add_xyz_layer(uri, name):
     raster_layer = QgsRasterLayer(uri, name, 'wms')
     QgsProject.instance().addMapLayer(raster_layer)
@@ -53,9 +47,11 @@ class TianDiTu:
         # 定义实例变量
         self.addTiandituToolbar = None
         self.addTiandituButton = None
+        self.extra_map_action = None
         self.action_setting = None
         self.action_search = None
         self.searchdockwidget = None
+        self.cfg = ConfigFile(CONFIG_FILE_PATH)
 
     def initGui(self):
         # 图标
@@ -71,11 +67,14 @@ class TianDiTu:
         for maptype in TianMapInfo:
             menu.addAction(icon_map, TianMapInfo[maptype], lambda maptype_=maptype: self.add_tianditu_basemap(maptype_))
         menu.addSeparator()
-        extra_map_action = menu.addAction(icon_map, '其他图源')
+        self.extra_map_action = menu.addAction(icon_map, '其他图源')
         extra_map_menu = QMenu()
         for name in extra_map:
             extra_map_menu.addAction(icon_googlemap_sat, name, lambda name_=name: add_extra_map(name_))
-        extra_map_action.setMenu(extra_map_menu)
+        self.extra_map_action.setMenu(extra_map_menu)
+        extramap_enabled = self.cfg.getValueBoolean('Other', 'extramap')
+        if not extramap_enabled:
+            self.extra_map_action.setEnabled(False)
 
         self.addTiandituButton = QToolButton()
         self.addTiandituButton.setMenu(menu)
@@ -87,13 +86,17 @@ class TianDiTu:
 
         # 设置 Action
         self.action_setting = QAction(icon_setting, "设置", self.iface.mainWindow())
-        self.action_setting.triggered.connect(show_setting_dialog)
+        self.action_setting.triggered.connect(self.show_setting_dialog)
         self.toolbar.addAction(self.action_setting)
 
         # 查询 Action
         self.action_search = QAction(icon_search, "查询", self.iface.mainWindow())
         self.action_search.triggered.connect(self.openSearch)
         self.toolbar.addAction(self.action_search)
+
+    def show_setting_dialog(self):
+        dlg = SettingDialog(self.extra_map_action)
+        dlg.exec_()
 
     def add_tianditu_basemap(self, maptype):
         cfg = ConfigFile(CONFIG_FILE_PATH)

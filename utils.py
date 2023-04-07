@@ -39,10 +39,30 @@ def api_search_v2(keyword, token, specify=None):
 
 
 def api_geocoder(keyword, token):
-    # 天地图地名搜索API说明：http://lbs.tianditu.gov.cn/server/search2.html
+    # 天地图地理编码接口API说明：http://lbs.tianditu.gov.cn/server/geocodinginterface.html
     data = {
         "keyWord": keyword,  # 搜索的关键字
     }
     payload = {'ds': str(data), 'tk': token}
     r = requests.get('http://api.tianditu.gov.cn/geocoder', headers=HEADER, params=payload)
     return r.json() if r.ok else {'status': {'cndesc': '服务异常:', 'infocode': 0}}
+
+
+def api_regeocoder(lon, lat, token):
+    data = {
+        "lon": lon,
+        "lat": lat,
+        "ver": 1
+    }
+    payload = {'postStr': str(data), 'type': 'geocode', 'tk': token}
+    r = requests.get('http://api.tianditu.gov.cn/geocoder', headers=HEADER, params=payload)
+    return r.json() if r.ok else {'status': {'cndesc': '服务异常:', 'infocode': 0}}
+
+
+class TiandituAPI:
+    def __init__(self, token: str):
+        self.token = token
+        self.header = {
+            'User-Agent': 'Mozilla/5.0 QGIS/32400/Windows 10 Version 2009',
+            'Referer': 'https://www.tianditu.gov.cn/'
+        }
