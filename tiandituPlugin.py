@@ -58,6 +58,7 @@ class TianDiTu:
         icon_setting = QIcon(self.plugin_dir + "/images/setting.svg")
         icon_add = QIcon(self.plugin_dir + "/images/add_map.svg")
         icon_map = QIcon(self.plugin_dir + "/images/map_tianditu.svg")
+        icon_other = QIcon(self.plugin_dir + "/images/earth.svg")
         icon_googlemap_sat = QIcon(self.plugin_dir + "/images/googlemap_satellite.png")
         icon_search = QIcon(self.plugin_dir + "/images/search.svg")
 
@@ -67,7 +68,7 @@ class TianDiTu:
         for maptype in TianMapInfo:
             menu.addAction(icon_map, TianMapInfo[maptype], lambda maptype_=maptype: self.add_tianditu_basemap(maptype_))
         menu.addSeparator()
-        self.extra_map_action = menu.addAction(icon_map, '其他图源')
+        self.extra_map_action = menu.addAction(icon_other, '其他图源')
         extra_map_menu = QMenu()
         for name in extra_map:
             extra_map_menu.addAction(icon_googlemap_sat, name, lambda name_=name: add_extra_map(name_))

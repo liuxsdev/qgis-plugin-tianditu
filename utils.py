@@ -66,3 +66,4 @@ class TiandituAPI:
             'User-Agent': 'Mozilla/5.0 QGIS/32400/Windows 10 Version 2009',
             'Referer': 'https://www.tianditu.gov.cn/'
         }
+        # TODO 错误处理

@@ -55,6 +55,11 @@ class Ui_SearchDockWidget(object):
         self.horizontalLayout.addWidget(self.pushButton_2)
         self.verticalLayout_3.addLayout(self.horizontalLayout)
         self.label = QtWidgets.QLabel(self.tab_2)
+        font = QtGui.QFont()
+        font.setFamily("微软雅黑")
+        font.setBold(False)
+        font.setWeight(50)
+        self.label.setFont(font)
         self.label.setTextFormat(QtCore.Qt.AutoText)
         self.label.setOpenExternalLinks(False)
         self.label.setTextInteractionFlags(QtCore.Qt.TextBrowserInteraction)
@@ -98,18 +103,20 @@ class Ui_SearchDockWidget(object):
         SearchDockWidget.setWidget(self.dockWidgetContents)
 
         self.retranslateUi(SearchDockWidget)
-        self.tabWidget.setCurrentIndex(2)
+        self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(SearchDockWidget)
 
     def retranslateUi(self, SearchDockWidget):
         _translate = QtCore.QCoreApplication.translate
         SearchDockWidget.setWindowTitle(_translate("SearchDockWidget", "天地图API-搜索"))
+        self.lineEdit.setPlaceholderText(_translate("SearchDockWidget", "请输入地名"))
         self.pushButton.setText(_translate("SearchDockWidget", "搜索"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("SearchDockWidget", "地名搜索"))
         self.lineEdit_2.setPlaceholderText(_translate("SearchDockWidget", "请输入地名"))
         self.pushButton_2.setText(_translate("SearchDockWidget", "查询"))
         self.label.setText(_translate("SearchDockWidget", "搜索结果："))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("SearchDockWidget", "地理编码查询"))
+        self.lineEdit_3.setPlaceholderText(_translate("SearchDockWidget", "请输入经纬度：经度,纬度"))
         self.pushButton_3.setText(_translate("SearchDockWidget", "查询"))
         self.label_3.setText(_translate("SearchDockWidget", "搜索结果"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), _translate("SearchDockWidget", "逆地理编码查询"))
