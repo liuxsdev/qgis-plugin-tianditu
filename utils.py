@@ -17,7 +17,20 @@ def tianditu_map_url(maptype, token):
 
 def check_url_status(url):
     r = requests.get(url, headers=HEADER)
-    return r.ok
+    msg = {
+        "code": 0
+    }
+    if r.status_code == 403:
+        msg['code'] = r.json()['code']  # 1:非法key 12:权限类型错误
+        msg['msg'] = r.json()['msg']
+        msg['resolve'] = r.json()['resolve']
+    elif r.status_code == 200:
+        msg['code'] = 0
+    else:
+        msg['code'] = 1000  # 未知错误
+        msg['msg'] = '未知错误 '
+        msg['resolve'] = f'错误代码:{r.status_code}'
+    return msg
 
 
 def api_search_v2(keyword, token, specify=None):

@@ -13,12 +13,13 @@ class CheckThread(QThread):
     def run(self):
         url = tianditu_map_url('vec', self.key)
         tile_url = url.format(x=0, y=0, z=0)
-        status = check_url_status(tile_url)
-        if status:
+        check_msg = check_url_status(tile_url)
+        if check_msg['code'] == 0:
             self.check_finished.emit('正常')
             cfg.setValue('Tianditu', 'keyisvalid', 'True')
         else:
-            self.check_finished.emit('异常,请检查key是否正确！')
+            error_msg = f"{check_msg['msg']}: {check_msg['resolve']}"
+            self.check_finished.emit(error_msg)
             cfg.setValue('Tianditu', 'keyisvalid', 'False')
 
 
@@ -34,6 +35,8 @@ class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
         self.mLineEdit_key.setText(self.key)
         if self.keyisvalid:
             self.label_keystatus.setText('正常')
+        else:
+            self.label_keystatus.setText('无效')
         self.pushButton.clicked.connect(self.check)
         self.checkBox.setChecked(self.extramap_enabled)
         self.checkBox.stateChanged.connect(self.enable_extramap)

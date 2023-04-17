@@ -94,6 +94,7 @@ class TianDiTu:
         self.action_search = QAction(icon_search, "查询", self.iface.mainWindow())
         self.action_search.triggered.connect(self.openSearch)
         self.toolbar.addAction(self.action_search)
+        #  TODO token检查的逻辑有点混乱，当token无效时，应不打开查询界面
 
     def show_setting_dialog(self):
         dlg = SettingDialog(self.extra_map_action)
