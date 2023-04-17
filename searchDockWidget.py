@@ -1,5 +1,4 @@
 import os
-import time
 
 from qgis.core import QgsProject, QgsVectorLayer, QgsGeometry, QgsFeature, QgsPointXY
 from qgis.PyQt import QtWidgets
@@ -54,10 +53,13 @@ class SearchWithAdminCodeThread(QThread):
 
     def run(self):
         r = api_search_v2(self.keyword, self.token, specify=self.admin_code)
-        time.sleep(5)
         if r['resultType'] == 1:
             pois = r['pois']
             self.search_complete.emit(pois)
+
+
+def do_nothing():
+    pass
 
 
 def handle_search_complete(item, pois):
@@ -103,7 +105,7 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
         self.pushButton_3.clicked.connect(self.regeocoder)
 
     def on_treeWidget_item_double_clicked(self, item, _):
-        # 没有子节点的根节点,根据根节点的行政区划进行搜索,行政区划代码在第4列(index:3)
+        # 没有子节点的根节点,根据根节点的行政区划进行搜索,行政区划代码在第4列(index=3)
         if item.childCount() == 0:
             if item.parent() is None:
                 admin_code = item.text(3)
@@ -150,6 +152,9 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
         keyword = self.lineEdit.text()
         # 清除treeview数据
         self.treeWidget.clear()
+        # 检查信号是否已经连接,连接的话就断开
+        if self.treeWidget.receivers(self.treeWidget.itemDoubleClicked) > 0:
+            self.treeWidget.itemDoubleClicked.disconnect(self.on_treeWidget_item_double_clicked)
         # TODO 加载中 使用 QThread, pyqtSignal
         # 搜索
         r = api_search_v2(keyword, self.token)
@@ -180,6 +185,7 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
                     root.setText(1, f"{admins['count']}个结果")
                     root.setText(3, f"{admins['adminCode']}")
                 self.treeWidget.itemDoubleClicked.connect(self.on_treeWidget_item_double_clicked)
+            # TODO 返回行政区的情况
             else:
                 root = QTreeWidgetItem(self.treeWidget)
                 root.setText(0, f"无结果")
