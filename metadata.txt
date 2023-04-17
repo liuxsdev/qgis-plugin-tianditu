@@ -1,15 +1,15 @@
 [general]
-name=天地图
+name=TianDiTu Tools
 qgisMinimumVersion=3.0
 description=天地图底图加载
-about=天地图底图加载，使用天地图官方API
+about=QGIS 天地图插件，方便进行天地图瓦片底图的添加以及简单实现了部分天地图 Web 服务 API（搜索、地理编码查询、逆地理编码查询） 
 version=0.1.0
-tags=basemap, tianditu, 天地图
-icon=reload.png
+tags=basemap, xyz, tianditu, geocoder, 天地图
+icon=icon.png
 experimental=False
 deprecated=False
-author=liu XS
-email=liuxsmail@126.com
-homepage=https://github.com/liuxsdev/TianDiTu
-tracker=https://github.com/liuxsdev/TianDiTu/issues
-repository=https://github.com/liuxsdev/TianDiTu
+author=liuxspro
+email=liuxspro@gmail.com
+homepage=https://github.com/liuxsdev/qgis-plugin-tianditu
+tracker=https://github.com/liuxsdev/qgis-plugin-tianditu/issues
+repository=https://github.com/liuxsdev/qgis-plugin-tianditu
