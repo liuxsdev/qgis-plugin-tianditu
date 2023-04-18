@@ -1,0 +1,24 @@
+- name: 高德地图*
+  icon: amap.png
+  url: http://webrd03.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}
+  zmin: 0
+  zmax: 21
+  referer: ''
+- name: Google Map - Satellite
+  icon: googlemap_satellite.png
+  url: http://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}
+  zmin: 0
+  zmax: 21
+  referer: ''
+- name: Google Map (CN) - Satellite
+  icon: googlemap_satellite.png
+  url: https://gac-geo.googlecnapps.cn/maps/vt?lyrs=s&x={x}&y={y}&z={z}
+  zmin: 0
+  zmax: 21
+  referer: ''
+- name: Openstreetmap
+  icon: osm.svg
+  url: https://tile.openstreetmap.org/{z}/{x}/{y}.png
+  zmin: 0
+  zmax: 21
+  referer: ''

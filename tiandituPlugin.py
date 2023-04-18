@@ -7,7 +7,7 @@ from qgis.core import Qgis, QgsRasterLayer, QgsProject
 from .configSetting import ConfigFile, CONFIG_FILE_PATH
 from .searchDockWidget import SearchDockWidget
 from .settingDialog import SettingDialog
-from .tiandituConfig import TianMapInfo, extra_map
+from .tiandituConfig import TianMapInfo, extra_maps
 from .utils import tianditu_map_url, TianDiTuHomeURL, PluginDir
 
 current_qgis_version = Qgis.versionInt()
@@ -29,11 +29,20 @@ def get_map_uri(url, zmin=0, zmax=18, referer=''):
     return uri
 
 
-def add_extra_map(name):
-    map_data = extra_map[name]
+def add_extra_map(map_data):
     name = map_data['name']
     uri = get_map_uri(map_data['url'], map_data['zmin'], map_data['zmax'], map_data['referer'])
     add_xyz_layer(uri, name)
+
+
+def get_extra_map_icon(map_data):
+    icon_home_path = PluginDir + "/images/map_icons/"
+    if 'icon' in map_data:
+        icon = QIcon(icon_home_path + map_data['icon'])
+    else:
+        icon = QIcon(icon_home_path + "default.svg")
+    print(icon)
+    return icon
 
 
 class TianDiTu:
@@ -51,7 +60,7 @@ class TianDiTu:
         self.action_setting = None
         self.action_search = None
         self.searchdockwidget = None
-        self.cfg = ConfigFile(CONFIG_FILE_PATH)
+        self.cfg_init = ConfigFile(CONFIG_FILE_PATH)
 
     def initGui(self):
         # 图标
@@ -59,7 +68,6 @@ class TianDiTu:
         icon_add = QIcon(self.plugin_dir + "/images/add_map.svg")
         icon_map = QIcon(self.plugin_dir + "/images/map_tianditu.svg")
         icon_other = QIcon(self.plugin_dir + "/images/earth.svg")
-        icon_googlemap_sat = QIcon(self.plugin_dir + "/images/googlemap_satellite.png")
         icon_search = QIcon(self.plugin_dir + "/images/search.svg")
 
         # 底图添加 Action
@@ -70,10 +78,16 @@ class TianDiTu:
         menu.addSeparator()
         self.extra_map_action = menu.addAction(icon_other, '其他图源')
         extra_map_menu = QMenu()
-        for name in extra_map:
-            extra_map_menu.addAction(icon_googlemap_sat, name, lambda name_=name: add_extra_map(name_))
+        for map_data in extra_maps:
+            icon = get_extra_map_icon(map_data)
+            extra_map_menu.addAction(
+                icon,
+                map_data['name'],
+                lambda map_data_=map_data: add_extra_map(map_data_)
+            )
+            # TODO:增加备注tooltip
         self.extra_map_action.setMenu(extra_map_menu)
-        extramap_enabled = self.cfg.getValueBoolean('Other', 'extramap')
+        extramap_enabled = self.cfg_init.getValueBoolean('Other', 'extramap')
         if not extramap_enabled:
             self.extra_map_action.setEnabled(False)
 
@@ -111,10 +125,16 @@ class TianDiTu:
             add_xyz_layer(uri, TianMapInfo[maptype])
 
     def openSearch(self):
-        if self.searchdockwidget is None:
-            self.searchdockwidget = SearchDockWidget(self.iface)
-        self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.searchdockwidget)
-        self.searchdockwidget.show()
+        cfg = ConfigFile(CONFIG_FILE_PATH)
+        token = cfg.getValue('Tianditu', 'key')
+        keyisvalid = cfg.getValueBoolean('Tianditu', 'keyisvalid')
+        if token == '' or keyisvalid is False:
+            QMessageBox.warning(self.toolbar, '错误', '天地图Key未设置或Key无效', QMessageBox.Yes, QMessageBox.Yes)
+        else:
+            if self.searchdockwidget is None:
+                self.searchdockwidget = SearchDockWidget(self.iface)
+            self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.searchdockwidget)
+            self.searchdockwidget.show()
 
     def unload(self):
         """Unload from the QGIS interface"""

@@ -82,6 +82,7 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
         self.cfg = ConfigFile(CONFIG_FILE_PATH)
         self.token = self.cfg.getValue('Tianditu', 'key')
         self.keyisvalid = self.cfg.getValueBoolean('Tianditu', 'keyisvalid')
+        # not necessary
         if not self.token or not self.keyisvalid:
             self.iface.messageBar().pushMessage("天地图Key未设置或Key无效")
             QMessageBox.warning(self.iface.mainWindow(), '错误', '天地图Key未设置或Key无效', QMessageBox.Yes,

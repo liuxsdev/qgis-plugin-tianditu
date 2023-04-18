@@ -1,3 +1,11 @@
+import yaml
+import os
+from .utils import PluginDir
+
+EXTRAMAPS_PATH = os.path.join(PluginDir, 'extramaps.yml')
+with open(EXTRAMAPS_PATH, encoding='utf-8') as f:
+    extra_maps = yaml.load(f, Loader=yaml.FullLoader)
+
 TianMapInfo = {
     'vec': '天地图-矢量底图',
     'cva': '天地图-矢量注记',
@@ -10,33 +18,3 @@ TianMapInfo = {
     'ibo': '天地图-全球境界'
 }
 
-extra_map = {
-    'Google Map - Satellite': {
-        'name': 'Google Map - Satellite',
-        'url': 'http://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
-        'zmin': 0,
-        'zmax': 21,
-        'referer': ''
-    },
-    'Google Map - Satellite(国内)': {
-        'name': 'Google Map - Satellite',
-        'url': 'https://gac-geo.googlecnapps.cn/maps/vt?lyrs=s&x={x}&y={y}&z={z}',
-        'zmin': 0,
-        'zmax': 21,
-        'referer': ''
-    },
-    'Openstreetmap': {
-        'name': 'Openstreetmap',
-        'url': 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-        'zmin': 0,
-        'zmax': 21,
-        'referer': ''
-    },
-    '高德地图(有偏移)': {
-        'name': '高德地图',
-        'url': 'http://webrd03.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}',
-        'zmin': 0,
-        'zmax': 21,
-        'referer': ''
-    }
-}
