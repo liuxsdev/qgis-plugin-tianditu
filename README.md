@@ -1,10 +1,12 @@
-# TianDiTu Plugin
+# TianDiTu Tools
 
-QGIS 天地图插件，方便进行天地图瓦片底图的添加以及简单实现了部分[天地图 Web 服务 API](http://lbs.tianditu.gov.cn/server/guide.html)（搜索、地理编码查询、逆地理编码查询）
+[QGIS Python Plugins Repository](https://plugins.qgis.org/plugins/tianditu-tools/)
+
+QGIS 天地图工具，方便进行天地图瓦片底图的添加以及简单实现了部分[天地图 Web 服务 API](http://lbs.tianditu.gov.cn/server/guide.html)（地名搜索、地理编码查询、逆地理编码查询）
 
 ## 使用说明
 
-安装插件后，可在 QGIS 工具栏中看到按钮，按钮功能分别为添加底图、搜索、以及设置
+安装插件后，可在 QGIS 工具栏中看到工具按钮，按钮功能分别为添加底图、搜索、以及设置
 
 ### 设置天地图 Key
 
