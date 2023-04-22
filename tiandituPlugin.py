@@ -41,7 +41,6 @@ def get_extra_map_icon(map_data):
         icon = QIcon(icon_home_path + map_data['icon'])
     else:
         icon = QIcon(icon_home_path + "default.svg")
-    print(icon)
     return icon
 
 
@@ -142,3 +141,5 @@ class TianDiTu:
         self.iface.removeToolBarIcon(self.action_setting)
         self.iface.removeToolBarIcon(self.action_search)
         self.iface.removeToolBarIcon(self.addTiandituToolbar)
+        if self.searchdockwidget:
+            self.iface.removeDockWidget(self.searchdockwidget)

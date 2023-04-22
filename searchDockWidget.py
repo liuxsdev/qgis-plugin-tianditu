@@ -4,91 +4,129 @@ from qgis.core import QgsProject, QgsVectorLayer, QgsGeometry, QgsFeature, QgsPo
 from qgis.PyQt import QtWidgets
 from qgis.PyQt.QtCore import QThread, pyqtSignal
 from qgis.PyQt.QtWidgets import QMessageBox, QTreeWidget, QTreeWidgetItem
-from .utils import PluginDir, api_search_v2, api_geocoder, api_regeocoder
+from .utils import PluginDir, TiandituAPI
 from .ui.search import Ui_SearchDockWidget
 from .configSetting import ConfigFile, CONFIG_FILE_PATH
+
+
+class SearchRequestThread(QThread):
+    request_finished = pyqtSignal(dict)
+
+    def __init__(self, search_type, api, data):
+        super().__init__()
+        self.type = search_type  # 搜索类型
+        self.data = data  # 搜索参数
+        self.api = api
+
+    def run(self):
+        if self.type == 'api_search_v2':
+            keyword = self.data['keyword']
+            r = self.api.api_search_v2(keyword)
+            if r['code'] == 1:
+                data = r['data']
+                if data['status']['infocode'] != 0:
+                    # 直接返回POI的情况
+                    if data['resultType'] == 1:
+                        pois = data['pois']
+                        # 获取当前搜索结果所在的行政区,作为根节点
+                        if 'prompt' in data:  # prompt不一定存在
+                            admins = data['prompt'][0]['admins'][0]['adminName']
+                        else:
+                            admins = '全国'
+                        self.request_finished.emit(
+                            {
+                                'type': 'api_search_v2:1',
+                                'admins': admins,
+                                'pois': pois
+                            }
+                        )
+                    # 返回统计集合的情况
+                    elif data['resultType'] == 2:
+                        self.request_finished.emit(
+                            {
+                                'type': 'api_search_v2:2',
+                                'all_admins': data['statistics']['allAdmins'],
+                            }
+                        )
+                    else:
+                        print("到这里了？？")
+                        self.request_finished.emit({
+                            'type': 'no_result',
+                            'message': '无结果'
+                        })
+            else:
+                self.request_finished.emit({
+                    'type': 'error',
+                    'message': r['message']
+                })
+        elif self.type == 'api_search_v2_admincode':
+            keyword = self.data['keyword']
+            admin_code = self.data['admin_code']
+            r = self.api.api_search_v2(keyword, specify=admin_code)
+            if r['code'] == 1:
+                data = r['data']
+                if data['resultType'] == 1:
+                    pois = data['pois']
+                    self.request_finished.emit({
+                        'type': 'api_search_v2_admincode',
+                        'pois': pois
+                    })
+            # TODO:BUG: 地点不精确的时候，第一级为省提示，第二级为市提示，此时的resultType = 2，统计类型，即还需要根据市级代码进行搜索
 
 
 class RegeocoderRequestThread(QThread):
     request_finished = pyqtSignal(str)
 
     def run(self):
-        r = api_regeocoder(self.lon, self.lat, self.token)
-        if r['status'] == '0':
-            result = r['result']
-            formatted_address = result['formatted_address']
-            if formatted_address != '':
-                self.request_finished.emit(formatted_address)
+        r = self.api.api_regeocoder(self.lon, self.lat)
+        if r['code'] == 1:
+            data = r['data']
+            if data['status'] == '0':
+                result = data['result']
+                formatted_address = result['formatted_address']
+                if formatted_address != '':
+                    self.request_finished.emit(formatted_address)
+                else:
+                    self.request_finished.emit("无结果")
             else:
-                self.request_finished.emit("无结果")
+                self.request_finished.emit("请求失败！")
         else:
-            self.request_finished.emit("请求失败！")
+            self.request_finished.emit(f"请求失败！{r['message']}")
 
 
 class GeocoderRequestThread(QThread):
     request_finished = pyqtSignal(str)
 
     def run(self):
-        r = api_geocoder(self.keyword, self.token)
-        if r['msg'] == 'ok':
-            location = r['location']
-            level = location['level']
-            score = location['score']
-            lon = round(location['lon'], 6)
-            lat = round(location['lat'], 6)
-            t = f"关键词: {location['keyWord']}\n\nScore:{score}\n\n类别名称: {level}\n\n经纬度: {lon},{lat}  [添加到地图中](#)"
-            self.request_finished.emit(t)
+        r = self.api.api_geocoder(self.keyword)
+        if r['code'] == 1:
+            data = r['data']
+            if data['msg'] == 'ok':
+                location = data['location']
+                level = location['level']
+                score = location['score']
+                lon = round(location['lon'], 6)
+                lat = round(location['lat'], 6)
+                t = f"关键词: {location['keyWord']}\n\nScore:{score}\n\n类别名称: {level}\n\n经纬度: {lon},{lat}  [添加到地图中](#)"
+                self.request_finished.emit(t)
+            else:
+                self.request_finished.emit("请求失败！")
         else:
-            self.request_finished.emit("请求失败！")
-
-
-class SearchWithAdminCodeThread(QThread):
-    search_complete = pyqtSignal(list)
-
-    def __init__(self, keyword, token, admin_code):
-        super().__init__()
-        self.keyword = keyword
-        self.token = token
-        self.admin_code = admin_code
-
-    def run(self):
-        r = api_search_v2(self.keyword, self.token, specify=self.admin_code)
-        if r['resultType'] == 1:
-            pois = r['pois']
-            self.search_complete.emit(pois)
-
-
-def do_nothing():
-    pass
-
-
-def handle_search_complete(item, pois):
-    """添加搜索结果至item"""
-    for index, poi in enumerate(pois):
-        child = QTreeWidgetItem(item)
-        child.setText(0, str(index + 1))
-        child.setText(1, poi['name'])
-        child.setText(2, poi['lonlat'])
-    item.removeChild(item.child(0))
+            self.request_finished.emit(f"请求失败！{r['message']}")
 
 
 class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
     def __init__(self, iface, parent=None):
         super(SearchDockWidget, self).__init__(parent)
+        self.search_request_thread = None
         self.thread_request_search2 = None
         self.setupUi(self)
         self.iface = iface
         # 读取token
         self.cfg = ConfigFile(CONFIG_FILE_PATH)
         self.token = self.cfg.getValue('Tianditu', 'key')
-        self.keyisvalid = self.cfg.getValueBoolean('Tianditu', 'keyisvalid')
-        # not necessary
-        if not self.token or not self.keyisvalid:
-            self.iface.messageBar().pushMessage("天地图Key未设置或Key无效")
-            QMessageBox.warning(self.iface.mainWindow(), '错误', '天地图Key未设置或Key无效', QMessageBox.Yes,
-                                QMessageBox.Yes)
-
-        self.pushButton.clicked.connect(self.search)
+        self.api = TiandituAPI(self.token)
+        # 初始化treeWidget
         self.treeWidget = QTreeWidget(self.tab)
         self.treeWidget.setObjectName("treeWidget")
         self.treeWidget.setColumnCount(4)
@@ -97,6 +135,8 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
         self.treeWidget.setColumnHidden(3, True)
         self.treeWidget.setAlternatingRowColors(True)
         self.verticalLayout_2.addWidget(self.treeWidget)
+        # 地名搜索
+        self.pushButton.clicked.connect(self.search)
         # 地理编码查询
         self.pushButton_2.clicked.connect(self.geocoder)
         self.label_2.linkActivated.connect(self.geocoder_result_link_clicked)
@@ -113,9 +153,13 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
                 keyword = self.lineEdit.text()
                 search_progress_tip_item = QTreeWidgetItem(item)
                 search_progress_tip_item.setText(1, "搜索中...")
-                self.thread_request_search2 = SearchWithAdminCodeThread(keyword, self.token, admin_code)
-                self.thread_request_search2.search_complete.connect(lambda pois: handle_search_complete(item, pois))
-                self.thread_request_search2.start()
+                self.search_request_thread = SearchRequestThread(
+                    search_type="api_search_v2_admincode",
+                    api=self.api,
+                    data={'keyword': keyword, 'admin_code': admin_code}
+                )
+                self.search_request_thread.request_finished.connect(lambda data: self.on_search_complate(data, item))
+                self.search_request_thread.start()
             else:
                 name = item.text(1)
                 lonlat = item.text(2)
@@ -149,57 +193,77 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
         # self.iface.mapCanvas().setExtent(rect)
         self.iface.mapCanvas().refresh()
 
+    def on_search_complate(self, data, item=None):
+        search_type = data['type']
+        if search_type == "api_search_v2:1":
+            self.treeWidget.takeTopLevelItem(0)  # 移除"搜索中..."
+            admins = data['admins']
+            pois = data['pois']
+            root = QTreeWidgetItem(self.treeWidget)
+            root.setText(0, admins)
+            for index, poi in enumerate(pois):
+                child = QTreeWidgetItem(root)
+                child.setText(0, f"{index + 1}")
+                child.setText(1, poi['name'])
+                child.setText(2, poi['lonlat'])
+            # 展开所有节点
+            self.treeWidget.expandAll()
+            # item双击信号
+            self.treeWidget.itemDoubleClicked.connect(self.on_treeWidget_item_double_clicked)
+        elif search_type == "api_search_v2:2":
+            self.treeWidget.takeTopLevelItem(0)  # 移除"搜索中..."
+            all_admins = data['all_admins']
+            for index, admins in enumerate(all_admins):
+                root = QTreeWidgetItem(self.treeWidget)
+                root.setText(0, f"{index + 1} {admins['adminName']}")
+                root.setText(1, f"{admins['count']}个结果")
+                root.setText(3, f"{admins['adminCode']}")
+            self.treeWidget.itemDoubleClicked.connect(self.on_treeWidget_item_double_clicked)
+        elif search_type == "api_search_v2_admincode":
+            pois = data['pois']
+            for index, poi in enumerate(pois):
+                child = QTreeWidgetItem(item)
+                child.setText(0, str(index + 1))
+                child.setText(1, poi['name'])
+                child.setText(2, poi['lonlat'])
+            item.removeChild(item.child(0))
+        elif search_type == "no_result":
+            self.treeWidget.takeTopLevelItem(0)  # 移除"搜索中..."
+            root = QTreeWidgetItem(self.treeWidget)
+            root.setText(1, "无结果")
+        elif search_type == "error":
+            self.treeWidget.takeTopLevelItem(0)  # 移除"搜索中..."
+            root = QTreeWidgetItem(self.treeWidget)
+            root.setText(1, data['message'])
+            # print(data['message'])  # TODO 提示
+        else:
+            self.treeWidget.takeTopLevelItem(0)  # 移除"搜索中..."
+            root = QTreeWidgetItem(self.treeWidget)
+            root.setText(0, f"无结果")
+
     def search(self):
         keyword = self.lineEdit.text()
-        # 清除treeview数据
+        if len(keyword) == 0:
+            return
+        # 清除treeWidget数据
         self.treeWidget.clear()
         # 检查信号是否已经连接,连接的话就断开
         if self.treeWidget.receivers(self.treeWidget.itemDoubleClicked) > 0:
             self.treeWidget.itemDoubleClicked.disconnect(self.on_treeWidget_item_double_clicked)
-        # TODO 加载中 使用 QThread, pyqtSignal
         # 搜索
-        r = api_search_v2(keyword, self.token)
-        if r['status']['infocode'] != 0:
-            # 直接返回POI的情况
-            if r['resultType'] == 1:
-                pois = r['pois']
-                # 获取当前搜索结果所在的行政区,作为根节点
-                admins = r['prompt'][0]['admins'][0]['adminName']
-                root = QTreeWidgetItem(self.treeWidget)
-                root.setText(0, admins)
-                # 向根节点填充数据
-                for index, poi in enumerate(pois):
-                    child = QTreeWidgetItem(root)
-                    child.setText(0, str(index + 1))
-                    child.setText(1, poi['name'])
-                    child.setText(2, poi['lonlat'])
-                # 展开所有节点
-                self.treeWidget.expandAll()
-                # item双击信号
-                self.treeWidget.itemDoubleClicked.connect(self.on_treeWidget_item_double_clicked)
-            # 返回统计集合的情况
-            elif r['resultType'] == 2:
-                all_admins = r['statistics']['allAdmins']
-                for index, admins in enumerate(all_admins):
-                    root = QTreeWidgetItem(self.treeWidget)
-                    root.setText(0, f"{index + 1} {admins['adminName']}")
-                    root.setText(1, f"{admins['count']}个结果")
-                    root.setText(3, f"{admins['adminCode']}")
-                self.treeWidget.itemDoubleClicked.connect(self.on_treeWidget_item_double_clicked)
-            # TODO 返回行政区的情况
-            else:
-                root = QTreeWidgetItem(self.treeWidget)
-                root.setText(0, f"无结果")
-        else:
-            root = QTreeWidgetItem(self.treeWidget)
-            root.setText(0, f"服务异常，无结果")
+        search_progress_tip = QTreeWidgetItem(self.treeWidget)
+        search_progress_tip.setText(1, '搜索中...')
+        self.search_request_thread = SearchRequestThread(search_type="api_search_v2", api=self.api,
+                                                         data={'keyword': keyword})
+        self.search_request_thread.request_finished.connect(lambda data: self.on_search_complate(data))
+        self.search_request_thread.start()
 
     def geocoder(self):
         self.label_2.setText('搜索中...')
         keyword = self.lineEdit_2.text()
         self.request_geocoder = GeocoderRequestThread()
         self.request_geocoder.keyword = keyword
-        self.request_geocoder.token = self.token
+        self.request_geocoder.api = self.api
         self.request_geocoder.request_finished.connect(self.label_2.setText)
         self.request_geocoder.start()
 
@@ -218,7 +282,7 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
             lon, lat = map(float, lonlat.split(','))
             self.label_4.setText("搜索中...")
             self.request_regeocoder = RegeocoderRequestThread()
-            self.request_regeocoder.token = self.token
+            self.request_regeocoder.api = self.api
             self.request_regeocoder.lon = lon
             self.request_regeocoder.lat = lat
             self.request_regeocoder.request_finished.connect(self.label_4.setText)
