@@ -43,12 +43,8 @@ class TiandituAPI:
 
     def get(self, url: str, payload: dict):
         timeout = 8
-        header = {
-            'User-Agent': 'Mozilla/5.0 QGIS/32400/Windows 10 Version 2009',
-            'Referer': 'https://www.tianditu.gov.cn/'
-        }
         try:
-            r = requests.get(url, headers=header, params=payload, timeout=timeout)
+            r = requests.get(url, headers=self.header, params=payload, timeout=timeout)
             if r.ok:
                 return {'code': 1, 'data': r.json()}
             else:
@@ -57,6 +53,7 @@ class TiandituAPI:
             return {'code': -1, 'message': str(e)}
 
     def api_search_v2(self, keyword: str, specify=None):
+        # 天地图地名搜索V2接口API说明: http://lbs.tianditu.gov.cn/server/search2.html
         url = 'http://api.tianditu.gov.cn/v2/search'
         data = {
             "keyWord": keyword,  # 搜索的关键字

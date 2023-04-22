@@ -3,7 +3,7 @@ import os
 from qgis.core import QgsProject, QgsVectorLayer, QgsGeometry, QgsFeature, QgsPointXY
 from qgis.PyQt import QtWidgets
 from qgis.PyQt.QtCore import QThread, pyqtSignal
-from qgis.PyQt.QtWidgets import QMessageBox, QTreeWidget, QTreeWidgetItem
+from qgis.PyQt.QtWidgets import QTreeWidget, QTreeWidgetItem
 from .utils import PluginDir, TiandituAPI
 from .ui.search import Ui_SearchDockWidget
 from .configSetting import ConfigFile, CONFIG_FILE_PATH
@@ -14,12 +14,12 @@ class SearchRequestThread(QThread):
 
     def __init__(self, search_type, api, data):
         super().__init__()
-        self.type = search_type  # 搜索类型
+        self.search_type = search_type  # 搜索类型
         self.data = data  # 搜索参数
         self.api = api
 
     def run(self):
-        if self.type == 'api_search_v2':
+        if self.search_type == 'api_search_v2':
             keyword = self.data['keyword']
             r = self.api.api_search_v2(keyword)
             if r['code'] == 1:
@@ -42,14 +42,17 @@ class SearchRequestThread(QThread):
                         )
                     # 返回统计集合的情况
                     elif data['resultType'] == 2:
-                        self.request_finished.emit(
-                            {
-                                'type': 'api_search_v2:2',
-                                'all_admins': data['statistics']['allAdmins'],
-                            }
-                        )
+                        all_admins = (data['statistics']['allAdmins'])
+                        first = all_admins[0]
+                        if not first['isleaf']:
+                            # 地点不精确的时候，返回的统计集合为省级。不往下继续搜索了
+                            self.request_finished.emit({
+                                'type': 'no_result',
+                                'message': '请输入更为详细的地名'
+                            })
+                        else:
+                            self.request_finished.emit({'type': 'api_search_v2:2', 'all_admins': all_admins})
                     else:
-                        print("到这里了？？")
                         self.request_finished.emit({
                             'type': 'no_result',
                             'message': '无结果'
@@ -59,7 +62,7 @@ class SearchRequestThread(QThread):
                     'type': 'error',
                     'message': r['message']
                 })
-        elif self.type == 'api_search_v2_admincode':
+        elif self.search_type == 'api_search_v2_admincode':
             keyword = self.data['keyword']
             admin_code = self.data['admin_code']
             r = self.api.api_search_v2(keyword, specify=admin_code)
@@ -71,55 +74,54 @@ class SearchRequestThread(QThread):
                         'type': 'api_search_v2_admincode',
                         'pois': pois
                     })
-            # TODO:BUG: 地点不精确的时候，第一级为省提示，第二级为市提示，此时的resultType = 2，统计类型，即还需要根据市级代码进行搜索
-
-
-class RegeocoderRequestThread(QThread):
-    request_finished = pyqtSignal(str)
-
-    def run(self):
-        r = self.api.api_regeocoder(self.lon, self.lat)
-        if r['code'] == 1:
-            data = r['data']
-            if data['status'] == '0':
-                result = data['result']
-                formatted_address = result['formatted_address']
-                if formatted_address != '':
-                    self.request_finished.emit(formatted_address)
+        elif self.search_type == 'api_geocoder':
+            keyword = self.data['keyword']
+            r = self.api.api_geocoder(keyword)
+            if r['code'] == 1:
+                data = r['data']
+                if data['msg'] == 'ok':
+                    location = data['location']
+                    level = location['level']
+                    score = location['score']
+                    lon = round(location['lon'], 6)
+                    lat = round(location['lat'], 6)
+                    t = f"关键词: {location['keyWord']}\n\nScore:{score}\n\n类别名称: {level}\n\n经纬度: {lon},{lat}  [添加到地图中](#)"
                 else:
-                    self.request_finished.emit("无结果")
+                    t = '请求失败'
+                    self.request_finished.emit({'text': "请求失败！"})
             else:
-                self.request_finished.emit("请求失败！")
-        else:
-            self.request_finished.emit(f"请求失败！{r['message']}")
-
-
-class GeocoderRequestThread(QThread):
-    request_finished = pyqtSignal(str)
-
-    def run(self):
-        r = self.api.api_geocoder(self.keyword)
-        if r['code'] == 1:
-            data = r['data']
-            if data['msg'] == 'ok':
-                location = data['location']
-                level = location['level']
-                score = location['score']
-                lon = round(location['lon'], 6)
-                lat = round(location['lat'], 6)
-                t = f"关键词: {location['keyWord']}\n\nScore:{score}\n\n类别名称: {level}\n\n经纬度: {lon},{lat}  [添加到地图中](#)"
-                self.request_finished.emit(t)
+                t = f"请求失败！{r['message']}"
+            self.request_finished.emit({
+                'type': 'api_geocoder',
+                'text': t
+            })
+        elif self.search_type == 'api_regeocoder':
+            lon = self.data['lon']
+            lat = self.data['lat']
+            r = self.api.api_regeocoder(lon, lat)
+            if r['code'] == 1:
+                data = r['data']
+                if data['status'] == '0':
+                    result = data['result']
+                    formatted_address = result['formatted_address']
+                    if formatted_address != '':
+                        text = formatted_address
+                    else:
+                        text = '无结果'
+                else:
+                    text = '请求失败'
             else:
-                self.request_finished.emit("请求失败！")
-        else:
-            self.request_finished.emit(f"请求失败！{r['message']}")
+                text = f"请求失败！{r['message']}"
+            self.request_finished.emit({
+                'type': 'api_regeocoder',
+                'text': text
+            })
 
 
 class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
     def __init__(self, iface, parent=None):
         super(SearchDockWidget, self).__init__(parent)
         self.search_request_thread = None
-        self.thread_request_search2 = None
         self.setupUi(self)
         self.iface = iface
         # 读取token
@@ -227,15 +229,21 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
                 child.setText(1, poi['name'])
                 child.setText(2, poi['lonlat'])
             item.removeChild(item.child(0))
+        elif search_type == 'api_geocoder':
+            text = data['text']
+            self.label_2.setText(text)
+        elif search_type == 'api_regeocoder':
+            text = data['text']
+            self.label_4.setText(text)
         elif search_type == "no_result":
             self.treeWidget.takeTopLevelItem(0)  # 移除"搜索中..."
             root = QTreeWidgetItem(self.treeWidget)
-            root.setText(1, "无结果")
+            root.setText(1, data['message'])
         elif search_type == "error":
             self.treeWidget.takeTopLevelItem(0)  # 移除"搜索中..."
             root = QTreeWidgetItem(self.treeWidget)
             root.setText(1, data['message'])
-            # print(data['message'])  # TODO 提示
+            self.iface.messageBar().pushWarning(title="天地图API - Error", message=data['message'])
         else:
             self.treeWidget.takeTopLevelItem(0)  # 移除"搜索中..."
             root = QTreeWidgetItem(self.treeWidget)
@@ -259,13 +267,15 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
         self.search_request_thread.start()
 
     def geocoder(self):
-        self.label_2.setText('搜索中...')
         keyword = self.lineEdit_2.text()
-        self.request_geocoder = GeocoderRequestThread()
-        self.request_geocoder.keyword = keyword
-        self.request_geocoder.api = self.api
-        self.request_geocoder.request_finished.connect(self.label_2.setText)
-        self.request_geocoder.start()
+        if len(keyword) == 0:
+            return
+        self.label_2.setText('搜索中...')
+        self.search_request_thread = SearchRequestThread(
+            search_type='api_geocoder', api=self.api, data={'keyword': keyword}
+        )
+        self.search_request_thread.request_finished.connect(lambda data: self.on_search_complate(data))
+        self.search_request_thread.start()
 
     def geocoder_result_link_clicked(self):
         text = self.label_2.text()
@@ -278,15 +288,15 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
 
     def regeocoder(self):
         lonlat = self.lineEdit_3.text()
+        if len(lonlat) == 0:
+            return
         try:
             lon, lat = map(float, lonlat.split(','))
             self.label_4.setText("搜索中...")
-            self.request_regeocoder = RegeocoderRequestThread()
-            self.request_regeocoder.api = self.api
-            self.request_regeocoder.lon = lon
-            self.request_regeocoder.lat = lat
-            self.request_regeocoder.request_finished.connect(self.label_4.setText)
-            self.request_regeocoder.start()
+            self.search_request_thread = SearchRequestThread(
+                search_type='api_regeocoder', api=self.api, data={'lon': lon, 'lat': lat}
+            )
+            self.search_request_thread.request_finished.connect(lambda data: self.on_search_complate(data))
+            self.search_request_thread.start()
         except Exception as e:
-            QMessageBox.warning(self.iface.mainWindow(), '错误', '经纬度输入有误', QMessageBox.Yes, QMessageBox.Yes)
-            print(e)
+            self.iface.messageBar().pushWarning(title="天地图API - Error：经纬度输入有误", message=str(e))
