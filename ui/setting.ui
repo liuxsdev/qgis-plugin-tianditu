@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>470</width>
+    <width>458</width>
     <height>233</height>
    </rect>
   </property>
@@ -84,7 +84,7 @@
         <item>
          <widget class="QLabel" name="label_3">
           <property name="text">
-           <string>子域 (t0-t7)</string>
+           <string>子域:</string>
           </property>
          </widget>
         </item>
@@ -102,10 +102,20 @@
          </spacer>
         </item>
         <item>
+         <widget class="QCheckBox" name="checkBox_2">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;添加底图时随机选择子域名，可减轻服务器压力，&lt;/span&gt;提高可用性。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="text">
+           <string>随机</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QComboBox" name="comboBox">
           <property name="minimumSize">
            <size>
-            <width>70</width>
+            <width>90</width>
             <height>0</height>
            </size>
           </property>
@@ -114,6 +124,12 @@
             <width>200</width>
             <height>0</height>
            </size>
+          </property>
+          <property name="currentText">
+           <string/>
+          </property>
+          <property name="insertPolicy">
+           <enum>QComboBox::InsertAtTop</enum>
           </property>
          </widget>
         </item>

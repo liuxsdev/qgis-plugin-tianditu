@@ -23,6 +23,22 @@ class CheckThread(QThread):
             cfg.setValue('Tianditu', 'keyisvalid', 'False')
 
 
+class PingUrlThread(QThread):
+    ping_finished = pyqtSignal(list)
+
+    def __init__(self, key):
+        super().__init__()
+        self.key = key
+
+    def run(self):
+        url = tianditu_map_url('vec', self.key)
+        url_with_subdomains = url.replace('://t2.', '://{s}.')
+        urls = [url_with_subdomains.format(x=0, y=0, z=0, s=f't{x}') for x in range(8)]
+        status = check_subdomains(urls)
+        self.ping_finished.emit(status)
+    # TODO 勾选随机时不进行测速与选择 重构天地图url，增加{s}表示子域名
+
+
 class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
     def __init__(self, extra_map_action, parent=None):
         super(SettingDialog, self).__init__(parent)
@@ -40,17 +56,17 @@ class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
         self.pushButton.clicked.connect(self.check)
         self.checkBox.setChecked(self.extramap_enabled)
         self.checkBox.stateChanged.connect(self.enable_extramap)
-        # self.comboBox.addItems(['随机', 't0', 't1', 't2', 't3', 't4', 't5', 't6', 't7'])
-        self.check_urls()
+        self.comboBox.addItems(['t0', 't1', 't2', 't3', 't4', 't5', 't6', 't7'])
+        self.ping_thread = PingUrlThread(self.key)
+        self.ping_thread.ping_finished.connect(lambda data: self.handle_ping_finished(data))
+        self.ping_thread.start()
 
-    def check_urls(self):
-        url = tianditu_map_url('vec', self.key)
-        url_with_subdomains = url.replace('://t2.', '://{s}.')
-        # tile_url = url.format(x=0, y=0, z=0)
-        urls = [url_with_subdomains.format(x=0, y=0, z=0, s=f't{x}') for x in range(3)]
-        status = check_subdomains(urls)
-        self.comboBox.addItems(status)
-    #     TODO 需要修改
+    def handle_ping_finished(self, status):
+        min_time = min(status)
+        min_index = status.index(min_time)
+        for i in range(8):
+            self.comboBox.setItemText(i, f't{i} {status[i]}')
+        self.comboBox.setItemText(min_index, f't{min_index} {status[min_index]}*')
 
     def check(self):
         # save
