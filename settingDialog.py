@@ -2,7 +2,7 @@ from qgis.PyQt import QtWidgets
 from qgis.PyQt.QtCore import QThread, pyqtSignal
 from .configSetting import ConfigFile, CONFIG_FILE_PATH
 from .ui.setting import Ui_SettingDialog
-from .utils import tianditu_map_url, check_url_status
+from .utils import tianditu_map_url, check_url_status, check_subdomains
 
 cfg = ConfigFile(CONFIG_FILE_PATH)
 
@@ -40,6 +40,17 @@ class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
         self.pushButton.clicked.connect(self.check)
         self.checkBox.setChecked(self.extramap_enabled)
         self.checkBox.stateChanged.connect(self.enable_extramap)
+        # self.comboBox.addItems(['随机', 't0', 't1', 't2', 't3', 't4', 't5', 't6', 't7'])
+        self.check_urls()
+
+    def check_urls(self):
+        url = tianditu_map_url('vec', self.key)
+        url_with_subdomains = url.replace('://t2.', '://{s}.')
+        # tile_url = url.format(x=0, y=0, z=0)
+        urls = [url_with_subdomains.format(x=0, y=0, z=0, s=f't{x}') for x in range(3)]
+        status = check_subdomains(urls)
+        self.comboBox.addItems(status)
+    #     TODO 需要修改
 
     def check(self):
         # save

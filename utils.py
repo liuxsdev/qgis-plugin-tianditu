@@ -33,6 +33,18 @@ def check_url_status(url):
     return msg
 
 
+def check_subdomains(url_list):
+    ping_list = []
+    for url in url_list:
+        response = requests.get(url, headers=HEADER)
+        if response.status_code == 200:
+            ms = response.elapsed.total_seconds() * 1000
+            ping_list.append(f'{int(ms)} ms')
+        else:
+            ping_list.append(f'❌')
+    return ping_list
+
+
 class TiandituAPI:
     def __init__(self, token: str):
         self.token = token
