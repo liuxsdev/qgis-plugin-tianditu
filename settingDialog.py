@@ -11,7 +11,7 @@ class CheckThread(QThread):
     check_finished = pyqtSignal(str)
 
     def run(self):
-        url = tianditu_map_url('vec', self.key)
+        url = tianditu_map_url('vec', self.key, 't0')
         tile_url = url.format(x=0, y=0, z=0)
         check_msg = check_url_status(tile_url)
         if check_msg['code'] == 0:
@@ -31,9 +31,9 @@ class PingUrlThread(QThread):
         self.key = key
 
     def run(self):
-        url = tianditu_map_url('vec', self.key)
-        url_with_subdomains = url.replace('://t2.', '://{s}.')
-        urls = [url_with_subdomains.format(x=0, y=0, z=0, s=f't{x}') for x in range(8)]
+        # url = tianditu_map_url('vec', self.key)
+        subdomain_list = ['t0', 't1', 't2', 't3', 't4', 't5', 't6', 't7']
+        urls = [tianditu_map_url('vec', self.key, subdomain) for subdomain in subdomain_list]
         status = check_subdomains(urls)
         self.ping_finished.emit(status)
     # TODO 勾选随机时不进行测速与选择 重构天地图url，增加{s}表示子域名
@@ -42,13 +42,18 @@ class PingUrlThread(QThread):
 class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
     def __init__(self, extra_map_action, parent=None):
         super(SettingDialog, self).__init__(parent)
+        self.ping_thread = None
         self.check_thread = None
         self.extra_map_action = extra_map_action
+        # 读取配置
         self.key = cfg.getValue('Tianditu', 'key')
         self.keyisvalid = cfg.getValueBoolean('Tianditu', 'keyisvalid')
         self.extramap_enabled = cfg.getValueBoolean('Other', 'extramap')
         self.random_enabled = cfg.getValueBoolean('Tianditu', 'random')
-        # print(self.random_enabled)
+        self.subdomain = cfg.getValue('Tianditu', 'subdomain')
+        if self.subdomain == '':
+            cfg.setValue('Tianditu', 'subdomain', 't0')
+            self.subdomain = cfg.getValue('Tianditu', 'subdomain')
         self.setupUi(self)
         self.mLineEdit_key.setText(self.key)
         if self.keyisvalid:
@@ -60,10 +65,15 @@ class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
         self.checkBox.stateChanged.connect(self.enable_extramap)
         self.checkBox_2.setChecked(self.random_enabled)
         self.checkBox_2.stateChanged.connect(self.enable_random)
-        self.comboBox.addItems(['t0', 't1', 't2', 't3', 't4', 't5', 't6', 't7'])
-        self.ping_thread = PingUrlThread(self.key)
-        self.ping_thread.ping_finished.connect(lambda data: self.handle_ping_finished(data))
-        self.ping_thread.start()
+        self.subdomain_list = ['t0', 't1', 't2', 't3', 't4', 't5', 't6', 't7']
+        self.comboBox.addItems(self.subdomain_list)
+        self.comboBox.setCurrentIndex(self.subdomain_list.index(self.subdomain))
+        self.comboBox.setEnabled(not self.random_enabled)
+        self.comboBox.currentIndexChanged.connect(self.handle_comboBox_index_changed)
+        if not self.random_enabled:
+            self.ping_thread = PingUrlThread(self.key)
+            self.ping_thread.ping_finished.connect(lambda data: self.handle_ping_finished(data))
+            self.ping_thread.start()
 
     def handle_ping_finished(self, status):
         min_time = min(status)
@@ -89,10 +99,18 @@ class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
             cfg.setValue('Other', 'extramap', 'False')
             self.extra_map_action.setEnabled(False)
 
+    def handle_comboBox_index_changed(self):
+        selected_index = self.comboBox.currentIndex()
+        selected_domain = self.subdomain_list[selected_index]
+        cfg.setValue('Tianditu', 'subdomain', selected_domain)
+
     def enable_random(self):
         if self.checkBox_2.isChecked():
             cfg.setValue('Tianditu', 'random', 'True')
-            # self.extra_map_action.setEnabled(True)
+            self.comboBox.setEnabled(False)
         else:
             cfg.setValue('Tianditu', 'random', 'False')
-            # self.extra_map_action.setEnabled(False)
+            self.comboBox.setEnabled(True)
+            self.ping_thread = PingUrlThread(self.key)
+            self.ping_thread.ping_finished.connect(lambda data: self.handle_ping_finished(data))
+            self.ping_thread.start()

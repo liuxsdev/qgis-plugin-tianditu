@@ -7,8 +7,8 @@ PluginDir = os.path.dirname(__file__)
 HEADER = {'User-Agent': 'Mozilla/5.0 QGIS/32400/Windows 10 Version 2009', 'Referer': 'https://www.tianditu.gov.cn/'}
 
 
-def tianditu_map_url(maptype, token):
-    url = 'https://t2.tianditu.gov.cn/'
+def tianditu_map_url(maptype, token, s):
+    url = f'https://{s}.tianditu.gov.cn/'
     url += f'{maptype}_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER={maptype}'
     url += '&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TileCol={x}&TileRow={y}&TileMatrix={z}'
     url += f'&tk={token}'

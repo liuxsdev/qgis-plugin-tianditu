@@ -1,4 +1,5 @@
 import requests
+import random
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction, QMenu, QToolButton, QMessageBox
@@ -117,10 +118,16 @@ class TianDiTu:
         cfg = ConfigFile(CONFIG_FILE_PATH)
         token = cfg.getValue('Tianditu', 'key')
         keyisvalid = cfg.getValueBoolean('Tianditu', 'keyisvalid')
+        random_enabled = cfg.getValueBoolean('Tianditu', 'random')
+        subdomain = cfg.getValue('Tianditu', 'subdomain')
         if token == '' or keyisvalid is False:
             QMessageBox.warning(self.toolbar, '错误', '天地图Key未设置或Key无效', QMessageBox.Yes, QMessageBox.Yes)
         else:
-            uri = get_map_uri(tianditu_map_url(maptype, token), zmin=1, referer=TianDiTuHomeURL)
+            if random_enabled:
+                subdomain = random.choice(['t0', 't1', 't2', 't3', 't4', 't5', 't6', 't7'])
+                uri = get_map_uri(tianditu_map_url(maptype, token, subdomain), zmin=1, referer=TianDiTuHomeURL)
+            else:
+                uri = get_map_uri(tianditu_map_url(maptype, token, subdomain), zmin=1, referer=TianDiTuHomeURL)
             add_xyz_layer(uri, TianMapInfo[maptype])
 
     def openSearch(self):

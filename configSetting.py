@@ -1,5 +1,6 @@
 import configparser
 import os
+
 from .utils import PluginDir
 
 CONFIG_FILE_PATH = os.path.join(PluginDir, 'config.ini')
@@ -28,7 +29,8 @@ class ConfigFile:
             value = self.cfg.get(section, key)
         except (configparser.NoSectionError, configparser.NoOptionError):
             # print("section or key do not exist")
-            value = None
+            value = ''
+            self.setValue(section, key, value)
         return value
 
     def getValueBoolean(self, section, key):
@@ -48,7 +50,7 @@ class ConfigFile:
         self.cfg.set('Tianditu', 'key', '')
         self.cfg.set('Tianditu', 'keyisvalid', 'False')
         self.cfg.set('Tianditu', 'random', 'False')
+        self.cfg.set('Tianditu', 'subdomain', 't0')
         self.cfg.add_section('Other')
         self.cfg.set('Other', 'extramap', 'False')
         self.saveConfig()
-
