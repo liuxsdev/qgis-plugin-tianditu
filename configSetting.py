@@ -27,7 +27,7 @@ class ConfigFile:
         try:
             value = self.cfg.get(section, key)
         except (configparser.NoSectionError, configparser.NoOptionError):
-            print("section or key do not exists")
+            # print("section or key do not exist")
             value = None
         return value
 
@@ -35,8 +35,9 @@ class ConfigFile:
         try:
             value = self.cfg.getboolean(section, key)
         except (configparser.NoSectionError, configparser.NoOptionError):
-            print("section or key do not exists")
-            value = None
+            # print("section or key do not exist")
+            value = False
+            self.setValue(section, key, str(value))
         return value
 
     def initConfigFile(self):
@@ -46,6 +47,7 @@ class ConfigFile:
         self.cfg.add_section('Tianditu')
         self.cfg.set('Tianditu', 'key', '')
         self.cfg.set('Tianditu', 'keyisvalid', 'False')
+        self.cfg.set('Tianditu', 'random', 'False')
         self.cfg.add_section('Other')
         self.cfg.set('Other', 'extramap', 'False')
         self.saveConfig()

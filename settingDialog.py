@@ -47,6 +47,8 @@ class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
         self.key = cfg.getValue('Tianditu', 'key')
         self.keyisvalid = cfg.getValueBoolean('Tianditu', 'keyisvalid')
         self.extramap_enabled = cfg.getValueBoolean('Other', 'extramap')
+        self.random_enabled = cfg.getValueBoolean('Tianditu', 'random')
+        # print(self.random_enabled)
         self.setupUi(self)
         self.mLineEdit_key.setText(self.key)
         if self.keyisvalid:
@@ -56,6 +58,8 @@ class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
         self.pushButton.clicked.connect(self.check)
         self.checkBox.setChecked(self.extramap_enabled)
         self.checkBox.stateChanged.connect(self.enable_extramap)
+        self.checkBox_2.setChecked(self.random_enabled)
+        self.checkBox_2.stateChanged.connect(self.enable_random)
         self.comboBox.addItems(['t0', 't1', 't2', 't3', 't4', 't5', 't6', 't7'])
         self.ping_thread = PingUrlThread(self.key)
         self.ping_thread.ping_finished.connect(lambda data: self.handle_ping_finished(data))
@@ -84,3 +88,11 @@ class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
         else:
             cfg.setValue('Other', 'extramap', 'False')
             self.extra_map_action.setEnabled(False)
+
+    def enable_random(self):
+        if self.checkBox_2.isChecked():
+            cfg.setValue('Tianditu', 'random', 'True')
+            # self.extra_map_action.setEnabled(True)
+        else:
+            cfg.setValue('Tianditu', 'random', 'False')
+            # self.extra_map_action.setEnabled(False)
