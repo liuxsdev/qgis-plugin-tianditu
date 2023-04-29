@@ -1,11 +1,11 @@
-import requests
 import random
+
+import requests
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction, QMenu, QToolButton, QMessageBox
-from qgis.core import Qgis, QgsRasterLayer, QgsProject
+from qgis.core import Qgis, QgsRasterLayer, QgsProject, QgsSettings
 
-from .configSetting import ConfigFile, CONFIG_FILE_PATH
 from .searchDockWidget import SearchDockWidget
 from .settingDialog import SettingDialog
 from .tiandituConfig import TianMapInfo, extra_maps
@@ -60,7 +60,16 @@ class TianDiTu:
         self.action_setting = None
         self.action_search = None
         self.searchdockwidget = None
-        self.cfg_init = ConfigFile(CONFIG_FILE_PATH)
+        self.tdt_jiangsu_action = None
+        # 配置文件
+        self.qset = QgsSettings()
+        if not self.qset.contains("tianditu-tools/Tianditu/key"):
+            # 初始化
+            self.qset.setValue("tianditu-tools/Tianditu/key", '')
+            self.qset.setValue("tianditu-tools/Tianditu/keyisvalid", False)
+            self.qset.setValue("tianditu-tools/Tianditu/random", True)
+            self.qset.setValue("tianditu-tools/Tianditu/subdomain", 't0')
+            self.qset.setValue("tianditu-tools/Other/extramap", False)
 
     def initGui(self):
         # 图标
@@ -69,13 +78,13 @@ class TianDiTu:
         icon_map = QIcon(self.plugin_dir + "/images/map_tianditu.svg")
         icon_other = QIcon(self.plugin_dir + "/images/earth.svg")
         icon_search = QIcon(self.plugin_dir + "/images/search.svg")
-
-        # 底图添加 Action
+        # 天地图添加 Action
         menu = QMenu()
         menu.setObjectName('TianDiTuAddMap')
         for maptype in TianMapInfo:
             menu.addAction(icon_map, TianMapInfo[maptype], lambda maptype_=maptype: self.add_tianditu_basemap(maptype_))
         menu.addSeparator()
+        # 其他图源
         self.extra_map_action = menu.addAction(icon_other, '其他图源')
         extra_map_menu = QMenu()
         for map_data in extra_maps:
@@ -87,7 +96,7 @@ class TianDiTu:
             )
             # TODO:增加备注tooltip
         self.extra_map_action.setMenu(extra_map_menu)
-        extramap_enabled = self.cfg_init.getValueBoolean('Other', 'extramap')
+        extramap_enabled = self.qset.value("tianditu-tools/Other/extramap", type=bool)
         if not extramap_enabled:
             self.extra_map_action.setEnabled(False)
 
@@ -108,33 +117,30 @@ class TianDiTu:
         self.action_search = QAction(icon_search, "查询", self.iface.mainWindow())
         self.action_search.triggered.connect(self.openSearch)
         self.toolbar.addAction(self.action_search)
-        #  TODO token检查的逻辑有点混乱，当token无效时，应不打开查询界面
 
     def show_setting_dialog(self):
         dlg = SettingDialog(self.extra_map_action)
         dlg.exec_()
 
     def add_tianditu_basemap(self, maptype):
-        cfg = ConfigFile(CONFIG_FILE_PATH)
-        token = cfg.getValue('Tianditu', 'key')
-        keyisvalid = cfg.getValueBoolean('Tianditu', 'keyisvalid')
-        random_enabled = cfg.getValueBoolean('Tianditu', 'random')
-        subdomain = cfg.getValue('Tianditu', 'subdomain')
-        if token == '' or keyisvalid is False:
+        key = self.qset.value('tianditu-tools/Tianditu/key')
+        keyisvalid = self.qset.value('tianditu-tools/Tianditu/keyisvalid', type=bool)
+        random_enabled = self.qset.value('tianditu-tools/Tianditu/random', type=bool)
+        subdomain = self.qset.value('tianditu-tools/Tianditu/subdomain')
+        if key == '' or keyisvalid is False:
             QMessageBox.warning(self.toolbar, '错误', '天地图Key未设置或Key无效', QMessageBox.Yes, QMessageBox.Yes)
         else:
             if random_enabled:
                 subdomain = random.choice(['t0', 't1', 't2', 't3', 't4', 't5', 't6', 't7'])
-                uri = get_map_uri(tianditu_map_url(maptype, token, subdomain), zmin=1, referer=TianDiTuHomeURL)
+                uri = get_map_uri(tianditu_map_url(maptype, key, subdomain), zmin=1, referer=TianDiTuHomeURL)
             else:
-                uri = get_map_uri(tianditu_map_url(maptype, token, subdomain), zmin=1, referer=TianDiTuHomeURL)
+                uri = get_map_uri(tianditu_map_url(maptype, key, subdomain), zmin=1, referer=TianDiTuHomeURL)
             add_xyz_layer(uri, TianMapInfo[maptype])
 
     def openSearch(self):
-        cfg = ConfigFile(CONFIG_FILE_PATH)
-        token = cfg.getValue('Tianditu', 'key')
-        keyisvalid = cfg.getValueBoolean('Tianditu', 'keyisvalid')
-        if token == '' or keyisvalid is False:
+        key = self.qset.value('tianditu-tools/Tianditu/key')
+        keyisvalid = self.qset.value('tianditu-tools/Tianditu/keyisvalid', type=bool)
+        if key == '' or keyisvalid is False:
             QMessageBox.warning(self.toolbar, '错误', '天地图Key未设置或Key无效', QMessageBox.Yes, QMessageBox.Yes)
         else:
             if self.searchdockwidget is None:

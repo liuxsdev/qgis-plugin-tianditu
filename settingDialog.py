@@ -1,14 +1,16 @@
 from qgis.PyQt import QtWidgets
 from qgis.PyQt.QtCore import QThread, pyqtSignal
-from .configSetting import ConfigFile, CONFIG_FILE_PATH
+from qgis.core import QgsSettings
 from .ui.setting import Ui_SettingDialog
 from .utils import tianditu_map_url, check_url_status, check_subdomains
-
-cfg = ConfigFile(CONFIG_FILE_PATH)
 
 
 class CheckThread(QThread):
     check_finished = pyqtSignal(str)
+
+    def __init__(self, qset):
+        super().__init__()
+        self.qset = qset
 
     def run(self):
         url = tianditu_map_url('vec', self.key, 't0')
@@ -16,11 +18,11 @@ class CheckThread(QThread):
         check_msg = check_url_status(tile_url)
         if check_msg['code'] == 0:
             self.check_finished.emit('正常')
-            cfg.setValue('Tianditu', 'keyisvalid', 'True')
+            self.qset.setValue('tianditu-tools/Tianditu/keyisvalid', True)
         else:
             error_msg = f"{check_msg['msg']}: {check_msg['resolve']}"
             self.check_finished.emit(error_msg)
-            cfg.setValue('Tianditu', 'keyisvalid', 'False')
+            self.qset.setValue('tianditu-tools/Tianditu/keyisvalid', False)
 
 
 class PingUrlThread(QThread):
@@ -31,12 +33,10 @@ class PingUrlThread(QThread):
         self.key = key
 
     def run(self):
-        # url = tianditu_map_url('vec', self.key)
         subdomain_list = ['t0', 't1', 't2', 't3', 't4', 't5', 't6', 't7']
         urls = [tianditu_map_url('vec', self.key, subdomain) for subdomain in subdomain_list]
         status = check_subdomains(urls)
         self.ping_finished.emit(status)
-    # TODO 勾选随机时不进行测速与选择 重构天地图url，增加{s}表示子域名
 
 
 class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
@@ -46,14 +46,12 @@ class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
         self.check_thread = None
         self.extra_map_action = extra_map_action
         # 读取配置
-        self.key = cfg.getValue('Tianditu', 'key')
-        self.keyisvalid = cfg.getValueBoolean('Tianditu', 'keyisvalid')
-        self.extramap_enabled = cfg.getValueBoolean('Other', 'extramap')
-        self.random_enabled = cfg.getValueBoolean('Tianditu', 'random')
-        self.subdomain = cfg.getValue('Tianditu', 'subdomain')
-        if self.subdomain == '':
-            cfg.setValue('Tianditu', 'subdomain', 't0')
-            self.subdomain = cfg.getValue('Tianditu', 'subdomain')
+        self.qset = QgsSettings()
+        self.key = self.qset.value('tianditu-tools/Tianditu/key')
+        self.keyisvalid = self.qset.value('tianditu-tools/Tianditu/keyisvalid', type=bool)
+        self.random_enabled = self.qset.value('tianditu-tools/Tianditu/random', type=bool)
+        self.subdomain = self.qset.value('tianditu-tools/Tianditu/subdomain')
+        self.extramap_enabled = self.qset.value('tianditu-tools/Other/extramap', type=bool)
         self.setupUi(self)
         self.mLineEdit_key.setText(self.key)
         if self.keyisvalid:
@@ -70,7 +68,7 @@ class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
         self.comboBox.setCurrentIndex(self.subdomain_list.index(self.subdomain))
         self.comboBox.setEnabled(not self.random_enabled)
         self.comboBox.currentIndexChanged.connect(self.handle_comboBox_index_changed)
-        if not self.random_enabled:
+        if not self.random_enabled and self.keyisvalid:
             self.ping_thread = PingUrlThread(self.key)
             self.ping_thread.ping_finished.connect(lambda data: self.handle_ping_finished(data))
             self.ping_thread.start()
@@ -84,33 +82,34 @@ class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
 
     def check(self):
         # save
-        cfg.setValue('Tianditu', 'key', self.mLineEdit_key.text())
+        self.qset.setValue('tianditu-tools/Tianditu/key', self.mLineEdit_key.text())
         self.label_keystatus.setText('检查中...')
-        self.check_thread = CheckThread()
+        self.check_thread = CheckThread(self.qset)
         self.check_thread.key = self.mLineEdit_key.text()
         self.check_thread.check_finished.connect(self.label_keystatus.setText)
         self.check_thread.start()
 
     def enable_extramap(self):
         if self.checkBox.isChecked():
-            cfg.setValue('Other', 'extramap', 'True')
+            self.qset.setValue('tianditu-tools/Other/extramap', True)
             self.extra_map_action.setEnabled(True)
         else:
-            cfg.setValue('Other', 'extramap', 'False')
+            self.qset.setValue('tianditu-tools/Other/extramap', False)
             self.extra_map_action.setEnabled(False)
 
     def handle_comboBox_index_changed(self):
         selected_index = self.comboBox.currentIndex()
         selected_domain = self.subdomain_list[selected_index]
-        cfg.setValue('Tianditu', 'subdomain', selected_domain)
+        self.qset.setValue('tianditu-tools/Tianditu/subdomain', selected_domain)
 
     def enable_random(self):
         if self.checkBox_2.isChecked():
-            cfg.setValue('Tianditu', 'random', 'True')
+            self.qset.setValue('tianditu-tools/Tianditu/random', True)
             self.comboBox.setEnabled(False)
         else:
-            cfg.setValue('Tianditu', 'random', 'False')
+            self.qset.setValue('tianditu-tools/Tianditu/random', False)
             self.comboBox.setEnabled(True)
-            self.ping_thread = PingUrlThread(self.key)
-            self.ping_thread.ping_finished.connect(lambda data: self.handle_ping_finished(data))
-            self.ping_thread.start()
+            if self.keyisvalid:
+                self.ping_thread = PingUrlThread(self.key)
+                self.ping_thread.ping_finished.connect(lambda data: self.handle_ping_finished(data))
+                self.ping_thread.start()

@@ -36,7 +36,7 @@ def check_url_status(url):
 def check_subdomains(url_list):
     ping_list = []
     for url in url_list:
-        response = requests.get(url, headers=HEADER)
+        response = requests.get(url, headers=HEADER, timeout=8)
         if response.status_code == 200:
             ms = response.elapsed.total_seconds() * 1000
             ping_list.append(f'{int(ms)} ms')
