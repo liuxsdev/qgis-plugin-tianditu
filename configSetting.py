@@ -28,7 +28,6 @@ class ConfigFile:
         try:
             value = self.cfg.get(section, key)
         except (configparser.NoSectionError, configparser.NoOptionError):
-            # print("section or key do not exist")
             value = ''
             self.setValue(section, key, value)
         return value
@@ -37,7 +36,6 @@ class ConfigFile:
         try:
             value = self.cfg.getboolean(section, key)
         except (configparser.NoSectionError, configparser.NoOptionError):
-            # print("section or key do not exist")
             value = False
             self.setValue(section, key, str(value))
         return value
