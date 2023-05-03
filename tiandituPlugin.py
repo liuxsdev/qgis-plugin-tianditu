@@ -8,7 +8,7 @@ from qgis.core import Qgis, QgsRasterLayer, QgsProject, QgsSettings
 
 from .searchDockWidget import SearchDockWidget
 from .settingDialog import SettingDialog
-from .tiandituConfig import TianMapInfo, extra_maps
+from .tiandituConfig import TianMapInfo, extra_maps, tdt
 from .utils import tianditu_map_url, TianDiTuHomeURL, PluginDir
 
 current_qgis_version = Qgis.versionInt()
@@ -84,16 +84,27 @@ class TianDiTu:
         for maptype in TianMapInfo:
             menu.addAction(icon_map, TianMapInfo[maptype], lambda maptype_=maptype: self.add_tianditu_basemap(maptype_))
         menu.addSeparator()
+        # 天地图省级节点
+        self.tdt_jiangsu_action = menu.addAction(icon_other, '天地图·江苏')
+        tdt_jiangsu_menu = QMenu()
+        tianditu_jiangsu = tdt['天地图-江苏']
+        for mapdata in tianditu_jiangsu:
+            tdt_jiangsu_menu.addAction(icon_map, mapdata['name'], lambda m=mapdata: add_xyz_layer(m['uri'], m['name']))
+        self.tdt_jiangsu_action.setMenu(tdt_jiangsu_menu)
+        menu.addSeparator()
         # 其他图源
         self.extra_map_action = menu.addAction(icon_other, '其他图源')
         extra_map_menu = QMenu()
         for map_data in extra_maps:
-            icon = get_extra_map_icon(map_data)
-            extra_map_menu.addAction(
-                icon,
-                map_data['name'],
-                lambda map_data_=map_data: add_extra_map(map_data_)
-            )
+            if map_data['name'] != 'Separator':
+                icon = get_extra_map_icon(map_data)
+                extra_map_menu.addAction(
+                    icon,
+                    map_data['name'],
+                    lambda map_data_=map_data: add_extra_map(map_data_)
+                )
+            else:
+                extra_map_menu.addSeparator()
             # TODO:增加备注tooltip
         self.extra_map_action.setMenu(extra_map_menu)
         extramap_enabled = self.qset.value("tianditu-tools/Other/extramap", type=bool)

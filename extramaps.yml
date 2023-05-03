@@ -4,21 +4,55 @@
   zmin: 0
   zmax: 21
   referer: ''
-- name: Google Map - Satellite
-  icon: googlemap_satellite.png
-  url: http://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}
-  zmin: 0
-  zmax: 21
-  referer: ''
+- name: Separator
 - name: Google Map (CN) - Satellite
   icon: googlemap_satellite.png
   url: https://gac-geo.googlecnapps.cn/maps/vt?lyrs=s&x={x}&y={y}&z={z}
   zmin: 0
   zmax: 21
   referer: ''
+- name: Google Map (CN) - Roadmap*
+  icon: googlemap_default.png
+  url: https://gac-geo.googlecnapps.cn/maps/vt?lyrs=r&x={x}&y={y}&z={z}
+  zmin: 0
+  zmax: 21
+  referer: ''
+- name: Google Map (CN) - Terrain*
+  icon: googlemap_terrain.png
+  url: https://gac-geo.googlecnapps.cn/maps/vt?lyrs=p&x={x}&y={y}&z={z}
+  zmin: 0
+  zmax: 21
+  referer: ''
+- name: Separator
 - name: Openstreetmap
   icon: osm.svg
   url: https://tile.openstreetmap.org/{z}/{x}/{y}.png
   zmin: 0
   zmax: 21
   referer: ''
+- name: Separator
+- name: Stamen Maps - Toner
+  icon: stamen_toner.png
+  url: https://stamen-tiles.a.ssl.fastly.net/toner/{z}/{x}/{y}.png
+  zmin: 0
+  zmax: 16
+  referer: ''
+- name: Stamen Maps - Terrain
+  icon: stamen_terrain.png
+  url: https://stamen-tiles.a.ssl.fastly.net/terrain/{z}/{x}/{y}.png
+  zmin: 0
+  zmax: 12
+  referer: ''
+- name: Stamen Maps - Terrain Background
+  icon: stamen_terrain.png
+  url: https://stamen-tiles.a.ssl.fastly.net/terrain-background/{z}/{x}/{y}.png
+  zmin: 0
+  zmax: 12
+  referer: ''
+- name: Stamen Maps - Watercolor
+  icon: stamen_watercolor.png
+  url: https://stamen-tiles.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.jpg
+  zmin: 0
+  zmax: 15
+  referer: ''
+

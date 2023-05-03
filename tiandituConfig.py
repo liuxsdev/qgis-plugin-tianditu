@@ -6,6 +6,11 @@ EXTRAMAPS_PATH = os.path.join(PluginDir, 'extramaps.yml')
 with open(EXTRAMAPS_PATH, encoding='utf-8') as f:
     extra_maps = yaml.load(f, Loader=yaml.FullLoader)
 
+T_PATH = os.path.join(PluginDir, 'tianditu.yml')
+with open(T_PATH, encoding='utf-8') as f:
+    tdt = yaml.load(f, Loader=yaml.FullLoader)
+
+
 TianMapInfo = {
     'vec': '天地图-矢量底图',
     'cva': '天地图-矢量注记',
@@ -17,4 +22,3 @@ TianMapInfo = {
     'eia': '天地图-英文影像注记',
     'ibo': '天地图-全球境界'
 }
-
