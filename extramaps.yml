@@ -25,32 +25,32 @@
   referer: ''
 - name: Separator
 - name: Openstreetmap
-  icon: osm.svg
+  icon: osm.webp
   url: https://tile.openstreetmap.org/{z}/{x}/{y}.png
   zmin: 0
   zmax: 21
   referer: ''
 - name: Separator
 - name: Stamen Maps - Toner
-  icon: stamen_toner.png
+  icon: stamen_toner.webp
   url: https://stamen-tiles.a.ssl.fastly.net/toner/{z}/{x}/{y}.png
   zmin: 0
   zmax: 16
   referer: ''
 - name: Stamen Maps - Terrain
-  icon: stamen_terrain.png
+  icon: stamen_terrain.webp
   url: https://stamen-tiles.a.ssl.fastly.net/terrain/{z}/{x}/{y}.png
   zmin: 0
   zmax: 12
   referer: ''
 - name: Stamen Maps - Terrain Background
-  icon: stamen_terrain.png
+  icon: stamen_terrain.webp
   url: https://stamen-tiles.a.ssl.fastly.net/terrain-background/{z}/{x}/{y}.png
   zmin: 0
   zmax: 12
   referer: ''
 - name: Stamen Maps - Watercolor
-  icon: stamen_watercolor.png
+  icon: stamen_watercolor.webp
   url: https://stamen-tiles.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.jpg
   zmin: 0
   zmax: 15
