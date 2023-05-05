@@ -12,7 +12,7 @@ dest_dir = source_dir.joinpath('dist/tianditu-tools')
 exclude_files = ['run.py']
 
 # Other necessary files
-other_files = ['metadata.txt', 'PointStyle.qml', 'extramaps.yml', 'README.md', 'LICENSE']
+other_files = ['metadata.txt', 'PointStyle.qml', 'tianditu.yml', 'extramaps.yml', 'README.md', 'LICENSE']
 
 
 # Define the command line argument

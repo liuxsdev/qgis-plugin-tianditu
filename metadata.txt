@@ -14,7 +14,7 @@ homepage=https://github.com/liuxsdev/qgis-plugin-tianditu
 tracker=https://github.com/liuxsdev/qgis-plugin-tianditu/issues
 repository=https://github.com/liuxsdev/qgis-plugin-tianditu
 changelog=
-  Version 0.2.0:
+  Version 0.2.0 2023/5/5:
   * 💥 更改配置文件到 QGIS Setting中
   * ✨ 新增天地图·江苏
   * ✨ 新增底图(stamen/esri)
