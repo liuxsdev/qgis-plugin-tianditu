@@ -11,20 +11,20 @@
   zmin: 0
   zmax: 21
   referer: ''
-- name: Google Map (CN) - Roadmap*
+- name: Google Map (CN) - Roadmap
   icon: googlemap_default.png
   url: https://gac-geo.googlecnapps.cn/maps/vt?lyrs=r&x={x}&y={y}&z={z}
   zmin: 0
   zmax: 21
   referer: ''
-- name: Google Map (CN) - Terrain*
+- name: Google Map (CN) - Terrain
   icon: googlemap_terrain.png
   url: https://gac-geo.googlecnapps.cn/maps/vt?lyrs=p&x={x}&y={y}&z={z}
   zmin: 0
   zmax: 21
   referer: ''
 - name: Separator
-- name: Openstreetmap
+- name: Openstreetmap🪜
   icon: osm.webp
   url: https://tile.openstreetmap.org/{z}/{x}/{y}.png
   zmin: 0
@@ -55,4 +55,40 @@
   zmin: 0
   zmax: 15
   referer: ''
-
+- name: Separator
+- name: ESRI - Imagery
+  icon: ESRI.webp
+  url: https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}
+  zmin: 0
+  zmax: 18
+  referer: ''
+- name: ESRI - Hillshade
+  icon: ESRI.webp
+  url: https://server.arcgisonline.com/arcgis/rest/services/Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}
+  zmin: 0
+  zmax: 18
+  referer: ''
+- name: ESRI - 中国地图彩色版
+  icon: ESRI.webp
+  url: https://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineCommunity/MapServer/tile/{z}/{y}/{x}
+  zmin: 0
+  zmax: 18
+  referer: ''
+- name: ESRI - 中国地图暖色版
+  icon: ESRI.webp
+  url: https://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetWarm/MapServer/tile/{z}/{y}/{x}
+  zmin: 0
+  zmax: 18
+  referer: ''
+- name: ESRI - 中国地图灰色版
+  icon: ESRI.webp
+  url: https://map.geoq.cn/arcgis/rest/services/ChinaOnlineStreetGray/MapServer/tile/{z}/{y}/{x}
+  zmin: 0
+  zmax: 18
+  referer: ''
+- name: ESRI - 中国地图蓝黑版
+  icon: ESRI.webp
+  url: https://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer/tile/{z}/{y}/{x}
+  zmin: 0
+  zmax: 18
+  referer: ''

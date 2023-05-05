@@ -85,7 +85,7 @@ class TianDiTu:
             menu.addAction(icon_map, TianMapInfo[maptype], lambda maptype_=maptype: self.add_tianditu_basemap(maptype_))
         menu.addSeparator()
         # 天地图省级节点
-        self.tdt_jiangsu_action = menu.addAction(icon_other, '天地图·江苏')
+        self.tdt_jiangsu_action = menu.addAction(icon_map, '天地图·江苏')
         tdt_jiangsu_menu = QMenu()
         tianditu_jiangsu = tdt['天地图-江苏']
         for mapdata in tianditu_jiangsu:
