@@ -1,6 +1,6 @@
 # TianDiTu Tools
 
-[QGIS Python Plugins Repository](https://plugins.qgis.org/plugins/tianditu-tools/)
+<a href="https://plugins.qgis.org/plugins/tianditu-tools/"><img src="https://img.shields.io/badge/dynamic/json?color=green&label=Downloads&query=downloads&url=https://func.liuxs.pro/api/main?action=qgis_plugin%26query=tianditu-tools"></a>
 
 QGIS 天地图工具，方便进行天地图瓦片底图的添加以及简单实现了部分[天地图 Web 服务 API](http://lbs.tianditu.gov.cn/server/guide.html)（地名搜索、地理编码查询、逆地理编码查询）
 
