@@ -1,12 +1,11 @@
 import os
 
-from qgis.core import QgsProject, QgsVectorLayer, QgsGeometry, QgsFeature, QgsPointXY
+from qgis.core import QgsProject, QgsVectorLayer, QgsGeometry, QgsFeature, QgsPointXY, QgsSettings
 from qgis.PyQt import QtWidgets
 from qgis.PyQt.QtCore import QThread, pyqtSignal
 from qgis.PyQt.QtWidgets import QTreeWidget, QTreeWidgetItem
 from .utils import PluginDir, TiandituAPI
 from .ui.search import Ui_SearchDockWidget
-from .configSetting import ConfigFile, CONFIG_FILE_PATH
 
 
 class SearchRequestThread(QThread):
@@ -124,9 +123,9 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
         self.search_request_thread = None
         self.setupUi(self)
         self.iface = iface
+        self.qset = QgsSettings()
         # 读取token
-        self.cfg = ConfigFile(CONFIG_FILE_PATH)
-        self.token = self.cfg.getValue('Tianditu', 'key')
+        self.token = self.qset.value('tianditu-tools/Tianditu/key')
         self.api = TiandituAPI(self.token)
         # 初始化treeWidget
         self.treeWidget = QTreeWidget(self.tab)
@@ -160,7 +159,7 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
                     api=self.api,
                     data={'keyword': keyword, 'admin_code': admin_code}
                 )
-                self.search_request_thread.request_finished.connect(lambda data: self.on_search_complate(data, item))
+                self.search_request_thread.request_finished.connect(lambda data: self.on_search_complete(data, item))
                 self.search_request_thread.start()
             else:
                 name = item.text(1)
@@ -195,7 +194,7 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
         # self.iface.mapCanvas().setExtent(rect)
         self.iface.mapCanvas().refresh()
 
-    def on_search_complate(self, data, item=None):
+    def on_search_complete(self, data, item=None):
         search_type = data['type']
         if search_type == "api_search_v2:1":
             self.treeWidget.takeTopLevelItem(0)  # 移除"搜索中..."
@@ -263,7 +262,7 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
         search_progress_tip.setText(1, '搜索中...')
         self.search_request_thread = SearchRequestThread(search_type="api_search_v2", api=self.api,
                                                          data={'keyword': keyword})
-        self.search_request_thread.request_finished.connect(lambda data: self.on_search_complate(data))
+        self.search_request_thread.request_finished.connect(lambda data: self.on_search_complete(data))
         self.search_request_thread.start()
 
     def geocoder(self):
@@ -274,7 +273,7 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
         self.search_request_thread = SearchRequestThread(
             search_type='api_geocoder', api=self.api, data={'keyword': keyword}
         )
-        self.search_request_thread.request_finished.connect(lambda data: self.on_search_complate(data))
+        self.search_request_thread.request_finished.connect(lambda data: self.on_search_complete(data))
         self.search_request_thread.start()
 
     def geocoder_result_link_clicked(self):
@@ -296,7 +295,7 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
             self.search_request_thread = SearchRequestThread(
                 search_type='api_regeocoder', api=self.api, data={'lon': lon, 'lat': lat}
             )
-            self.search_request_thread.request_finished.connect(lambda data: self.on_search_complate(data))
+            self.search_request_thread.request_finished.connect(lambda data: self.on_search_complete(data))
             self.search_request_thread.start()
         except Exception as e:
             self.iface.messageBar().pushWarning(title="天地图API - Error：经纬度输入有误", message=str(e))

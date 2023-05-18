@@ -14,7 +14,6 @@ exclude_files = ['run.py']
 # Other necessary files
 other_files = ['metadata.txt', 'PointStyle.qml', 'tianditu.yml', 'extramaps.yml', 'README.md', 'LICENSE']
 
-
 # Define the command line argument
 arg = sys.argv[1] if len(sys.argv) > 1 else None
 
@@ -25,7 +24,6 @@ if arg == 'build':
     dest_dir.mkdir(parents=True, exist_ok=True)
     dest_dir_ui = dest_dir.joinpath('ui')
     dest_dir_ui.mkdir(parents=True, exist_ok=True)
-  
 
     # Copy all .py files from the root directory except for exclude_files
     for file in source_dir.glob('*.py'):
