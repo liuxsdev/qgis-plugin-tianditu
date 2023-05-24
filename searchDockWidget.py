@@ -1,6 +1,6 @@
 import os
 
-from qgis.core import QgsProject, QgsVectorLayer, QgsGeometry, QgsFeature, QgsPointXY, QgsSettings
+from qgis.core import QgsProject, QgsVectorLayer, QgsGeometry, QgsFeature, QgsPoint, QgsSettings
 from qgis.PyQt import QtWidgets
 from qgis.PyQt.QtCore import QThread, pyqtSignal
 from qgis.PyQt.QtWidgets import QTreeWidget, QTreeWidgetItem
@@ -178,13 +178,12 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
         layer = QgsVectorLayer('point?crs=epsg:4326&field=Name:string', name, 'memory')
         pr = layer.dataProvider()
         # 定义要素
-        geom = QgsGeometry.fromPointXY(QgsPointXY(x, y))
-        point = QgsFeature()
-        point.setGeometry(geom)
-        point.setAttributes([name])
+        point_feature = QgsFeature()
+        point_feature.setGeometry(QgsPoint(x, y))
+        point_feature.setAttributes([name])
         # 添加要素到图层
+        pr.addFeature(point_feature)
         group.addLayer(layer)
-        pr.addFeature(point)
         # 加载图层样式
         layer.loadNamedStyle(os.path.join(PluginDir, "PointStyle.qml"))
         layer.updateExtents()
