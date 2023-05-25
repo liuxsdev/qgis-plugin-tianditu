@@ -8,7 +8,7 @@ from qgis.core import Qgis, QgsRasterLayer, QgsProject, QgsSettings
 
 from .searchDockWidget import SearchDockWidget
 from .settingDialog import SettingDialog
-from .tiandituConfig import TianMapInfo, extra_maps, tdt
+from .tiandituConfig import TianMapInfo, extra_maps, tianditu_province
 from .utils import tianditu_map_url, TianDiTuHomeURL, PluginDir
 
 current_qgis_version = Qgis.versionInt()
@@ -85,12 +85,14 @@ class TianDiTu:
             menu.addAction(icon_map, TianMapInfo[maptype], lambda maptype_=maptype: self.add_tianditu_basemap(maptype_))
         menu.addSeparator()
         # 天地图省级节点
-        self.tdt_jiangsu_action = menu.addAction(icon_map, '天地图·江苏')
-        tdt_jiangsu_menu = QMenu()
-        tianditu_jiangsu = tdt['天地图-江苏']
-        for mapdata in tianditu_jiangsu:
-            tdt_jiangsu_menu.addAction(icon_map, mapdata['name'], lambda m=mapdata: add_xyz_layer(m['uri'], m['name']))
-        self.tdt_jiangsu_action.setMenu(tdt_jiangsu_menu)
+        keys = tianditu_province.keys()
+        for key in keys:
+            province_action = menu.addAction(icon_map, key)
+            map_data = tianditu_province[key]
+            province_menu = QMenu()
+            for m in map_data:
+                province_menu.addAction(icon_map, m['name'], lambda m_=m: add_xyz_layer(m_['uri'], m_['name']))
+            province_action.setMenu(province_menu)
         menu.addSeparator()
         # 其他图源
         self.extra_map_action = menu.addAction(icon_other, '其他图源')

@@ -8,7 +8,7 @@ with open(EXTRAMAPS_PATH, encoding="utf-8") as f:
 
 T_PATH = os.path.join(PluginDir, "tianditu.yml")
 with open(T_PATH, encoding="utf-8") as f:
-    tdt = yaml.load(f, Loader=yaml.FullLoader)
+    tianditu_province = yaml.load(f, Loader=yaml.FullLoader)
 
 TianMapInfo = {
     "vec": "天地图-矢量底图",

@@ -14,6 +14,8 @@ homepage=https://github.com/liuxsdev/qgis-plugin-tianditu
 tracker=https://github.com/liuxsdev/qgis-plugin-tianditu/issues
 repository=https://github.com/liuxsdev/qgis-plugin-tianditu
 changelog=
+  Version 0.2.1 2023/5/25:
+  * 🐛 修复地名搜索不正常/添加地名点时图标丢失
   Version 0.2.0 2023/5/5:
   * 💥 更改配置文件到 QGIS Setting中
   * ✨ 新增天地图·江苏
