@@ -5,67 +5,53 @@ import zipfile
 from pathlib import Path
 
 # Define the source and destination directories
-source_dir = Path.cwd()
-dest_dir = source_dir.joinpath('dist/tianditu-tools')
-
-# Define the files to be excluded from copying
-exclude_files = ['run.py']
+cwd = Path.cwd()
+source_dir = cwd.joinpath("tianditu-tools")
+dist_dir = cwd.joinpath("dist")
+dist_source_dir = dist_dir.joinpath("tianditu-tools")
 
 # Other necessary files
-other_files = ['metadata.txt', 'PointStyle.qml', 'tianditu.yml', 'extramaps.yml']
-other_files_in_parent = ['README.md', 'LICENSE']
+other_files = ["README.md", "LICENSE"]
 
 # Define the command line argument
 arg = sys.argv[1] if len(sys.argv) > 1 else None
 
-if arg == 'build':
-    if dest_dir.exists():
-        shutil.rmtree(dest_dir)
-    # Create the destination directory if it does not exist
-    dest_dir.mkdir(parents=True, exist_ok=True)
-    dest_dir_ui = dest_dir.joinpath('ui')
-    dest_dir_ui.mkdir(parents=True, exist_ok=True)
+if arg == "build":
+    if dist_source_dir.exists():
+        shutil.rmtree(dist_source_dir)
+    # 复制源文件夹到dist目录下的tianditu-tools文件夹
+    shutil.copytree(source_dir, dist_source_dir)
 
-    # Copy all .py files from the root directory except for exclude_files
-    for file in source_dir.glob('*.py'):
-        if file.name not in exclude_files:
-            shutil.copy(file, dest_dir)
-
-    # Copy the files listed in other_files to dest_dir
+    # 删除ui文件夹的ui文件，只保留python文件
+    for file_path in dist_source_dir.joinpath("ui").glob("*.ui"):
+        file_path.unlink()
+    # 复制README和LICENSE文件
     for file in other_files:
-        shutil.copy(source_dir.joinpath(file), dest_dir)
-
-    # Copy the files listed in other_files to dest_dir's parent dir (home dir)
-    for file in other_files_in_parent:
-        print(source_dir.parent.joinpath(file).absolute())
-        shutil.copy(source_dir.parent.joinpath(file).absolute(), dest_dir)
-
-    # Copy all .py files from the ui directory
-    for file in source_dir.joinpath('ui').glob('*.py'):
-        shutil.copy(file, dest_dir_ui)
-
-    # Copy the entire images directory
-    shutil.copytree(source_dir.joinpath('images'), dest_dir.joinpath('images'))
+        shutil.copy(cwd.joinpath(file), dist_source_dir)
 
     # Read the metadata.txt file using configparser
     config = configparser.ConfigParser()
-    config.read('metadata.txt', encoding='utf-8')
+    config.read(source_dir.joinpath("metadata.txt"), encoding="utf-8")
 
     # Get the version under the [general] section
-    version = config.get('general', 'version')
+    version = config.get("general", "version")
+
+    filename = f"tianditu-tools-{version}.zip"
 
     # Zip the destination directory
-    with zipfile.ZipFile(f'{dest_dir}-{version}.zip', 'w', zipfile.ZIP_DEFLATED) as zipf:
-        for file in dest_dir.glob('**/*'):
-            zipf.write(file, file.relative_to(dest_dir.parent))
+    with zipfile.ZipFile(
+        dist_dir.joinpath(filename), "w", zipfile.ZIP_DEFLATED
+    ) as zipf:
+        for file in dist_source_dir.glob("**/*"):
+            zipf.write(file, file.relative_to(dist_source_dir.parent))
 
-    # 删除目标目录
-    shutil.rmtree(dest_dir)
-    print(f"完成打包 tianditu-tools-{version}.zip")
+    # 删除dist目录
+    shutil.rmtree(dist_source_dir)
+    print(f"完成打包 {filename}")
 
-elif arg == 'clean':
+elif arg == "clean":
     # Remove the destination directory if it exists
-    shutil.rmtree(dest_dir.parent, ignore_errors=True)
+    shutil.rmtree(dist_dir, ignore_errors=True)
 
 else:
     print('Invalid argument. Please use "build" or "clean".')
