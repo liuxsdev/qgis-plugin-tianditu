@@ -1,11 +1,12 @@
 import os
 
-from qgis.core import QgsProject, QgsVectorLayer, QgsGeometry, QgsFeature, QgsPoint, QgsSettings
 from qgis.PyQt import QtWidgets
 from qgis.PyQt.QtCore import QThread, pyqtSignal
 from qgis.PyQt.QtWidgets import QTreeWidget, QTreeWidgetItem
-from .utils import PluginDir, TiandituAPI
+from qgis.core import QgsProject, QgsVectorLayer, QgsFeature, QgsPoint, QgsSettings
+
 from .ui.search import Ui_SearchDockWidget
+from .utils import PluginDir, TiandituAPI
 
 
 class SearchRequestThread(QThread):
