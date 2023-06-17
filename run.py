@@ -5,14 +5,15 @@ import zipfile
 from pathlib import Path
 
 # Define the source and destination directories
-source_dir = Path('.')
+source_dir = Path.cwd()
 dest_dir = source_dir.joinpath('dist/tianditu-tools')
 
 # Define the files to be excluded from copying
 exclude_files = ['run.py']
 
 # Other necessary files
-other_files = ['metadata.txt', 'PointStyle.qml', 'tianditu.yml', 'extramaps.yml', 'README.md', 'LICENSE']
+other_files = ['metadata.txt', 'PointStyle.qml', 'tianditu.yml', 'extramaps.yml']
+other_files_in_parent = ['README.md', 'LICENSE']
 
 # Define the command line argument
 arg = sys.argv[1] if len(sys.argv) > 1 else None
@@ -33,6 +34,11 @@ if arg == 'build':
     # Copy the files listed in other_files to dest_dir
     for file in other_files:
         shutil.copy(source_dir.joinpath(file), dest_dir)
+
+    # Copy the files listed in other_files to dest_dir's parent dir (home dir)
+    for file in other_files_in_parent:
+        print(source_dir.parent.joinpath(file).absolute())
+        shutil.copy(source_dir.parent.joinpath(file).absolute(), dest_dir)
 
     # Copy all .py files from the ui directory
     for file in source_dir.joinpath('ui').glob('*.py'):
@@ -55,7 +61,7 @@ if arg == 'build':
 
     # 删除目标目录
     shutil.rmtree(dest_dir)
-    print("完成")
+    print(f"完成打包 tianditu-tools-{version}.zip")
 
 elif arg == 'clean':
     # Remove the destination directory if it exists
