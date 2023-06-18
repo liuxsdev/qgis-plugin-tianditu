@@ -2,6 +2,7 @@
 
 [![Version](https://img.shields.io/badge/dynamic/xml?color=blue&label=Version&query=%2F%2Fpyqgis_plugin%5B%40name%3D%27TianDiTu%20Tools%27%5D%2Fversion%2Ftext%28%29&url=https%3A%2F%2Fplugins.qgis.org%2Fplugins%2Fplugins.xml%3Fqgis%3D3.30)](https://plugins.qgis.org/plugins/tianditu-tools/)
 [![Downloads](https://img.shields.io/badge/dynamic/xml?color=success&label=Downloads&query=%2F%2Fpyqgis_plugin%5B%40name%3D%27TianDiTu%20Tools%27%5D%2Fdownloads%2Ftext%28%29&url=https%3A%2F%2Fplugins.qgis.org%2Fplugins%2Fplugins.xml%3Fqgis%3D3.30)](https://plugins.qgis.org/plugins/tianditu-tools/)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 QGIS 天地图工具，方便进行天地图瓦片底图的添加以及简单实现了部分[天地图 Web 服务 API](http://lbs.tianditu.gov.cn/server/guide.html)（地名搜索、地理编码查询、逆地理编码查询）
 
