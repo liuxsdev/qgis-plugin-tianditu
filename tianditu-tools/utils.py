@@ -45,6 +45,19 @@ def check_subdomains(url_list):
     return ping_list
 
 
+def check_key_format(key: str):
+    # 检查key格式
+    correct_length = 32
+    key_length = len(key)
+    key_length_error = False
+    if key_length != correct_length:
+        key_length_error = True
+    return {
+        'key_length_error': key_length_error,
+        'has_special_character': not key.isalnum()
+    }
+
+
 class TiandituAPI:
     def __init__(self, token: str):
         self.token = token
