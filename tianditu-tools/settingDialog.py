@@ -1,8 +1,9 @@
 from qgis.PyQt import QtWidgets
 from qgis.PyQt.QtCore import QThread, pyqtSignal
 from qgis.core import QgsSettings
+
 from .ui.setting import Ui_SettingDialog
-from .utils import tianditu_map_url, check_url_status, check_subdomains
+from .utils import tianditu_map_url, check_url_status, check_subdomains, check_key_format
 
 
 class CheckThread(QThread):
@@ -52,8 +53,10 @@ class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
         self.random_enabled = self.qset.value('tianditu-tools/Tianditu/random', type=bool)
         self.subdomain = self.qset.value('tianditu-tools/Tianditu/subdomain')
         self.extramap_enabled = self.qset.value('tianditu-tools/Other/extramap', type=bool)
+        # 设置界面
         self.setupUi(self)
         self.mLineEdit_key.setText(self.key)
+        self.mLineEdit_key.textChanged.connect(self.on_key_LineEdit_changed)
         if self.keyisvalid:
             self.label_keystatus.setText('正常')
         else:
@@ -80,8 +83,28 @@ class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
             self.comboBox.setItemText(i, f't{i} {status[i]}')
         self.comboBox.setItemText(min_index, f't{min_index} {status[min_index]}*')
 
+    def on_key_LineEdit_changed(self):
+        current_text = self.mLineEdit_key.text()
+        # 删除key中的空格以及非打印字符
+        filtered_text = "".join([c for c in current_text if c.isprintable() and not c.isspace()])
+        if filtered_text != current_text:
+            self.mLineEdit_key.setText(filtered_text)
+        # 检查key格式
+        key_format = check_key_format(current_text)
+        if key_format['key_length_error']:
+            self.label_keystatus.setText('无效key: 格式错误(长度不对)')
+            self.pushButton.setEnabled(False)
+        elif key_format['has_special_character']:
+            self.label_keystatus.setText('无效key: 含非常规字符')
+            self.pushButton.setEnabled(False)
+        else:
+            self.label_keystatus.setText('未知')
+            self.pushButton.setEnabled(True)
+
     def check(self):
-        # save
+        """
+        检查key是否有效
+        """
         self.qset.setValue('tianditu-tools/Tianditu/key', self.mLineEdit_key.text())
         self.label_keystatus.setText('检查中...')
         self.check_thread = CheckThread(self.qset)
