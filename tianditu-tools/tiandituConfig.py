@@ -1,5 +1,7 @@
-import yaml
 import os
+
+import yaml
+
 from .utils import PluginDir
 
 EXTRAMAPS_PATH = os.path.join(PluginDir, "extramaps.yml")

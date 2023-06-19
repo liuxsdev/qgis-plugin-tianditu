@@ -1,3 +1,6 @@
+from .tiandituPlugin import TianDiTu
+
+
 def classFactory(iface):
-    from .tiandituPlugin import TianDiTu
+    """QGIS Plugin"""
     return TianDiTu(iface)
