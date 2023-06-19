@@ -1,14 +1,33 @@
-"""Module providing util functions"""
 import os
-
+from dataclasses import dataclass
 import requests
 
 TIANDITU_HOME_URL = "https://www.tianditu.gov.cn/"
+PLUGIN_NAME = "tianditu-tools"
 PluginDir = os.path.dirname(__file__)
 HEADER = {
     "User-Agent": "Mozilla/5.0 QGIS/32400/Windows 10 Version 2009",
     "Referer": "https://www.tianditu.gov.cn/",
 }
+
+
+@dataclass
+class PluginConfig:
+    key: str
+    keyisvalid: bool
+    random_enabled: bool
+    subdomain: str
+    extramap_enabled: bool
+
+
+def get_qset_name(key: str) -> str:
+    section_tianditu = ["key", "random", "keyisvalid", "subdomain"]
+    section_other = ["extramap"]
+    if key in section_tianditu:
+        return f"tianditu-tools/Tianditu/{key}"
+    if key in section_other:
+        return f"tianditu-tools/Other/{key}"
+    return ""
 
 
 def tianditu_map_url(maptype: str, token: str, subdomain: str) -> str:
