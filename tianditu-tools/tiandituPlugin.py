@@ -14,12 +14,29 @@ from .utils import tianditu_map_url, TIANDITU_HOME_URL, PluginDir
 current_qgis_version = Qgis.versionInt()
 
 
-def add_xyz_layer(uri, name):
+def add_xyz_layer(uri: str, name: str) -> None:
+    """QGIS 添加xyz图层
+
+    Args:
+        uri (str): 图层uri
+        name (str): 图层名称
+    """
     raster_layer = QgsRasterLayer(uri, name, "wms")
     QgsProject.instance().addMapLayer(raster_layer)
 
 
-def get_map_uri(url, zmin=0, zmax=18, referer=""):
+def get_map_uri(url: str, zmin: int = 0, zmax: int = 18, referer: str = "") -> str:
+    """返回瓦片地图uri
+
+    Args:
+        url (str): 瓦片地图url
+        zmin (int, optional): z 最小值. Defaults to 0.
+        zmax (int, optional): z 最大值 Defaults to 18.
+        referer (str, optional): Referer. Defaults to "".
+
+    Returns:
+        str: 瓦片地图uri
+    """
     url_quote = requests.utils.quote(url, safe=":/")
     uri = f"type=xyz&url={url_quote}&zmin={zmin}&zmax={zmax}"
     if referer != "":
@@ -30,7 +47,12 @@ def get_map_uri(url, zmin=0, zmax=18, referer=""):
     return uri
 
 
-def add_extra_map(map_data):
+def add_extra_map(map_data: object) -> None:
+    """添加额外的地图
+
+    Args:
+        map_data (object): 地图信息
+    """
     name = map_data["name"]
     uri = get_map_uri(
         map_data["url"], map_data["zmin"], map_data["zmax"], map_data["referer"]
@@ -38,7 +60,15 @@ def add_extra_map(map_data):
     add_xyz_layer(uri, name)
 
 
-def get_extra_map_icon(map_data):
+def get_extra_map_icon(map_data: object) -> QIcon:
+    """获取额外地图的图标
+
+    Args:
+        map_data (object): 地图信息
+
+    Returns:
+        QIcon: 图标
+    """
     icon_home_path = PluginDir + "/images/map_icons/"
     if "icon" in map_data:
         icon = QIcon(icon_home_path + map_data["icon"])
@@ -54,15 +84,11 @@ class TianDiTu:
         self.toolbar = self.iface.addToolBar("TianDiTu Toolbar")
         self.toolbar.setObjectName("TianDiTuToolbar")
         self.toolbar.setToolTip("天地图工具栏")
-        self.plugin_dir = PluginDir
         # 定义实例变量
         self.addTiandituToolbar = None
         self.addTiandituButton = None
-        self.extra_map_action = None
-        self.action_setting = None
-        self.action_search = None
         self.searchdockwidget = None
-        self.tdt_jiangsu_action = None
+        self.actions = {"search": None, "setting": None, "extra_map_action": None}
         # 配置文件
         self.qset = QgsSettings()
         if not self.qset.contains("tianditu-tools/Tianditu/key"):
@@ -75,37 +101,39 @@ class TianDiTu:
 
     def initGui(self):
         # 图标
-        icon_setting = QIcon(self.plugin_dir + "/images/setting.svg")
-        icon_add = QIcon(self.plugin_dir + "/images/add_map.svg")
-        icon_map = QIcon(self.plugin_dir + "/images/map_tianditu.svg")
-        icon_other = QIcon(self.plugin_dir + "/images/earth.svg")
-        icon_search = QIcon(self.plugin_dir + "/images/search.svg")
+        icons = {
+            "setting": QIcon(PluginDir + "/images/setting.svg"),
+            "add": QIcon(PluginDir + "/images/add_map.svg"),
+            "map": QIcon(PluginDir + "/images/map_tianditu.svg"),
+            "other": QIcon(PluginDir + "/images/earth.svg"),
+            "search": QIcon(PluginDir + "/images/search.svg"),
+        }
         # 天地图添加 Action
         menu = QMenu()
         menu.setObjectName("TianDiTuAddMap")
-        for maptype in TianMapInfo:
+        for map_type, map_name in TianMapInfo.items():
             menu.addAction(
-                icon_map,
-                TianMapInfo[maptype],
-                lambda maptype_=maptype: self.add_tianditu_basemap(maptype_),
+                icons["map"],
+                map_name,
+                lambda maptype_=map_type: self.add_tianditu_basemap(maptype_),
             )
         menu.addSeparator()
         # 天地图省级节点
         keys = tianditu_province.keys()
         for key in keys:
-            province_action = menu.addAction(icon_map, key)
+            province_action = menu.addAction(icons["map"], key)
             map_data = tianditu_province[key]
             province_menu = QMenu()
             for m in map_data:
                 province_menu.addAction(
-                    icon_map,
+                    icons["map"],
                     m["name"],
                     lambda m_=m: add_xyz_layer(m_["uri"], m_["name"]),
                 )
             province_action.setMenu(province_menu)
         menu.addSeparator()
-        # 其他图源
-        self.extra_map_action = menu.addAction(icon_other, "其他图源")
+        # 添加其他图源 Action
+        self.actions["extra_map_action"] = menu.addAction(icons["other"], "其他图源")
         extra_map_menu = QMenu()
         for map_data in extra_maps:
             if map_data["name"] != "Separator":
@@ -117,32 +145,33 @@ class TianDiTu:
                 )
             else:
                 extra_map_menu.addSeparator()
-            # TODO:增加备注tooltip
-        self.extra_map_action.setMenu(extra_map_menu)
+        self.actions["extra_map_action"].setMenu(extra_map_menu)
         extramap_enabled = self.qset.value("tianditu-tools/Other/extramap", type=bool)
         if not extramap_enabled:
-            self.extra_map_action.setEnabled(False)
+            self.actions["extra_map_action"].setEnabled(False)
 
         self.addTiandituButton = QToolButton()
         self.addTiandituButton.setMenu(menu)
         self.addTiandituButton.setPopupMode(QToolButton.MenuButtonPopup)
         self.addTiandituButton.setText("添加底图")
-        self.addTiandituButton.setIcon(icon_add)
+        self.addTiandituButton.setIcon(icons["add"])
         self.addTiandituButton.setToolTip("添加底图")
         self.addTiandituToolbar = self.toolbar.addWidget(self.addTiandituButton)
 
         # 设置 Action
-        self.action_setting = QAction(icon_setting, "设置", self.iface.mainWindow())
-        self.action_setting.triggered.connect(self.show_setting_dialog)
-        self.toolbar.addAction(self.action_setting)
+        self.actions["setting"] = QAction(
+            icons["setting"], "设置", self.iface.mainWindow()
+        )
+        self.actions["setting"].triggered.connect(self.show_setting_dialog)
+        self.toolbar.addAction(self.actions["setting"])
 
         # 查询 Action
-        self.action_search = QAction(icon_search, "查询", self.iface.mainWindow())
-        self.action_search.triggered.connect(self.openSearch)
-        self.toolbar.addAction(self.action_search)
+        self.actions["search"] = QAction(icons["search"], "查询", self.iface.mainWindow())
+        self.actions["search"].triggered.connect(self.openSearch)
+        self.toolbar.addAction(self.actions["search"])
 
     def show_setting_dialog(self):
-        dlg = SettingDialog(self.extra_map_action)
+        dlg = SettingDialog(self.actions["extra_map_action"])
         dlg.exec_()
 
     def add_tianditu_basemap(self, maptype):
@@ -188,8 +217,8 @@ class TianDiTu:
     def unload(self):
         """Unload from the QGIS interface"""
         self.addTiandituButton.setMenu(None)
-        self.iface.removeToolBarIcon(self.action_setting)
-        self.iface.removeToolBarIcon(self.action_search)
+        self.iface.removeToolBarIcon(self.actions["setting"])
+        self.iface.removeToolBarIcon(self.actions["search"])
         self.iface.removeToolBarIcon(self.addTiandituToolbar)
         if self.searchdockwidget:
             self.iface.removeDockWidget(self.searchdockwidget)
