@@ -11,7 +11,7 @@ from .settingDialog import SettingDialog
 from .tiandituConfig import TianMapInfo, extra_maps, tianditu_province
 from .utils import tianditu_map_url, TIANDITU_HOME_URL, PluginDir
 
-current_qgis_version = Qgis.versionInt()
+current_qgis_version = Qgis.QGIS_VERSION_INT
 
 
 def add_xyz_layer(uri: str, name: str) -> None:

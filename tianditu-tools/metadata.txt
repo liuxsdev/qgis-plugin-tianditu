@@ -1,6 +1,6 @@
 [general]
 name=TianDiTu Tools
-qgisMinimumVersion=3.0
+qgisMinimumVersion=3.4
 description=天地图底图加载
 about=QGIS 天地图工具，方便进行天地图瓦片底图的添加以及简单实现了部分天地图 Web 服务 API（地名搜索、地理编码查询、逆地理编码查询） 
 version=0.2.1
