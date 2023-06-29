@@ -1,5 +1,6 @@
 import os
 from dataclasses import dataclass
+from multiprocessing.dummy import Pool as ThreadPool
 import requests
 
 TIANDITU_HOME_URL = "https://www.tianditu.gov.cn/"
@@ -80,8 +81,25 @@ def check_url_status(url: str) -> object:
     return msg
 
 
-def check_subdomains(url_list: list) -> list:
+def check_subdomain(url: str) -> int:
     """对子域名进行测速
+
+    Args:
+        url (str): 瓦片url
+
+    Returns:
+        int: 子域名对应的延迟数(毫秒), -1 表示连接失败
+    """
+    response = requests.get(url, headers=HEADER, timeout=8)
+    if response.status_code == 200:
+        millisecond = response.elapsed.total_seconds() * 1000
+    else:
+        millisecond = -1
+    return int(millisecond)
+
+
+def check_subdomains(url_list: list) -> list:
+    """对子域名列表进行测速
 
     Args:
         url_list (list): 由不同子域名组成的瓦片url列表
@@ -89,15 +107,11 @@ def check_subdomains(url_list: list) -> list:
     Returns:
         list: 每个子域名对应的延迟数(毫秒)组成的列表
     """
-    ping_list = []
-    for url in url_list:
-        response = requests.get(url, headers=HEADER, timeout=8)
-        if response.status_code == 200:
-            millisecond = response.elapsed.total_seconds() * 1000
-            ping_list.append(f"{int(millisecond)} ms")
-        else:
-            ping_list.append("❌")
-    return ping_list
+    pool = ThreadPool(4)
+    ping_list = pool.map(check_subdomain, url_list)
+    pool.close()
+    pool.join()
+    return ["❌" if x == -1 else f"{x} ms" for x in ping_list]
 
 
 def check_key_format(key: str) -> object:
