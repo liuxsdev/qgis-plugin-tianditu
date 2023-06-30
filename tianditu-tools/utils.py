@@ -136,6 +136,19 @@ def check_key_format(key: str) -> object:
     }
 
 
+def find_nearest_number_index(numbers_list, target):
+    min_difference = float("inf")
+    nearest_index = None
+
+    for i, number in enumerate(numbers_list):
+        difference = abs(number - target)
+        if difference < min_difference:
+            min_difference = difference
+            nearest_index = i
+
+    return nearest_index
+
+
 class TiandituAPI:
     """实现天地图搜索API"""
 

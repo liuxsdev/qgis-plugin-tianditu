@@ -9,7 +9,12 @@ from qgis.core import Qgis, QgsRasterLayer, QgsProject, QgsSettings
 from .searchDockWidget import SearchDockWidget
 from .settingDialog import SettingDialog
 from .tiandituConfig import TianMapInfo, extra_maps, tianditu_province
-from .utils import tianditu_map_url, TIANDITU_HOME_URL, PluginDir
+from .utils import (
+    tianditu_map_url,
+    TIANDITU_HOME_URL,
+    PluginDir,
+    find_nearest_number_index,
+)
 
 current_qgis_version = Qgis.QGIS_VERSION_INT
 
@@ -107,6 +112,7 @@ class TianDiTu:
             "map": QIcon(PluginDir + "/images/map_tianditu.svg"),
             "other": QIcon(PluginDir + "/images/earth.svg"),
             "search": QIcon(PluginDir + "/images/search.svg"),
+            "fitzoom": QIcon(PluginDir + "/images/fitzoom.svg"),
         }
         # 天地图添加 Action
         menu = QMenu()
@@ -170,6 +176,13 @@ class TianDiTu:
         self.actions["search"].triggered.connect(self.openSearch)
         self.toolbar.addAction(self.actions["search"])
 
+        # 调整至标准 Zoom Level Action
+        self.actions["fitzoom"] = QAction(
+            icons["fitzoom"], "调整Zoom Level", self.iface.mainWindow()
+        )
+        self.actions["fitzoom"].triggered.connect(self.fit_zoom_level)
+        self.toolbar.addAction(self.actions["fitzoom"])
+
     def show_setting_dialog(self):
         dlg = SettingDialog(self.actions["extra_map_action"])
         dlg.exec_()
@@ -213,6 +226,15 @@ class TianDiTu:
                 self.searchdockwidget = SearchDockWidget(self.iface)
             self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.searchdockwidget)
             self.searchdockwidget.show()
+
+    def fit_zoom_level(self):
+        maxZoomLevel = 23
+        mpp_3857 = [40075016.685 / (2**i * 256) for i in range(maxZoomLevel)]
+        current_mpp = self.iface.mapCanvas().mapUnitsPerPixel()
+        nearest_level = find_nearest_number_index(mpp_3857, current_mpp)
+        # print(f"最接近的zoomlevle:{nearest_level} 地图单位: {mpp_3857[nearest_level]}")
+        zoom_factor = mpp_3857[nearest_level] / current_mpp
+        self.iface.mapCanvas().zoomByFactor(zoom_factor)
 
     def unload(self):
         """Unload from the QGIS interface"""
