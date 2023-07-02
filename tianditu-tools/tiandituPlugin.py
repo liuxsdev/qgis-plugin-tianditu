@@ -4,12 +4,23 @@ import requests
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction, QMenu, QToolButton, QMessageBox
-from qgis.core import Qgis, QgsRasterLayer, QgsProject, QgsSettings
+from qgis.core import (
+    Qgis,
+    QgsRasterLayer,
+    QgsProject,
+    QgsSettings,
+    QgsCoordinateReferenceSystem,
+)
 
 from .searchDockWidget import SearchDockWidget
 from .settingDialog import SettingDialog
 from .tiandituConfig import TianMapInfo, extra_maps, tianditu_province
-from .utils import tianditu_map_url, TIANDITU_HOME_URL, PluginDir
+from .utils import (
+    tianditu_map_url,
+    TIANDITU_HOME_URL,
+    PluginDir,
+    find_nearest_number_index,
+)
 
 current_qgis_version = Qgis.QGIS_VERSION_INT
 
@@ -88,7 +99,12 @@ class TianDiTu:
         self.addTiandituToolbar = None
         self.addTiandituButton = None
         self.searchdockwidget = None
-        self.actions = {"search": None, "setting": None, "extra_map_action": None}
+        self.actions = {
+            "search": None,
+            "setting": None,
+            "extra_map_action": None,
+            "fitzoom": None,
+        }
         # 配置文件
         self.qset = QgsSettings()
         if not self.qset.contains("tianditu-tools/Tianditu/key"):
@@ -107,6 +123,7 @@ class TianDiTu:
             "map": QIcon(PluginDir + "/images/map_tianditu.svg"),
             "other": QIcon(PluginDir + "/images/earth.svg"),
             "search": QIcon(PluginDir + "/images/search.svg"),
+            "fitzoom": QIcon(PluginDir + "/images/fitzoom.svg"),
         }
         # 天地图添加 Action
         menu = QMenu()
@@ -170,6 +187,17 @@ class TianDiTu:
         self.actions["search"].triggered.connect(self.openSearch)
         self.toolbar.addAction(self.actions["search"])
 
+        # 调整至合适的 Zoom Level (EPSG:3857 Only)
+        self.actions["fitzoom"] = QAction(
+            icons["fitzoom"], "调整至合适的 Zoom Level", self.iface.mainWindow()
+        )
+        self.actions["fitzoom"].triggered.connect(self.fit_zoom_level)
+        self.toolbar.addAction(self.actions["fitzoom"])
+
+        self.check_crs()
+        self.iface.mapCanvas().destinationCrsChanged.connect(self.check_crs)
+        self.iface.mapCanvas().layersChanged.connect(self.check_crs)
+
     def show_setting_dialog(self):
         dlg = SettingDialog(self.actions["extra_map_action"])
         dlg.exec_()
@@ -214,11 +242,31 @@ class TianDiTu:
             self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.searchdockwidget)
             self.searchdockwidget.show()
 
+    def fit_zoom_level(self):
+        crs = self.iface.mapCanvas().mapSettings().destinationCrs()
+        if crs == QgsCoordinateReferenceSystem("EPSG:3857"):
+            maxZoomLevel = 23
+            mpp_3857 = [40075016.685 / (2**i * 256) for i in range(maxZoomLevel)]
+            current_mpp = self.iface.mapCanvas().mapUnitsPerPixel()
+            nearest_level = find_nearest_number_index(mpp_3857, current_mpp)
+            zoom_factor = mpp_3857[nearest_level] / current_mpp
+            if not abs(1 - zoom_factor) < 1e-5:
+                self.iface.mapCanvas().zoomByFactor(zoom_factor)
+
+    def check_crs(self):
+        crs = self.iface.mapCanvas().mapSettings().destinationCrs()
+        layers_number = self.iface.mapCanvas().layerCount()
+        if crs == QgsCoordinateReferenceSystem("EPSG:3857") and layers_number > 0:
+            self.actions["fitzoom"].setEnabled(True)
+        else:
+            self.actions["fitzoom"].setEnabled(False)
+
     def unload(self):
         """Unload from the QGIS interface"""
         self.addTiandituButton.setMenu(None)
         self.iface.removeToolBarIcon(self.actions["setting"])
         self.iface.removeToolBarIcon(self.actions["search"])
+        self.iface.removeToolBarIcon(self.actions["fitzoom"])
         self.iface.removeToolBarIcon(self.addTiandituToolbar)
         if self.searchdockwidget:
             self.iface.removeDockWidget(self.searchdockwidget)
