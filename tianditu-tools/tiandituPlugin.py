@@ -25,14 +25,15 @@ from .utils import (
 current_qgis_version = Qgis.QGIS_VERSION_INT
 
 
-def add_xyz_layer(uri: str, name: str) -> None:
+def add_xyz_layer(uri: str, name: str, providerType: str = "wms") -> None:
     """QGIS 添加xyz图层
 
     Args:
         uri (str): 图层uri
         name (str): 图层名称
+        providerType(str): 类型(wms,arcgismapserver)
     """
-    raster_layer = QgsRasterLayer(uri, name, "wms")
+    raster_layer = QgsRasterLayer(uri, name, providerType)
     QgsProject.instance().addMapLayer(raster_layer)
 
 
@@ -145,7 +146,9 @@ class TianDiTu:
                 province_menu.addAction(
                     icons["map"],
                     m["name"],
-                    lambda m_=m: add_xyz_layer(m_["uri"], m_["name"]),
+                    lambda m_=m: add_xyz_layer(
+                        m_["uri"], m_["name"], m_.get("type", "wms")
+                    ),
                 )
             province_action.setMenu(province_menu)
         menu.addSeparator()

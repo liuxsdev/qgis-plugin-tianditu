@@ -43,3 +43,34 @@
     uri: crs=EPSG:4490&dpiMode=7&format=image/jpgpng&layers=History_js_yxdt_2021&styles=default&tileMatrixSet=default&url=http://jiangsu.tianditu.gov.cn/historyraster/rest/services/History/js_yxdt_2021/MapServer/WMTS/1.0.0/WMTSCapabilities.xml
   - name: 江苏-2022年影像地图
     uri: crs=EPSG:4490&dpiMode=7&format=image/jpgpng&layers=tdtjs_js_img2022_r05&styles=default&tileMatrixSet=default&url=http://jiangsu.tianditu.gov.cn/tdtsite05/rest/services/tdtjs/js_img2022_r05/MapServer/WMTS/1.0.0/WMTSCapabilities.xml
+天地图-湖北:
+  - name: 湖北-2015年影像地图
+    uri: crs='EPSG:4490' format='PNG32' layer='0' url='http://27.17.60.13:6080/arcgis/rest/services/IMG_2015/MapServer'
+    type: arcgismapserver
+  - name: 湖北-2016年影像地图
+    uri: crs='EPSG:4490' format='PNG32' layer='0' url='http://27.17.60.13:6080/arcgis/rest/services/IMG_2016/MapServer'
+    type: arcgismapserver
+  - name: 湖北(武汉)-2017年影像地图
+    uri: crs='EPSG:4490' format='PNG32' layer='0' url='http://27.17.60.13:6080/arcgis/rest/services/IMG_2017/MapServer'
+    type: arcgismapserver
+  - name: 湖北-2018年影像地图
+    uri: crs='EPSG:4490' format='PNG32' layer='0' url='http://27.17.60.13:6080/arcgis/rest/services/IMG_2018/MapServer'
+    type: arcgismapserver
+  - name: 湖北-2019年影像地图
+    uri: crs='EPSG:4490' format='PNG32' layer='0' url='http://27.17.60.13:6080/arcgis/rest/services/IMG_2019/MapServer'
+    type: arcgismapserver
+  - name: 湖北-2020年影像地图
+    uri: crs='EPSG:4490' format='PNG32' layer='0' url='http://27.17.60.13:6080/arcgis/rest/services/IMG_2020/MapServer'
+    type: arcgismapserver
+  - name: 湖北-2021年影像地图
+    uri: crs='EPSG:4490' format='PNG32' layer='0' url='http://27.17.60.13:6080/arcgis/rest/services/IMG_2021/MapServer'
+    type: arcgismapserver
+  - name: 湖北-影像注记
+    uri: crs='EPSG:4490' format='PNG32' layer='0' url='http://27.17.60.13:6080/arcgis/rest/services/IDT_L7_L20_HB/MapServer'
+    type: arcgismapserver
+  - name: 湖北-矢量地图
+    uri: crs='EPSG:4490' format='PNG32' layer='0' url='http://27.17.60.13:6080/arcgis/rest/services/SLDT_L7_L20_HB/MapServer'
+    type: arcgismapserver
+  - name: 湖北-矢量注记
+    uri: crs='EPSG:4490' format='PNG32' layer='0' url='http://27.17.60.13:6080/arcgis/rest/services/SLZJ_L7_L20_HB/MapServer'
+    type: arcgismapserver
