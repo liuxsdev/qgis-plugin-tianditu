@@ -19,6 +19,11 @@ arg = sys.argv[1] if len(sys.argv) > 1 else None
 if arg == "build":
     if dist_source_dir.exists():
         shutil.rmtree(dist_source_dir)
+    # 删除__pycache__文件夹
+    if source_dir.joinpath("__pycache__").exists():
+        shutil.rmtree(source_dir.joinpath("__pycache__"))
+    if source_dir.joinpath("./ui/__pycache__").exists():
+        shutil.rmtree(source_dir.joinpath("./ui/__pycache__"))
     # 复制源文件夹到dist目录下的tianditu-tools文件夹
     shutil.copytree(source_dir, dist_source_dir)
 

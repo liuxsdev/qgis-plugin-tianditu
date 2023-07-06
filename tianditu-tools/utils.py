@@ -154,10 +154,7 @@ class TiandituAPI:
 
     def __init__(self, token: str):
         self.token = token
-        self.header = {
-            "User-Agent": "Mozilla/5.0 QGIS/32400/Windows 10 Version 2009",
-            "Referer": "https://www.tianditu.gov.cn/",
-        }
+        self.header = HEADER
 
     def get(self, url: str, payload: dict) -> object:
         """实现get请求
@@ -232,11 +229,11 @@ class TiandituAPI:
         API说明: http://lbs.tianditu.gov.cn/server/geocoding.html
 
         Args:
-            lon (float): _description_
-            lat (float): _description_
+            lon (float): 纬度值
+            lat (float): 经度值
 
         Returns:
-            object: _description_
+            object: 逆地理编码数据
         """
         url = "http://api.tianditu.gov.cn/geocoder"
         data = {"lon": lon, "lat": lat, "ver": 1}

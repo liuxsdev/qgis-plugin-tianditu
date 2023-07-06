@@ -14,9 +14,9 @@ QGIS 天地图工具，方便进行天地图瓦片底图的添加以及简单实
 
 使用前需要设置天地图 Key，点击设置按钮，输入 key，保存并检查
 
-> 天地图 key 需要到[ 天地图控制台 ](https://console.tianditu.gov.cn/api/key)去申请，申请的类型为“浏览器端”
+![设置](doc/设置.png)
 
-![设置](doc/设置.webp)
+> 天地图 key 需要到[ 天地图控制台 ](https://console.tianditu.gov.cn/api/key)去申请，申请的类型为“浏览器端”
 
 ### 天地图底图添加
 
