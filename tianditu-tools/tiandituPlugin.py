@@ -49,7 +49,9 @@ def get_map_uri(url: str, zmin: int = 0, zmax: int = 18, referer: str = "") -> s
     Returns:
         str: 瓦片地图uri
     """
-    url_quote = requests.utils.quote(url, safe=":/")
+    # ?" 进行 URL 编码后, 在 3.34 版本上无法加载地图
+    # "&"是必须要进行 url 编码的
+    url_quote = requests.utils.quote(url, safe=":/?=")
     uri = f"type=xyz&url={url_quote}&zmin={zmin}&zmax={zmax}"
     if referer != "":
         if current_qgis_version >= 32600:
