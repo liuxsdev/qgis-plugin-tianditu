@@ -68,6 +68,8 @@ class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
         # 设置界面
         self.setupUi(self)
         self.mLineEdit_key.setText(self.config.key)
+        if len(self.mLineEdit_key.text()) == 0:
+            self.pushButton.setEnabled(False)
         self.mLineEdit_key.textChanged.connect(self.on_key_LineEdit_changed)
         if self.config.keyisvalid:
             self.label_keystatus.setText("正常")
@@ -96,6 +98,7 @@ class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
         self.comboBox.setItemText(min_index, f"t{min_index} {status[min_index]}*")
 
     def on_key_LineEdit_changed(self):
+        self.pushButton.setEnabled(True)
         current_text = self.mLineEdit_key.text()
         # 删除key中的空格以及非打印字符
         filtered_text = "".join(
