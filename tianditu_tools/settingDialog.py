@@ -98,7 +98,7 @@ class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
         self.comboBox.setItemText(min_index, f"t{min_index} {status[min_index]}*")
 
     def on_key_LineEdit_changed(self):
-        self.pushButton.setEnabled(True)
+        # self.pushButton.setEnabled(True)
         current_text = self.mLineEdit_key.text()
         # 删除key中的空格以及非打印字符
         filtered_text = "".join(
@@ -107,7 +107,7 @@ class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
         if filtered_text != current_text:
             self.mLineEdit_key.setText(filtered_text)
         # 检查key格式
-        key_format = check_key_format(current_text)
+        key_format = check_key_format(self.mLineEdit_key.text())
         if key_format["key_length_error"]:
             self.label_keystatus.setText("无效key: 格式错误(长度不对)")
             self.pushButton.setEnabled(False)

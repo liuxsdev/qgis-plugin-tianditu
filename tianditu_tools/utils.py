@@ -1,6 +1,7 @@
 import os
 from dataclasses import dataclass
 from multiprocessing.dummy import Pool as ThreadPool
+
 import requests
 
 TIANDITU_HOME_URL = "https://www.tianditu.gov.cn/"
@@ -52,6 +53,14 @@ def tianditu_map_url(maptype: str, token: str, subdomain: str) -> str:
     return url
 
 
+def get(url, headers, timeout=6):
+    try:
+        response = requests.get(url, headers=headers, timeout=timeout)
+    except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+        response = None
+    return response
+
+
 def check_url_status(url: str) -> object:
     """
     检查url状态
@@ -61,23 +70,27 @@ def check_url_status(url: str) -> object:
     Returns:
         object: {"code": 0}
         code:
+            -1:网络异常
             0: 正常
             1: 非法key
             12: 权限类型错误
             1000: 未知错误
     """
-    res = requests.get(url, headers=HEADER, timeout=10)
+    res = get(url, headers=HEADER)
     msg = {"code": 0}
-    if res.status_code == 403:
-        msg["code"] = res.json()["code"]  # 1:非法key 12:权限类型错误
-        msg["msg"] = res.json()["msg"]
-        msg["resolve"] = res.json()["resolve"]
-    elif res.status_code == 200:
-        msg["code"] = 0
+    if res is not None:
+        if res.status_code == 403:
+            msg["code"] = res.json()["code"]  # 1:非法key 12:权限类型错误
+            msg["msg"] = res.json()["msg"]
+            msg["resolve"] = res.json()["resolve"]
+        elif res.status_code == 200:
+            msg["code"] = 0
+        else:
+            msg["code"] = 1000  # 未知错误
+            msg["msg"] = "未知错误 "
+            msg["resolve"] = f"错误代码:{res.status_code}"
     else:
-        msg["code"] = 1000  # 未知错误
-        msg["msg"] = "未知错误 "
-        msg["resolve"] = f"错误代码:{res.status_code}"
+        msg = {"code": -1, "msg": "网络错误", "resolve": "请检查网络连接"}
     return msg
 
 
@@ -90,8 +103,8 @@ def check_subdomain(url: str) -> int:
     Returns:
         int: 子域名对应的延迟数(毫秒), -1 表示连接失败
     """
-    response = requests.get(url, headers=HEADER, timeout=8)
-    if response.status_code == 200:
+    response = get(url, headers=HEADER, timeout=8)
+    if response:
         millisecond = response.elapsed.total_seconds() * 1000
     else:
         millisecond = -1
