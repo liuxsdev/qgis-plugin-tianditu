@@ -1,35 +1,56 @@
-import os
-from dataclasses import dataclass
 from multiprocessing.dummy import Pool as ThreadPool
+from pathlib import Path
 
 import requests
+from qgis.core import QgsSettings
 
 TIANDITU_HOME_URL = "https://www.tianditu.gov.cn/"
 PLUGIN_NAME = "tianditu-tools"
-PluginDir = os.path.dirname(__file__)
+
+PluginDir = Path(__file__).parent
+
 HEADER = {
     "User-Agent": "Mozilla/5.0 QGIS/32400/Windows 10 Version 2009",
     "Referer": "https://www.tianditu.gov.cn/",
 }
 
 
-@dataclass
 class PluginConfig:
-    key: str
-    keyisvalid: bool
-    random_enabled: bool
-    subdomain: str
-    extramap_enabled: bool
+    def __init__(self):
+        self.conf = QgsSettings()
+        self.conf_name = "tianditu-tools"
+        self.init_config()
+
+    def init_config(self):
+        # 初始化配置文件
+        if not self.conf.contains("tianditu-tools/Tianditu/key"):
+            print("初始化配置文件")
+            # 初始化
+            self.conf.setValue(f"{self.conf_name}/Tianditu/key", "")
+            self.conf.setValue(f"{self.conf_name}/Tianditu/keyisvalid", False)
+            self.conf.setValue(f"{self.conf_name}/Tianditu/random", True)
+            self.conf.setValue(f"{self.conf_name}/Tianditu/subdomain", "t0")
+            self.conf.setValue(f"{self.conf_name}/Other/extramap", False)
+
+    def get_value(self, name):
+        return self.conf.value(f"{self.conf_name}/{name}")
+
+    def get_bool_value(self, name):
+        return self.conf.value(f"{self.conf_name}/{name}", type=bool)
+
+    def set_value(self, name, value):
+        self.conf.setValue(f"{self.conf_name}/{name}", value)
+
+    def get_key(self):
+        return self.get_value("Tianditu/key")
 
 
-def get_qset_name(key: str) -> str:
-    section_tianditu = ["key", "random", "keyisvalid", "subdomain"]
-    section_other = ["extramap"]
-    if key in section_tianditu:
-        return f"tianditu-tools/Tianditu/{key}"
-    if key in section_other:
-        return f"tianditu-tools/Other/{key}"
-    return ""
+def get(url, headers, timeout=6):
+    try:
+        response = requests.get(url, headers=headers, timeout=timeout)
+    except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+        response = None
+    return response
 
 
 def tianditu_map_url(maptype: str, token: str, subdomain: str) -> str:
@@ -51,14 +72,6 @@ def tianditu_map_url(maptype: str, token: str, subdomain: str) -> str:
     url += "&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TileCol={x}&TileRow={y}&TileMatrix={z}"
     url += f"&tk={token}"
     return url
-
-
-def get(url, headers, timeout=6):
-    try:
-        response = requests.get(url, headers=headers, timeout=timeout)
-    except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-        response = None
-    return response
 
 
 def check_url_status(url: str) -> object:
@@ -147,19 +160,6 @@ def check_key_format(key: str) -> object:
         "key_length_error": key_length_error,
         "has_special_character": not key.isalnum(),
     }
-
-
-def find_nearest_number_index(numbers_list, target):
-    min_difference = float("inf")
-    nearest_index = None
-
-    for i, number in enumerate(numbers_list):
-        difference = abs(number - target)
-        if difference < min_difference:
-            min_difference = difference
-            nearest_index = i
-
-    return nearest_index
 
 
 class TiandituAPI:

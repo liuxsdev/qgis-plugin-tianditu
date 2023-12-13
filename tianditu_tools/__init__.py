@@ -1,4 +1,4 @@
-from .tiandituPlugin import TianDiTu
+from .plugin import TianDiTu
 
 
 def classFactory(iface):
