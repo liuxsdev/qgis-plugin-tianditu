@@ -8,7 +8,9 @@ from tianditu_tools.utils import (
     check_subdomains,
     check_key_format,
     PluginConfig,
+    PluginDir,
 )
+from .mapmanager import MapManager
 
 
 class CheckThread(QThread):
@@ -86,6 +88,11 @@ class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
             self.ping_thread = PingUrlThread(self.conf.get_key())
             self.ping_thread.ping_finished.connect(self.handle_ping_finished)
             self.ping_thread.start()
+        # init map manager
+        map_folder = PluginDir.joinpath("maps")
+        self.mapm = MapManager(map_folder=map_folder, parent=self.tab_map)
+        self.verticalLayout_6.addWidget(self.mapm)
+        self.pushButton_2.clicked.connect(self.mapm.check_update)
 
     def handle_ping_finished(self, status):
         min_time = min(status)

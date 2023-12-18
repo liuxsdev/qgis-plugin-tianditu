@@ -2,6 +2,7 @@ from multiprocessing.dummy import Pool as ThreadPool
 from pathlib import Path
 
 import requests
+import yaml
 from qgis.core import QgsSettings
 
 TIANDITU_HOME_URL = "https://www.tianditu.gov.cn/"
@@ -160,6 +161,14 @@ def check_key_format(key: str) -> object:
         "key_length_error": key_length_error,
         "has_special_character": not key.isalnum(),
     }
+
+
+def load_yaml(file_path: Path):
+    """
+    读取YAML文件
+    """
+    with open(file_path, "r", encoding="utf-8") as f:
+        return yaml.safe_load(f)
 
 
 class TiandituAPI:
