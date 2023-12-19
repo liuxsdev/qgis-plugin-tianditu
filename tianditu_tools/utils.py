@@ -1,3 +1,4 @@
+import json
 from multiprocessing.dummy import Pool as ThreadPool
 from pathlib import Path
 
@@ -16,11 +17,19 @@ HEADER = {
 }
 
 
+def get_extramap_status():
+    summary = load_yaml(PluginDir.joinpath("maps/summary.yml"))
+    default_status = {}
+    for section in summary:
+        section_data = load_yaml(PluginDir.joinpath(f"maps/{section}.yml"))
+        default_status[section] = list(section_data["maps"].keys())
+    return default_status
+
+
 class PluginConfig:
     def __init__(self):
         self.conf = QgsSettings()
         self.conf_name = "tianditu-tools"
-        self.init_config()
 
     def init_config(self):
         # 初始化配置文件
@@ -32,6 +41,15 @@ class PluginConfig:
             self.conf.setValue(f"{self.conf_name}/Tianditu/random", True)
             self.conf.setValue(f"{self.conf_name}/Tianditu/subdomain", "t0")
             self.conf.setValue(f"{self.conf_name}/Other/extramap", False)
+        if not self.conf.contains("tianditu-tools/Other/extramap_status"):
+            print("初始化 extra map 文件")
+            self.conf.setValue(
+                f"{self.conf_name}/Other/extramap_status", str(get_extramap_status())
+            )
+
+    def get_extra_maps_status(self):
+        data = self.get_value(f"Other/extramap_status")
+        return json.loads(data.replace("'", '"'))
 
     def get_value(self, name):
         return self.conf.value(f"{self.conf_name}/{name}")

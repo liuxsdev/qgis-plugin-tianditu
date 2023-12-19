@@ -6,7 +6,7 @@ from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QPushButton, QTreeWidget, QTreeWidgetItem
 
-from tianditu_tools.utils import load_yaml
+from tianditu_tools.utils import load_yaml, PluginConfig
 
 
 class MapManager(QTreeWidget):
@@ -15,9 +15,9 @@ class MapManager(QTreeWidget):
     """
 
     def __init__(
-        self,
-        map_folder: Path,
-        parent=None,
+            self,
+            map_folder: Path,
+            parent=None,
     ):
         super().__init__(parent)
         self.map_folder = map_folder
@@ -26,6 +26,7 @@ class MapManager(QTreeWidget):
         self.font.setPointSize(8)
         self.setFont(self.font)
         self.update_url = "https://maps-tan-phi.vercel.app/dist/summary.yml"
+        self.conf = PluginConfig()
         # self.check_update()
         self.setupUI()
 
@@ -62,11 +63,17 @@ class MapManager(QTreeWidget):
             item.setTextAlignment(1, Qt.AlignCenter)
             item.setTextAlignment(2, Qt.AlignCenter)
             self.setItemWidget(item, 3, update_btn)
+            extra_maps_status = self.conf.get_extra_maps_status()
             map_detail = self.load_map_detail(value["id"])["maps"]
+            section_maps_status = extra_maps_status[value["id"]]
             for map_name in map_detail.keys():
                 child_item = QTreeWidgetItem(item)
                 child_item.setText(0, map_name)
-                child_item.setCheckState(0, Qt.Unchecked)
+                # 是否启用
+                if map_name in section_maps_status:
+                    child_item.setCheckState(0, Qt.Checked)
+                else:
+                    child_item.setCheckState(0, Qt.Unchecked)
 
             self.addTopLevelItem(item)
 

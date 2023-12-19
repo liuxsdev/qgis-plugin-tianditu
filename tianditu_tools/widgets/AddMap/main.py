@@ -72,23 +72,8 @@ class AddMapBtn(QToolButton):
         menu.addSeparator()
         # 天地图省级节点
         add_tianditu_province_menu(menu)
-        # keys = tianditu_province.keys()
-        # for key in keys:
-        #     province_action = menu.addAction(icons["map"], key)
-        #     province_menu = QMenu()
-        #     map_data = tianditu_province[key]
-        #     for m in map_data:
-        #         province_menu.addAction(
-        #             icons["map"],
-        #             m["name"],
-        #             lambda m_=m: add_raster_layer(
-        #                 m_["uri"], m_["name"], m_.get("type", "wms")
-        #             ),
-        #         )
-        #     province_action.setMenu(province_menu)
-        # menu.addSeparator()
         # 其他图源
-        # extra = menu.addAction(icons["other"], "其他图源")
+        extra = menu.addAction(icons["other"], "其他图源")
         # extra_map_menu = QMenu()
         self.setMenu(menu)
         self.setPopupMode(QToolButton.MenuButtonPopup)
