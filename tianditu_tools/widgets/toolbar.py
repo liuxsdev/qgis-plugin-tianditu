@@ -29,9 +29,12 @@ class TiandituToolbar(QToolBar):
         action_search = SearchAction(iface=self.iface, parent=self)
         action_fitzoom = FitZoomAction(iface=self.iface, parent=self)
 
-        # self.actions.extend([action_setting, action_search, action_fitzoom])
         self.actions.extend([action_setting, action_search, action_fitzoom])
         self.addActions(self.actions)
 
     def init_config(self):
         self.conf.init_config()
+
+    def remove_dock(self):
+        dock = self.actions[1]
+        dock.unload()

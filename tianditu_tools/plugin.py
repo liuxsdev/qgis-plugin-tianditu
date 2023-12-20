@@ -12,6 +12,7 @@ class TianDiTu:
 
     def unload(self):
         """Unload from the QGIS interface"""
+        self.toolbar.remove_dock()
         mw = self.iface.mainWindow()
         mw.removeToolBar(self.toolbar)
         self.toolbar.deleteLater()
