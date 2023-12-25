@@ -73,7 +73,7 @@ class AddMapBtn(QToolButton):
         # 天地图省级节点
         add_tianditu_province_menu(menu)
         # 其他图源
-        extra = menu.addAction(icons["other"], "其他图源")
+        # extra = menu.addAction(icons["other"], "其他图源")
         # extra_map_menu = QMenu()
         self.setMenu(menu)
         self.setPopupMode(QToolButton.MenuButtonPopup)

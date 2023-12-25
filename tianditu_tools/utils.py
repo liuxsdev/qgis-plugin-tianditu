@@ -48,8 +48,11 @@ class PluginConfig:
             )
 
     def get_extra_maps_status(self):
-        data = self.get_value(f"Other/extramap_status")
+        data = self.get_value("Other/extramap_status")
         return json.loads(data.replace("'", '"'))
+
+    def set_extra_maps_status(self, data):
+        self.conf.setValue(f"{self.conf_name}/Other/extramap_status", str(data))
 
     def get_value(self, name):
         return self.conf.value(f"{self.conf_name}/{name}")

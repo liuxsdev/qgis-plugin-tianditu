@@ -51,11 +51,11 @@ class PingUrlThread(QThread):
 
 
 class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
-    def __init__(self, extra_map_action):
+    def __init__(self, toolbar):
         super().__init__()
         self.ping_thread = None
         self.check_thread = None
-        self.extra_map_action = extra_map_action
+        self.toolbar = toolbar
         # 读取配置
         self.conf = PluginConfig()
         # 设置界面
@@ -83,7 +83,7 @@ class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
         self.comboBox.setEnabled(not self.conf.get_value("Tianditu/random"))
         self.comboBox.currentIndexChanged.connect(self.handle_comboBox_index_changed)
         if not self.conf.get_bool_value("Tianditu/random") and self.conf.get_bool_value(
-            "Tianditu/keyisvalid"
+                "Tianditu/keyisvalid"
         ):
             self.ping_thread = PingUrlThread(self.conf.get_key())
             self.ping_thread.ping_finished.connect(self.handle_ping_finished)
@@ -155,3 +155,9 @@ class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
                 self.ping_thread = PingUrlThread(self.conf.get_key())
                 self.ping_thread.ping_finished.connect(self.handle_ping_finished)
                 self.ping_thread.start()
+
+    def closeEvent(self, event):
+        # 在对话框关闭时触发的事件
+        self.mapm.update_map_enable_state()
+        self.toolbar.add_button.setup_action()
+        event.accept()  # 接受关闭事件，关闭对话框
