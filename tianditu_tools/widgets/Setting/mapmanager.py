@@ -15,9 +15,9 @@ class MapManager(QTreeWidget):
     """
 
     def __init__(
-            self,
-            map_folder: Path,
-            parent=None,
+        self,
+        map_folder: Path,
+        parent=None,
     ):
         super().__init__(parent)
         self.map_folder = map_folder
@@ -57,18 +57,19 @@ class MapManager(QTreeWidget):
         通过地图名称获取id
         """
         summary = self.get_summary()
-        for key, item in summary.items():
+        for item in summary.values():
             if item["name"] == name:
                 return item["id"]
         return None
 
     def load_map_summary(self):
         summary = self.get_summary()
-        for key, value in summary.items():
+        for value in reversed(summary.values()):
             update_btn = QPushButton("更新")
             update_btn.setStyleSheet("QPushButton{margin:2px 20px;}")
             update_btn.setEnabled(False)
             item = QTreeWidgetItem(self, [value["name"], value["lastUpdated"], "/"])
+            # item.setBackground()
 
             item.setSizeHint(0, QSize(160, 28))
             item.setTextAlignment(1, Qt.AlignCenter)
@@ -77,6 +78,7 @@ class MapManager(QTreeWidget):
             extra_maps_status = self.conf.get_extra_maps_status()
             map_detail = self.load_map_detail(value["id"])["maps"]
             section_maps_status = extra_maps_status[value["id"]]
+            # 添加地图item
             for map_name in map_detail.keys():
                 child_item = QTreeWidgetItem(item)
                 child_item.setText(0, map_name)

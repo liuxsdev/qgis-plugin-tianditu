@@ -6,9 +6,9 @@ from .dialog import SettingDialog
 
 class SettingAction(QAction):
     def __init__(
-            self,
-            toolbar,
-            parent=None,
+        self,
+        toolbar,
+        parent=None,
     ):
         super().__init__(parent)
         self.setIcon(icons["setting"])

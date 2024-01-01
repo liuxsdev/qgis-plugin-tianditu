@@ -70,8 +70,6 @@ class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
         else:
             self.label_keystatus.setText("无效")
         self.pushButton.clicked.connect(self.check)
-        self.checkBox.setChecked(self.conf.get_bool_value("Other/extramap"))
-        self.checkBox.stateChanged.connect(self.enable_extramap)
         self.checkBox_2.setChecked(self.conf.get_bool_value("Tianditu/random"))
         self.checkBox_2.stateChanged.connect(self.enable_random)
         # subdomian 设置
@@ -83,7 +81,7 @@ class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
         self.comboBox.setEnabled(not self.conf.get_value("Tianditu/random"))
         self.comboBox.currentIndexChanged.connect(self.handle_comboBox_index_changed)
         if not self.conf.get_bool_value("Tianditu/random") and self.conf.get_bool_value(
-                "Tianditu/keyisvalid"
+            "Tianditu/keyisvalid"
         ):
             self.ping_thread = PingUrlThread(self.conf.get_key())
             self.ping_thread.ping_finished.connect(self.handle_ping_finished)
@@ -130,14 +128,6 @@ class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
         self.check_thread.key = self.mLineEdit_key.text()
         self.check_thread.check_finished.connect(self.label_keystatus.setText)
         self.check_thread.start()
-
-    def enable_extramap(self):
-        if self.checkBox.isChecked():
-            self.conf.set_value("Other/extramap", True)
-            self.extra_map_action.setEnabled(True)
-        else:
-            self.conf.set_value("Other/extramap", False)
-            self.extra_map_action.setEnabled(False)
 
     def handle_comboBox_index_changed(self):
         selected_index = self.comboBox.currentIndex()

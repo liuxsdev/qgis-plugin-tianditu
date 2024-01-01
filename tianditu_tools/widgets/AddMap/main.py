@@ -1,8 +1,6 @@
 import random
 
-import requests
 from qgis.PyQt.QtWidgets import QToolButton, QMenu, QMessageBox
-from qgis.core import Qgis
 
 from tianditu_tools.utils import (
     TIANDITU_HOME_URL,
@@ -10,8 +8,9 @@ from tianditu_tools.utils import (
     tianditu_map_url,
 )
 from tianditu_tools.widgets.icons import icons
-from .extra_map import add_tianditu_province_menu
+from .extra_map import add_tianditu_province_menu, add_extra_map_menu
 from .utils import add_raster_layer
+from .utils import get_map_uri
 
 tianditu_map_info = {
     "vec": "天地图-矢量地图",
@@ -26,31 +25,6 @@ tianditu_map_info = {
 }
 
 conf = PluginConfig()
-
-
-def get_map_uri(url: str, zmin: int = 0, zmax: int = 18, referer: str = "") -> str:
-    """返回瓦片地图uri
-
-    Args:
-        url (str): 瓦片地图url
-        zmin (int, optional): z 最小值. Defaults to 0.
-        zmax (int, optional): z 最大值 Defaults to 18.
-        referer (str, optional): Referer. Defaults to "".
-
-    Returns:
-        str: 瓦片地图uri
-    """
-    # "?" 进行 URL 编码后, 在 3.34 版本上无法加载地图
-    # "&"是必须要进行 url 编码的
-    current_qgis_version = Qgis.QGIS_VERSION_INT
-    url_quote = requests.utils.quote(url, safe=":/?=")
-    uri = f"type=xyz&url={url_quote}&zmin={zmin}&zmax={zmax}"
-    if referer != "":
-        if current_qgis_version >= 32600:
-            uri += f"&http-header:referer={referer}"
-        else:
-            uri += f"&referer={referer}"
-    return uri
 
 
 class AddMapBtn(QToolButton):
@@ -75,6 +49,7 @@ class AddMapBtn(QToolButton):
         # 其他图源
         # extra = menu.addAction(icons["other"], "其他图源")
         # extra_map_menu = QMenu()
+        add_extra_map_menu(menu)
         self.setMenu(menu)
         self.setPopupMode(QToolButton.MenuButtonPopup)
         self.setIcon(self.icons["add"])
