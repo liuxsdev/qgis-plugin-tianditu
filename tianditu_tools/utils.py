@@ -67,7 +67,7 @@ class PluginConfig:
         return self.get_value("Tianditu/key")
 
 
-def get(url, headers, timeout=6):
+def got(url, headers=None, timeout=6):
     try:
         response = requests.get(url, headers=headers, timeout=timeout)
     except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
@@ -111,7 +111,7 @@ def check_url_status(url: str) -> object:
             12: 权限类型错误
             1000: 未知错误
     """
-    res = get(url, headers=HEADER)
+    res = got(url, headers=HEADER)
     msg = {"code": 0}
     if res is not None:
         if res.status_code == 403:
@@ -138,7 +138,7 @@ def check_subdomain(url: str) -> int:
     Returns:
         int: 子域名对应的延迟数(毫秒), -1 表示连接失败
     """
-    response = get(url, headers=HEADER, timeout=8)
+    response = got(url, headers=HEADER, timeout=8)
     if response:
         millisecond = response.elapsed.total_seconds() * 1000
     else:

@@ -1,7 +1,7 @@
 info:
   id: extra
   name: 其他地图
-  lastUpdated: '2023-12-31 11:32:07'
+  lastUpdated: '2024-01-06 09:39:59'
 maps:
   谷歌地图中国:
     - name: Google Map (CN) - Satellite
@@ -21,4 +21,29 @@ maps:
       url: https://gac-geo.googlecnapps.cn/maps/vt?lyrs=p&x={x}&y={y}&z={z}
       zmin: 0
       zmax: 21
+      referer: ''
+  ESRI - 中国地图:
+    - name: ESRI - 中国地图彩色版
+      icon: ESRI.webp
+      url: https://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineCommunity/MapServer/tile/{z}/{y}/{x}
+      zmin: 0
+      zmax: 18
+      referer: ''
+    - name: ESRI - 中国地图暖色版
+      icon: ESRI.webp
+      url: https://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetWarm/MapServer/tile/{z}/{y}/{x}
+      zmin: 0
+      zmax: 18
+      referer: ''
+    - name: ESRI - 中国地图灰色版
+      icon: ESRI.webp
+      url: https://map.geoq.cn/arcgis/rest/services/ChinaOnlineStreetGray/MapServer/tile/{z}/{y}/{x}
+      zmin: 0
+      zmax: 18
+      referer: ''
+    - name: ESRI - 中国地图蓝黑版
+      icon: ESRI.webp
+      url: https://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer/tile/{z}/{y}/{x}
+      zmin: 0
+      zmax: 18
       referer: ''

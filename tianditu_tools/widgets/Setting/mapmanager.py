@@ -1,12 +1,11 @@
 from pathlib import Path
 
-import requests
 import yaml
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QPushButton, QTreeWidget, QTreeWidgetItem
 
-from tianditu_tools.utils import load_yaml, PluginConfig
+from tianditu_tools.utils import load_yaml, PluginConfig, got
 
 
 class MapManager(QTreeWidget):
@@ -15,9 +14,9 @@ class MapManager(QTreeWidget):
     """
 
     def __init__(
-        self,
-        map_folder: Path,
-        parent=None,
+            self,
+            map_folder: Path,
+            parent=None,
     ):
         super().__init__(parent)
         self.map_folder = map_folder
@@ -25,12 +24,14 @@ class MapManager(QTreeWidget):
         self.font.setFamily("微软雅黑")
         self.font.setPointSize(8)
         self.setFont(self.font)
-        self.update_url = "https://maps-tan-phi.vercel.app/dist/summary.yml"
+        self.update_host = "https://maps-tan-phi.vercel.app/dist/"
+        self.update_url = f"{self.update_host}summary.yml"
         self.conf = PluginConfig()
         # self.check_update()
         self.setupUI()
 
     def setupUI(self):
+        self.clear()
         self.setColumnCount(3)  # 设置列
         self.setHeaderLabels(["名称", "Local", "LastUpdated", "操作"])
         self.header().setDefaultAlignment(Qt.AlignCenter)
@@ -42,6 +43,9 @@ class MapManager(QTreeWidget):
         self.setColumnWidth(3, 90)
         self.load_map_summary()
         self.expandAll()
+        # 设置大小策略，使得 QTreeWidget 随窗口大小调整
+        # self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        # self.parent().setFixedHeight(300)
 
     def load_map_detail(self, map_id):
         mapfile_path = self.map_folder.joinpath(f"{map_id}.yml")
@@ -67,10 +71,9 @@ class MapManager(QTreeWidget):
         for value in reversed(summary.values()):
             update_btn = QPushButton("更新")
             update_btn.setStyleSheet("QPushButton{margin:2px 20px;}")
+            update_btn.clicked.connect(self.update_btn_clicked)
             update_btn.setEnabled(False)
             item = QTreeWidgetItem(self, [value["name"], value["lastUpdated"], "/"])
-            # item.setBackground()
-
             item.setSizeHint(0, QSize(160, 28))
             item.setTextAlignment(1, Qt.AlignCenter)
             item.setTextAlignment(2, Qt.AlignCenter)
@@ -90,14 +93,49 @@ class MapManager(QTreeWidget):
 
             self.addTopLevelItem(item)
 
+    def update_btn_clicked(self):
+        """
+        更新地图配置文件
+        """
+        sender_btn = self.sender()  # 获取发出信号的按钮
+        if sender_btn:
+            item = self.itemFromIndex(self.indexAt(sender_btn.pos()))  # 获取包含按钮的项
+            if item:
+                print("Button clicked in row:", self.indexOfTopLevelItem(item))
+                map_id = self.get_map_id_by_name(item.text(0))
+                self.download_map_conf(map_id)
+                # 重新禁用按钮
+                update_btn = self.itemWidget(item, 3)
+                update_btn.setEnabled(False)
+                # 重绘UI
+                self.setupUI()
+
+    def download_map_conf(self, map_id):
+        download_url = f"{self.update_host}{map_id}.yml"
+        mapfile_path = self.map_folder.joinpath(f"{map_id}.yml")
+        # 更新summary
+        summary_data = got(self.update_url)
+        if summary_data.ok:
+            with open(
+                    self.map_folder.joinpath("summary.yml"), "w", encoding="utf-8"
+            ) as f:
+                f.write(summary_data.text)
+        conf_data = got(download_url)
+        if conf_data.ok:
+            with open(mapfile_path, "w", encoding="utf-8") as f:
+                f.write(conf_data.text)
+
     def check_update(self):
-        r = requests.get(self.update_url, timeout=8)
+        r = got(self.update_url)
         update_summary = yaml.safe_load(r.text)
         for _, map_sum in update_summary.items():
-            print(map_sum)
             name = map_sum["name"]
             item = self.findItems(name, Qt.MatchExactly)[0]
             item.setText(2, map_sum["lastUpdated"])
+            if item.text(1) != item.text(2):
+                # 将按钮设置为启用状态
+                update_btn = self.itemWidget(item, 3)
+                update_btn.setEnabled(True)
 
     def update_map_enable_state(self):
         top_level_item_count = self.topLevelItemCount()
