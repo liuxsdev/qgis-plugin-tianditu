@@ -1,0 +1,17 @@
+{
+  "name": "qgis-plugin-tianditu-docs",
+  "version": "0.1.0",
+  "description": "documents of tianditu-tools plugin",
+  "main": "index.js",
+  "scripts": {
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "GPL-3.0",
+  "devDependencies": {
+    "vitepress": "1.0.0-rc.36"
+  }
+}
