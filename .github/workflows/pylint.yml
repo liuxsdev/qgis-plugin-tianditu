@@ -1,13 +1,13 @@
 name: Pylint
 
-on: [push]
+on: [ push ]
 
 jobs:
   Pylint:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.9']
+        python-version: [ '3.9' ]
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
@@ -20,4 +20,4 @@ jobs:
           pip install pylint
       - name: Analysing the code with pylint
         run: |
-          pylint $(git ls-files '*.py' ':(exclude)tianditu-tools/ui/') --disable=E0401,C0103,C0114,C0115,C0116,R0903
+          pylint $(git ls-files '*.py' ':(exclude)tianditu_tools/ui/') --disable=E0401,C0103,C0114,C0115,C0116,R0903

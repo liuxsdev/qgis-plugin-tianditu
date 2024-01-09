@@ -1,24 +1,24 @@
 from qgis.PyQt import QtWidgets
 from qgis.PyQt.QtCore import QThread, pyqtSignal
-from qgis.core import QgsSettings
 
-from .ui.setting import Ui_SettingDialog
-from .utils import (
+from tianditu_tools.ui.setting import Ui_SettingDialog
+from tianditu_tools.utils import (
     tianditu_map_url,
     check_url_status,
     check_subdomains,
     check_key_format,
-    get_qset_name,
     PluginConfig,
+    PluginDir,
 )
+from .mapmanager import MapManager
 
 
 class CheckThread(QThread):
     check_finished = pyqtSignal(str)
 
-    def __init__(self, qset):
+    def __init__(self, conf):
         super().__init__()
-        self.qset = qset
+        self.conf = conf
         self.key = ""
 
     def run(self):
@@ -27,11 +27,11 @@ class CheckThread(QThread):
         check_msg = check_url_status(tile_url)
         if check_msg["code"] == 0:
             self.check_finished.emit("正常")
-            self.qset.setValue("tianditu-tools/Tianditu/keyisvalid", True)
+            self.conf.set_value("Tianditu/keyisvalid", True)
         else:
             error_msg = f"{check_msg['msg']}: {check_msg['resolve']}"
             self.check_finished.emit(error_msg)
-            self.qset.setValue("tianditu-tools/Tianditu/keyisvalid", False)
+            self.conf.set_value("Tianditu/keyisvalid", False)
 
 
 class PingUrlThread(QThread):
@@ -51,44 +51,46 @@ class PingUrlThread(QThread):
 
 
 class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
-    def __init__(self, extra_map_action):
+    def __init__(self, toolbar):
         super().__init__()
         self.ping_thread = None
         self.check_thread = None
-        self.extra_map_action = extra_map_action
+        self.toolbar = toolbar
         # 读取配置
-        self.qset = QgsSettings()
-        self.config = PluginConfig(
-            key=self.qset.value(get_qset_name("key")),
-            random_enabled=self.qset.value(get_qset_name("random"), type=bool),
-            keyisvalid=self.qset.value(get_qset_name("keyisvalid"), type=bool),
-            subdomain=self.qset.value(get_qset_name("subdomain")),
-            extramap_enabled=self.qset.value(get_qset_name("extramap"), type=bool),
-        )
+        self.conf = PluginConfig()
         # 设置界面
         self.setupUi(self)
-        self.mLineEdit_key.setText(self.config.key)
+        self.mLineEdit_key.setText(self.conf.get_key())
         if len(self.mLineEdit_key.text()) == 0:
             self.pushButton.setEnabled(False)
         self.mLineEdit_key.textChanged.connect(self.on_key_LineEdit_changed)
-        if self.config.keyisvalid:
+        keyisvalid = self.conf.get_bool_value("Tianditu/keyisvalid")
+        if keyisvalid:
             self.label_keystatus.setText("正常")
         else:
             self.label_keystatus.setText("无效")
         self.pushButton.clicked.connect(self.check)
-        self.checkBox.setChecked(self.config.extramap_enabled)
-        self.checkBox.stateChanged.connect(self.enable_extramap)
-        self.checkBox_2.setChecked(self.config.random_enabled)
+        self.checkBox_2.setChecked(self.conf.get_bool_value("Tianditu/random"))
         self.checkBox_2.stateChanged.connect(self.enable_random)
+        # subdomian 设置
         self.subdomain_list = ["t0", "t1", "t2", "t3", "t4", "t5", "t6", "t7"]
         self.comboBox.addItems(self.subdomain_list)
-        self.comboBox.setCurrentIndex(self.subdomain_list.index(self.config.subdomain))
-        self.comboBox.setEnabled(not self.config.random_enabled)
+        self.comboBox.setCurrentIndex(
+            self.subdomain_list.index(self.conf.get_value("Tianditu/subdomain"))
+        )
+        self.comboBox.setEnabled(not self.conf.get_value("Tianditu/random"))
         self.comboBox.currentIndexChanged.connect(self.handle_comboBox_index_changed)
-        if not self.config.random_enabled and self.config.keyisvalid:
-            self.ping_thread = PingUrlThread(self.config.key)
+        if not self.conf.get_bool_value("Tianditu/random") and self.conf.get_bool_value(
+            "Tianditu/keyisvalid"
+        ):
+            self.ping_thread = PingUrlThread(self.conf.get_key())
             self.ping_thread.ping_finished.connect(self.handle_ping_finished)
             self.ping_thread.start()
+        # init map manager
+        map_folder = PluginDir.joinpath("maps")
+        self.mapm = MapManager(map_folder=map_folder, parent=self.tab_map)
+        self.verticalLayout_6.addWidget(self.mapm)
+        self.pushButton_2.clicked.connect(self.mapm.check_update)
 
     def handle_ping_finished(self, status):
         min_time = min(status)
@@ -98,7 +100,7 @@ class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
         self.comboBox.setItemText(min_index, f"t{min_index} {status[min_index]}*")
 
     def on_key_LineEdit_changed(self):
-        self.pushButton.setEnabled(True)
+        # self.pushButton.setEnabled(True)
         current_text = self.mLineEdit_key.text()
         # 删除key中的空格以及非打印字符
         filtered_text = "".join(
@@ -107,7 +109,7 @@ class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
         if filtered_text != current_text:
             self.mLineEdit_key.setText(filtered_text)
         # 检查key格式
-        key_format = check_key_format(current_text)
+        key_format = check_key_format(self.mLineEdit_key.text())
         if key_format["key_length_error"]:
             self.label_keystatus.setText("无效key: 格式错误(长度不对)")
             self.pushButton.setEnabled(False)
@@ -120,34 +122,32 @@ class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
 
     def check(self):
         """检查key是否有效"""
-        self.qset.setValue("tianditu-tools/Tianditu/key", self.mLineEdit_key.text())
+        self.conf.set_value("Tianditu/key", self.mLineEdit_key.text())
         self.label_keystatus.setText("检查中...")
-        self.check_thread = CheckThread(self.qset)
+        self.check_thread = CheckThread(self.conf)
         self.check_thread.key = self.mLineEdit_key.text()
         self.check_thread.check_finished.connect(self.label_keystatus.setText)
         self.check_thread.start()
 
-    def enable_extramap(self):
-        if self.checkBox.isChecked():
-            self.qset.setValue("tianditu-tools/Other/extramap", True)
-            self.extra_map_action.setEnabled(True)
-        else:
-            self.qset.setValue("tianditu-tools/Other/extramap", False)
-            self.extra_map_action.setEnabled(False)
-
     def handle_comboBox_index_changed(self):
         selected_index = self.comboBox.currentIndex()
         selected_domain = self.subdomain_list[selected_index]
-        self.qset.setValue("tianditu-tools/Tianditu/subdomain", selected_domain)
+        self.conf.set_value("Tianditu/subdomain", selected_domain)
 
     def enable_random(self):
         if self.checkBox_2.isChecked():
-            self.qset.setValue("tianditu-tools/Tianditu/random", True)
+            self.conf.set_value("Tianditu/random", True)
             self.comboBox.setEnabled(False)
         else:
-            self.qset.setValue("tianditu-tools/Tianditu/random", False)
+            self.conf.set_value("Tianditu/random", False)
             self.comboBox.setEnabled(True)
-            if self.config.keyisvalid:
-                self.ping_thread = PingUrlThread(self.config.key)
+            if self.conf.get_bool_value("Tianditu/keyisvalid"):
+                self.ping_thread = PingUrlThread(self.conf.get_key())
                 self.ping_thread.ping_finished.connect(self.handle_ping_finished)
                 self.ping_thread.start()
+
+    def closeEvent(self, event):
+        # 在对话框关闭时触发的事件
+        self.mapm.update_map_enable_state()
+        self.toolbar.add_button.setup_action()
+        event.accept()  # 接受关闭事件，关闭对话框

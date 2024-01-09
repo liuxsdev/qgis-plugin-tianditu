@@ -1,0 +1,98 @@
+info:
+  id: tianditu_province
+  name: 天地图省级节点
+  lastUpdated: '2023-12-16 00:12:27'
+maps:
+  天地图-江苏:
+    - name: 江苏-1966年影像地图
+      uri: crs=EPSG:4326&dpiMode=7&format=image/jpgpng&layers=History_yxdt_js_1966&styles=default&tileMatrixSet=default&tilePixelRatio=0&url=http://jiangsu.tianditu.gov.cn/historyraster/rest/services/History/yxdt_js_1966/MapServer/WMTS/1.0.0/WMTSCapabilities.xml
+    - name: 江苏-1966年影像注记
+      uri: crs=EPSG:4490&dpiMode=7&format=image/png&layers=History_yxzj_js_1966&styles=default&tileMatrixSet=default&tilePixelRatio=0&url=http://jiangsu.tianditu.gov.cn/historyraster/rest/services/History/yxzj_js_1966/MapServer/WMTS/1.0.0/WMTSCapabilities.xml
+    - name: 江苏-1976年影像地图
+      uri: crs=EPSG:4326&dpiMode=7&format=image/jpgpng&layers=History_yxdt_js_1976&styles=default&tileMatrixSet=default&tilePixelRatio=0&url=http://jiangsu.tianditu.gov.cn/historyraster/rest/services/History/yxdt_js_1976/MapServer/WMTS/1.0.0/WMTSCapabilities.xml
+    - name: 江苏-1976年影像注记
+      uri: crs=EPSG:4490&dpiMode=7&format=image/png&layers=History_yxzj_js_1976&styles=default&tileMatrixSet=default&tilePixelRatio=0&url=http://jiangsu.tianditu.gov.cn/historyraster/rest/services/History/yxzj_js_1976/MapServer/WMTS/1.0.0/WMTSCapabilities.xml
+    - name: 江苏-2005年影像地图
+      uri: crs=EPSG:4490&dpiMode=7&format=image/jpgpng&layers=History_js_yxdt_2005&styles=default&tileMatrixSet=default&tilePixelRatio=0&url=http://jiangsu.tianditu.gov.cn/historyraster/rest/services/History/js_yxdt_2005/MapServer/WMTS/1.0.0/WMTSCapabilities.xml
+    - name: 江苏-2010年影像地图
+      uri: crs=EPSG:4490&dpiMode=7&format=image/jpgpng&layers=History_js_yxdt_2010&styles=default&tileMatrixSet=default&tilePixelRatio=0&url=http://jiangsu.tianditu.gov.cn/historyraster/rest/services/History/js_yxdt_2010/MapServer/WMTS/1.0.0/WMTSCapabilities.xml
+    - name: 江苏-2012年影像地图
+      uri: crs=EPSG:4490&dpiMode=7&format=image/png&layers=History_js_yxdt_2012&styles=default&tileMatrixSet=default&tilePixelRatio=0&url=http://jiangsu.tianditu.gov.cn/historyraster/rest/services/History/js_yxdt_2012/MapServer/WMTS/1.0.0/WMTSCapabilities.xml
+    - name: 江苏-2012年影像注记
+      uri: crs=EPSG:4490&dpiMode=7&format=image/png&layers=History_js_yxzj_2012&styles=default&tileMatrixSet=default&tilePixelRatio=0&url=http://jiangsu.tianditu.gov.cn/historyraster/rest/services/History/js_yxzj_2012/MapServer/WMTS/1.0.0/WMTSCapabilities.xml
+    - name: 江苏-2014年影像地图
+      uri: crs=EPSG:4490&dpiMode=7&format=image/png&layers=History_js_yxdt_2014&styles=default&tileMatrixSet=default&tilePixelRatio=0&url=http://jiangsu.tianditu.gov.cn/historyraster/rest/services/History/js_yxdt_2014/MapServer/WMTS/1.0.0/WMTSCapabilities.xml
+    - name: 江苏-2014年影像注记
+      uri: crs=EPSG:4490&dpiMode=7&format=image/png&layers=History_js_yxzj_2014&styles=default&tileMatrixSet=default&tilePixelRatio=0&url=http://jiangsu.tianditu.gov.cn/historyraster/rest/services/History/js_yxzj_2014/MapServer/WMTS/1.0.0/WMTSCapabilities.xml
+    - name: 江苏-2016年影像地图
+      uri: crs=EPSG:4490&dpiMode=7&format=image/png&layers=MapJS_js_yxdt_2016&styles=default&tileMatrixSet=default&tilePixelRatio=0&url=http://jiangsu.tianditu.gov.cn/mapjs2/rest/services/MapJS/js_yxdt_2016/MapServer/WMTS/1.0.0/WMTSCapabilities.xml
+    - name: 江苏-2016年影像注记
+      uri: crs=EPSG:4490&dpiMode=7&format=image/png&layers=MapJS_js_yxzj_2016&styles=default&tileMatrixSet=default&tilePixelRatio=0&url=http://jiangsu.tianditu.gov.cn/mapjs2/rest/services/MapJS/js_yxzj_2016/MapServer/WMTS/1.0.0/WMTSCapabilities.xml
+    - name: 江苏-2017年影像地图
+      uri: crs=EPSG:4490&dpiMode=7&format=image/png&layers=History_js_yxdt_2017&styles=default&tileMatrixSet=default&tilePixelRatio=0&url=http://jiangsu.tianditu.gov.cn/historyraster/rest/services/History/js_yxdt_2017/MapServer/WMTS/1.0.0/WMTSCapabilities.xml
+    - name: 江苏-2017年矢量地图
+      uri: crs=EPSG:4490&dpiMode=7&format=image/png&layers=historyVector_js_sldt_2017&styles=default&tileMatrixSet=default&url=http://jiangsu.tianditu.gov.cn/historyraster/rest/services/historyVector/js_sldt_2017/MapServer/WMTS/1.0.0/WMTSCapabilities.xml
+    - name: 江苏-2017年矢量注记
+      uri: crs=EPSG:4490&dpiMode=7&format=image/png&layers=historyVector_js_slzj_2017&styles=default&tileMatrixSet=default&url=http://jiangsu.tianditu.gov.cn/historyraster/rest/services/historyVector/js_slzj_2017/MapServer/WMTS/1.0.0/WMTSCapabilities.xml
+    - name: 江苏-2018年矢量地图
+      uri: crs=EPSG:4490&dpiMode=7&format=image/png&layers=historyVector_js_sldt_2018&styles=default&tileMatrixSet=default&url=http://jiangsu.tianditu.gov.cn/historyraster/rest/services/historyVector/js_sldt_2018/MapServer/WMTS/1.0.0/WMTSCapabilities.xml
+    - name: 江苏-2018年矢量注记
+      uri: crs=EPSG:4490&dpiMode=7&format=image/png&layers=historyVector_js_slzj_2018&styles=default&tileMatrixSet=default&url=http://jiangsu.tianditu.gov.cn/historyraster/rest/services/historyVector/js_slzj_2018/MapServer/WMTS/1.0.0/WMTSCapabilities.xml
+    - name: 江苏-2018年影像地图
+      uri: crs=EPSG:4490&dpiMode=7&format=image/jpgpng&layers=History_js_yxdt_2018&styles=default&tileMatrixSet=default&url=http://jiangsu.tianditu.gov.cn/historyraster/rest/services/History/js_yxdt_2018/MapServer/WMTS/1.0.0/WMTSCapabilities.xml
+    - name: 江苏-2019年影像地图
+      uri: crs=EPSG:4490&dpiMode=7&format=image/jpgpng&layers=History_js_yxdt_2019&styles=default&tileMatrixSet=default&url=http://jiangsu.tianditu.gov.cn/historyraster/rest/services/History/js_yxdt_2019/MapServer/WMTS/1.0.0/WMTSCapabilities.xml
+    - name: 江苏-2020年影像地图
+      uri: crs=EPSG:4490&dpiMode=7&format=image/jpgpng&layers=History_js_yxdt_2020&styles=default&tileMatrixSet=default&url=http://jiangsu.tianditu.gov.cn/historyraster/rest/services/History/js_yxdt_2020/MapServer/WMTS/1.0.0/WMTSCapabilities.xml
+    - name: 江苏-2021年影像地图
+      uri: crs=EPSG:4490&dpiMode=7&format=image/jpgpng&layers=History_js_yxdt_2021&styles=default&tileMatrixSet=default&url=http://jiangsu.tianditu.gov.cn/historyraster/rest/services/History/js_yxdt_2021/MapServer/WMTS/1.0.0/WMTSCapabilities.xml
+    - name: 江苏-2022年影像地图
+      uri: crs=EPSG:4490&dpiMode=7&format=image/jpgpng&layers=tdtjs_js_img2022_r05&styles=default&tileMatrixSet=default&url=http://jiangsu.tianditu.gov.cn/tdtsite05/rest/services/tdtjs/js_img2022_r05/MapServer/WMTS/1.0.0/WMTSCapabilities.xml
+  天地图-湖北:
+    - name: 湖北-2015年影像地图
+      uri: crs='EPSG:4490' format='PNG32' layer='0' url='http://27.17.60.13:6080/arcgis/rest/services/IMG_2015/MapServer'
+      type: arcgismapserver
+    - name: 湖北-2016年影像地图
+      uri: crs='EPSG:4490' format='PNG32' layer='0' url='http://27.17.60.13:6080/arcgis/rest/services/IMG_2016/MapServer'
+      type: arcgismapserver
+    - name: 湖北(武汉)-2017年影像地图
+      uri: crs='EPSG:4490' format='PNG32' layer='0' url='http://27.17.60.13:6080/arcgis/rest/services/IMG_2017/MapServer'
+      type: arcgismapserver
+    - name: 湖北-2018年影像地图
+      uri: crs='EPSG:4490' format='PNG32' layer='0' url='http://27.17.60.13:6080/arcgis/rest/services/IMG_2018/MapServer'
+      type: arcgismapserver
+    - name: 湖北-2019年影像地图
+      uri: crs='EPSG:4490' format='PNG32' layer='0' url='http://27.17.60.13:6080/arcgis/rest/services/IMG_2019/MapServer'
+      type: arcgismapserver
+    - name: 湖北-2020年影像地图
+      uri: crs='EPSG:4490' format='PNG32' layer='0' url='http://27.17.60.13:6080/arcgis/rest/services/IMG_2020/MapServer'
+      type: arcgismapserver
+    - name: 湖北-2021年影像地图
+      uri: crs='EPSG:4490' format='PNG32' layer='0' url='http://27.17.60.13:6080/arcgis/rest/services/IMG_2021/MapServer'
+      type: arcgismapserver
+    - name: 湖北-影像注记
+      uri: crs='EPSG:4490' format='PNG32' layer='0' url='http://27.17.60.13:6080/arcgis/rest/services/IDT_L7_L20_HB/MapServer'
+      type: arcgismapserver
+    - name: 湖北-矢量地图
+      uri: crs='EPSG:4490' format='PNG32' layer='0' url='http://27.17.60.13:6080/arcgis/rest/services/SLDT_L7_L20_HB/MapServer'
+      type: arcgismapserver
+    - name: 湖北-矢量注记
+      uri: crs='EPSG:4490' format='PNG32' layer='0' url='http://27.17.60.13:6080/arcgis/rest/services/SLZJ_L7_L20_HB/MapServer'
+      type: arcgismapserver
+  天地图-安徽（有偏移）:
+    - name: 安徽-1968年合肥城区
+      uri: crs=EPSG:4490&dpiMode=7&format=image/tile&layers=HF1968&styles=HF1968&tileMatrixSet=HF1968_Matrix_1&tilePixelRatio=0&url=https://anhui.tianditu.gov.cn/geostar/test1968/wmts?SERVICE%3DWMTS%26REQUEST%3DGetCapabilities
+    - name: 安徽-1979年合肥城区
+      uri: crs=EPSG:4490&dpiMode=7&format=image/tile&layers=HF1979&styles=HF1979&tileMatrixSet=HF1979_Matrix_1&tilePixelRatio=0&url=https://anhui.tianditu.gov.cn/geostar/hf1979/wmts?SERVICE%3DWMTS%26REQUEST%3DGetCapabilities
+    - name: 安徽-1988年合肥城区
+      uri: crs=EPSG:4490&dpiMode=7&format=image/tile&layers=HF1995&styles=HF1995&tileMatrixSet=HF1995_Matrix_1&tilePixelRatio=0&url=https://anhui.tianditu.gov.cn/geostar/hf1995/wmts?SERVICE%3DWMTS%26REQUEST%3DGetCapabilities
+    - name: 安徽-2003年合肥城区
+      uri: IgnoreGetMapUrl=1&crs=EPSG:4490&dpiMode=7&format=image/tile&layers=HF2003&styles=HF2003&tileMatrixSet=HF2003_Matrix_1&tilePixelRatio=0&url=https://anhui.tianditu.gov.cn/geostar/HF2003/wmts?SERVICE%3DWMTS%26REQUEST%3DGetCapabilities
+    - name: 安徽-2012年合肥城区
+      uri: IgnoreGetMapUrl=1&crs=EPSG:4490&dpiMode=7&format=image/tile&layers=HF2012&styles=HF2012&tileMatrixSet=HF2012_Matrix_1&tilePixelRatio=0&url=https://anhui.tianditu.gov.cn/geostar/HF2012/wmts?SERVICE%3DWMTS%26REQUEST%3DGetCapabilities
+    - name: 安徽-2015年影像
+      uri: IgnoreGetMapUrl=1&crs=EPSG:4326&dpiMode=7&format=image/tile&layers=DOM20150313&styles=DOM20150313&tileMatrixSet=DOM20150313_Matrix_1&tilePixelRatio=0&url=https://anhui.tianditu.gov.cn/geostar/hf2015/wmts?SERVICE%3DWMTS%26REQUEST%3DGetCapabilities
+    - name: 安徽-2017年影像
+      uri: IgnoreGetMapUrl=1&crs=EPSG:4326&dpiMode=7&format=image/tile&layers=dom2017&styles=dom2017&tileMatrixSet=dom2017_Matrix_1&tilePixelRatio=0&url=https://anhui.tianditu.gov.cn/geostar/hf2017/wmts?SERVICE%3DWMTS%26REQUEST%3DGetCapabilities
+    - name: 安徽-2020年影像
+      uri: IgnoreGetMapUrl=1&crs=EPSG:4490&dpiMode=7&format=image/tile&layers=DOM2020&styles=DOM2020&tileMatrixSet=DOM2020_Matrix_1&tilePixelRatio=0&url=https://anhui.tianditu.gov.cn/geostar/AH2020/wmts?SERVICE%3DWMTS%26REQUEST%3DGetCapabilities

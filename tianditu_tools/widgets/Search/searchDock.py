@@ -3,10 +3,10 @@ import os
 from qgis.PyQt import QtWidgets
 from qgis.PyQt.QtCore import QThread, pyqtSignal
 from qgis.PyQt.QtWidgets import QTreeWidget, QTreeWidgetItem
-from qgis.core import QgsProject, QgsVectorLayer, QgsFeature, QgsPoint, QgsSettings
+from qgis.core import QgsFeature, QgsPoint, QgsProject, QgsSettings, QgsVectorLayer
 
-from .ui.search import Ui_SearchDockWidget
-from .utils import PluginDir, TiandituAPI
+from tianditu_tools.ui.search import Ui_SearchDockWidget
+from tianditu_tools.utils import PluginDir, TiandituAPI
 
 
 class SearchRequestThread(QThread):

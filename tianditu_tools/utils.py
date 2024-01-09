@@ -1,34 +1,78 @@
-import os
-from dataclasses import dataclass
+import json
 from multiprocessing.dummy import Pool as ThreadPool
+from pathlib import Path
+
 import requests
+import yaml
+from qgis.core import QgsSettings
 
 TIANDITU_HOME_URL = "https://www.tianditu.gov.cn/"
 PLUGIN_NAME = "tianditu-tools"
-PluginDir = os.path.dirname(__file__)
+
+PluginDir = Path(__file__).parent
+
 HEADER = {
     "User-Agent": "Mozilla/5.0 QGIS/32400/Windows 10 Version 2009",
     "Referer": "https://www.tianditu.gov.cn/",
 }
 
 
-@dataclass
+def get_extramap_status():
+    summary = load_yaml(PluginDir.joinpath("maps/summary.yml"))
+    default_status = {}
+    for section in summary:
+        section_data = load_yaml(PluginDir.joinpath(f"maps/{section}.yml"))
+        default_status[section] = list(section_data["maps"].keys())
+    return default_status
+
+
 class PluginConfig:
-    key: str
-    keyisvalid: bool
-    random_enabled: bool
-    subdomain: str
-    extramap_enabled: bool
+    def __init__(self):
+        self.conf = QgsSettings()
+        self.conf_name = "tianditu-tools"
+
+    def init_config(self):
+        # 初始化配置文件
+        if not self.conf.contains("tianditu-tools/Tianditu/key"):
+            print("初始化配置文件")
+            # 初始化
+            self.conf.setValue(f"{self.conf_name}/Tianditu/key", "")
+            self.conf.setValue(f"{self.conf_name}/Tianditu/keyisvalid", False)
+            self.conf.setValue(f"{self.conf_name}/Tianditu/random", True)
+            self.conf.setValue(f"{self.conf_name}/Tianditu/subdomain", "t0")
+            self.conf.setValue(f"{self.conf_name}/Other/extramap", False)
+        if not self.conf.contains("tianditu-tools/Other/extramap_status"):
+            print("初始化 extra map 文件")
+            self.conf.setValue(
+                f"{self.conf_name}/Other/extramap_status", str(get_extramap_status())
+            )
+
+    def get_extra_maps_status(self):
+        data = self.get_value("Other/extramap_status")
+        return json.loads(data.replace("'", '"'))
+
+    def set_extra_maps_status(self, data):
+        self.conf.setValue(f"{self.conf_name}/Other/extramap_status", str(data))
+
+    def get_value(self, name):
+        return self.conf.value(f"{self.conf_name}/{name}")
+
+    def get_bool_value(self, name):
+        return self.conf.value(f"{self.conf_name}/{name}", type=bool)
+
+    def set_value(self, name, value):
+        self.conf.setValue(f"{self.conf_name}/{name}", value)
+
+    def get_key(self):
+        return self.get_value("Tianditu/key")
 
 
-def get_qset_name(key: str) -> str:
-    section_tianditu = ["key", "random", "keyisvalid", "subdomain"]
-    section_other = ["extramap"]
-    if key in section_tianditu:
-        return f"tianditu-tools/Tianditu/{key}"
-    if key in section_other:
-        return f"tianditu-tools/Other/{key}"
-    return ""
+def got(url, headers=None, timeout=6):
+    try:
+        response = requests.get(url, headers=headers, timeout=timeout)
+    except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+        response = None
+    return response
 
 
 def tianditu_map_url(maptype: str, token: str, subdomain: str) -> str:
@@ -61,23 +105,27 @@ def check_url_status(url: str) -> object:
     Returns:
         object: {"code": 0}
         code:
+            -1:网络异常
             0: 正常
             1: 非法key
             12: 权限类型错误
             1000: 未知错误
     """
-    res = requests.get(url, headers=HEADER, timeout=10)
+    res = got(url, headers=HEADER)
     msg = {"code": 0}
-    if res.status_code == 403:
-        msg["code"] = res.json()["code"]  # 1:非法key 12:权限类型错误
-        msg["msg"] = res.json()["msg"]
-        msg["resolve"] = res.json()["resolve"]
-    elif res.status_code == 200:
-        msg["code"] = 0
+    if res is not None:
+        if res.status_code == 403:
+            msg["code"] = res.json()["code"]  # 1:非法key 12:权限类型错误
+            msg["msg"] = res.json()["msg"]
+            msg["resolve"] = res.json()["resolve"]
+        elif res.status_code == 200:
+            msg["code"] = 0
+        else:
+            msg["code"] = 1000  # 未知错误
+            msg["msg"] = "未知错误 "
+            msg["resolve"] = f"错误代码:{res.status_code}"
     else:
-        msg["code"] = 1000  # 未知错误
-        msg["msg"] = "未知错误 "
-        msg["resolve"] = f"错误代码:{res.status_code}"
+        msg = {"code": -1, "msg": "网络错误", "resolve": "请检查网络连接"}
     return msg
 
 
@@ -90,8 +138,8 @@ def check_subdomain(url: str) -> int:
     Returns:
         int: 子域名对应的延迟数(毫秒), -1 表示连接失败
     """
-    response = requests.get(url, headers=HEADER, timeout=8)
-    if response.status_code == 200:
+    response = got(url, headers=HEADER, timeout=8)
+    if response:
         millisecond = response.elapsed.total_seconds() * 1000
     else:
         millisecond = -1
@@ -136,17 +184,12 @@ def check_key_format(key: str) -> object:
     }
 
 
-def find_nearest_number_index(numbers_list, target):
-    min_difference = float("inf")
-    nearest_index = None
-
-    for i, number in enumerate(numbers_list):
-        difference = abs(number - target)
-        if difference < min_difference:
-            min_difference = difference
-            nearest_index = i
-
-    return nearest_index
+def load_yaml(file_path: Path):
+    """
+    读取YAML文件
+    """
+    with open(file_path, "r", encoding="utf-8") as f:
+        return yaml.safe_load(f)
 
 
 class TiandituAPI:

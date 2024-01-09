@@ -6,7 +6,7 @@ from pathlib import Path
 
 # Define the source and destination directories
 cwd = Path.cwd()
-source_dir = cwd.joinpath("tianditu-tools")
+source_dir = cwd.joinpath("tianditu_tools")
 dist_dir = cwd.joinpath("dist")
 dist_source_dir = dist_dir.joinpath("tianditu-tools")
 
@@ -41,7 +41,7 @@ if arg == "build":
     # Get the version under the [general] section
     version = config.get("general", "version")
 
-    filename = f"tianditu-tools-{version}.zip"
+    filename = f"tianditu_tools-{version}.zip"
 
     # Zip the destination directory
     with zipfile.ZipFile(
