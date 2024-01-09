@@ -40,9 +40,9 @@ body:
     attributes:
       label: 自查清单
       description: |
-        请您自查以下问题
+        请您自查以下问题 (是则勾选)
       options:
-        - label: 通过XYZ Tiles的方式能否能正常加载天地图.
+        - label: 通过XYZ Tiles的方式能否能正常加载天地图. 
         - label: 访问[天地图官网地图](https://www.tianditu.gov.cn/)是否正常
 
   - type: textarea
