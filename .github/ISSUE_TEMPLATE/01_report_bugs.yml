@@ -1,0 +1,53 @@
+name: 报告插件错误❌
+description: 报告你使用插件过程中遇到的异常
+labels:
+  - 'Bug'
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢您抽出时间正确填写这份错误报告。
+
+  - type: textarea
+    id: what
+    attributes:
+      label: 请描述您遇到的问题?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: 如何重现您的问题
+      description: |
+        重现问题的步骤
+        1.  
+        2.
+    validations:
+      required: true
+
+  - type: textarea
+    id: version-info
+    attributes:
+      label: 您使用的QGIS版本以及电脑系统版本
+      description: |
+        您使用的QGIS版本以及电脑系统版本, 如 Windows 11 23H2, QGIS 3.34.2
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: self-check
+    attributes:
+      label: 自查清单
+      description: |
+        请您自查以下问题
+      options:
+        - label: 通过XYZ Tiles的方式能否能正常加载天地图.
+        - label: 访问[天地图官网地图](https://www.tianditu.gov.cn/)是否正常
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: 其他补充描述
+      description: |
+        其他补充描述
