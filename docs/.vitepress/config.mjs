@@ -16,7 +16,10 @@ export default defineConfig({
     sidebar: [
       {
         text: "使用说明",
-        items: [{ text: "简介", link: "/intro" }],
+        items: [
+          { text: "简介", link: "/intro" },
+          { text: "通过 XYZ Tiles 添加的天地图", link: "/通过 XYZ Tiles 添加天地图" },
+        ],
       },
     ],
 

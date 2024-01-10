@@ -17,7 +17,9 @@ hero:
     - theme: alt
       text: View on GitHub
       link: https://github.com/liuxsdev/qgis-plugin-tianditu
-
+    - theme: alt
+      text: View on QGIS Plugins Repository
+      link: https://plugins.qgis.org/plugins/tianditu-tools/
 
 features:
   - title: 天地图底图
