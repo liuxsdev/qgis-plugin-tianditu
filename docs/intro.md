@@ -20,7 +20,7 @@ QGIS 天地图工具，方便进行天地图瓦片底图的添加以及简单实
 
 在工具栏下拉菜单中选择底图，点击即可添加到当前工程中。
 
-<img src="./images/菜单.png" width="38%">
+<img src="./images/菜单.png" width="36%">
 
 ### 天地图 Web 服务 API
 
