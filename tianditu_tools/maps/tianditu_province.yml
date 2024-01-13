@@ -1,7 +1,7 @@
 info:
   id: tianditu_province
   name: 天地图省级节点
-  lastUpdated: '2023-12-16 00:12:27'
+  lastUpdated: '2024-01-11 21:08:33'
 maps:
   天地图-江苏:
     - name: 江苏-1966年影像地图
@@ -79,6 +79,15 @@ maps:
     - name: 湖北-矢量注记
       uri: crs='EPSG:4490' format='PNG32' layer='0' url='http://27.17.60.13:6080/arcgis/rest/services/SLZJ_L7_L20_HB/MapServer'
       type: arcgismapserver
+  天地图-浙江:
+    - name: 浙江 - 2022年遥感影像
+      uri: crs=EPSG:4490&dpiMode=7&format=image/jpgpng&http-header:referer=https://zhejiang.tianditu.gov.cn/&layers=imgmap&styles=default&tileMatrixSet=default028mm&tilePixelRatio=0&url=https://maps.liuxs.pro/tweak/ZJ_2022_tweak.xml
+    - name: 浙江 - 2021年遥感影像
+      uri: crs=EPSG:4490&dpiMode=7&format=image/jpgpng&http-header:referer=https://zhejiang.tianditu.gov.cn/&layers=imgmap&styles=default&tileMatrixSet=default028mm&tilePixelRatio=0&url=https://maps.liuxs.pro/tweak/ZJ_2021_tweak.xml
+    - name: 浙江 - 2020年遥感影像
+      uri: crs=EPSG:4490&dpiMode=7&format=image/jpgpng&http-header:referer=https://zhejiang.tianditu.gov.cn/&layers=imgmap&styles=default&tileMatrixSet=default028mm&tilePixelRatio=0&url=https://maps.liuxs.pro/tweak/ZJ_2020_tweak.xml
+    - name: 浙江 - 2019年遥感影像
+      uri: crs=EPSG:4490&dpiMode=7&format=image/jpgpng&http-header:referer=https://zhejiang.tianditu.gov.cn/&layers=imgmap&styles=default&tileMatrixSet=default028mm&tilePixelRatio=0&url=https://maps.liuxs.pro/tweak/ZJ_2019_tweak.xml
   天地图-安徽（有偏移）:
     - name: 安徽-1968年合肥城区
       uri: crs=EPSG:4490&dpiMode=7&format=image/tile&layers=HF1968&styles=HF1968&tileMatrixSet=HF1968_Matrix_1&tilePixelRatio=0&url=https://anhui.tianditu.gov.cn/geostar/test1968/wmts?SERVICE%3DWMTS%26REQUEST%3DGetCapabilities
