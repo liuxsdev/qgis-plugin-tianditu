@@ -4,21 +4,22 @@ import { defineConfig } from "vitepress";
 export default defineConfig({
   title: "Tianditu Tools",
   description: "QGIS Plugin",
+  head: [["link", { rel: "icon", href: "/favicon.ico" }]],
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
+    logo: "/logo.svg",
     nav: [
-      { text: "指南", link: "/" },
-      { text: "开发笔记", link: "/notes" },
+      { text: "主页", link: "/" },
+      // { text: "开发笔记", link: "https://liuxs.pro" },
     ],
 
     sidebar: [
       {
-        text: "",
-        items: [{ text: "使用说明", link: "/intro" }],
-      },
-      {
-        text: "",
-        items: [{ text: "开发笔记", link: "/intro" }],
+        text: "使用说明",
+        items: [
+          { text: "简介", link: "/intro" },
+          { text: "通过 XYZ Tiles 添加的天地图", link: "/通过 XYZ Tiles 添加天地图" },
+        ],
       },
     ],
 
