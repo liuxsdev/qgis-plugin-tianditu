@@ -1,6 +1,7 @@
 import json
 from multiprocessing.dummy import Pool as ThreadPool
 from pathlib import Path
+from random import choice
 
 import requests
 import yaml
@@ -30,22 +31,33 @@ class PluginConfig:
     def __init__(self):
         self.conf = QgsSettings()
         self.conf_name = "tianditu-tools"
+        self.section_tianditu = f"{self.conf_name}/Tianditu"
 
     def init_config(self):
         # 初始化配置文件
         if not self.conf.contains("tianditu-tools/Tianditu/key"):
             print("初始化配置文件")
             # 初始化
-            self.conf.setValue(f"{self.conf_name}/Tianditu/key", "")
-            self.conf.setValue(f"{self.conf_name}/Tianditu/keyisvalid", False)
-            self.conf.setValue(f"{self.conf_name}/Tianditu/random", True)
-            self.conf.setValue(f"{self.conf_name}/Tianditu/subdomain", "t0")
-            self.conf.setValue(f"{self.conf_name}/Other/extramap", False)
+            self.conf.setValue(f"{self.section_tianditu}/key", "")
+            self.conf.setValue(f"{self.section_tianditu}/keyList", "")
+            self.conf.setValue(f"{self.section_tianditu}/random", True)
+            self.conf.setValue(f"{self.section_tianditu}/subdomain", "t0")
         if not self.conf.contains("tianditu-tools/Other/extramap_status"):
             print("初始化 extra map 文件")
             self.conf.setValue(
                 f"{self.conf_name}/Other/extramap_status", str(get_extramap_status())
             )
+        if not self.conf.contains(f"{self.section_tianditu}/keyList"):
+            self.conf.setValue(f"{self.section_tianditu}/keyList", "")
+
+    def get_key_list(self):
+        data_str = self.get_value("/Tianditu/keyList")
+        if data_str == "":
+            return []
+        return data_str.split(",")
+
+    def save_key_list(self, data_list):
+        self.conf.setValue(f"{self.section_tianditu}/keyList", ",".join(data_list))
 
     def get_extra_maps_status(self):
         data = self.get_value("Other/extramap_status")
@@ -65,6 +77,19 @@ class PluginConfig:
 
     def get_key(self):
         return self.get_value("Tianditu/key")
+
+    def get_random_key(self):
+        key_list = self.get_key_list()
+        if len(key_list) > 0:
+            return choice(key_list)
+
+    def set_key(self, key):
+        key_to_set = ""
+        if key is None:
+            key_to_set = ""
+        else:
+            key_to_set = key
+        self.conf.setValue(f"{self.section_tianditu}/key", key_to_set)
 
 
 def got(url, headers=None, timeout=6):
@@ -160,28 +185,6 @@ def check_subdomains(url_list: list) -> list:
     pool.close()
     pool.join()
     return ["❌" if x == -1 else f"{x} ms" for x in ping_list]
-
-
-def check_key_format(key: str) -> object:
-    """检查key格式
-
-    Args:
-        key (str): 天地图key
-
-    Returns:
-        object:
-            "key_length_error": key的长度有误,
-            "has_special_character": 含有除字母数字外的其他字符
-    """
-    correct_length = 32
-    key_length = len(key)
-    key_length_error = False
-    if key_length != correct_length:
-        key_length_error = True
-    return {
-        "key_length_error": key_length_error,
-        "has_special_character": not key.isalnum(),
-    }
 
 
 def load_yaml(file_path: Path):

@@ -47,8 +47,6 @@ class AddMapBtn(QToolButton):
         # 天地图省级节点
         add_tianditu_province_menu(menu)
         # 其他图源
-        # extra = menu.addAction(icons["other"], "其他图源")
-        # extra_map_menu = QMenu()
         add_extra_map_menu(menu)
         self.setMenu(menu)
         self.setPopupMode(QToolButton.MenuButtonPopup)
@@ -56,8 +54,7 @@ class AddMapBtn(QToolButton):
 
     def add_tianditu_basemap(self, maptype):
         key = conf.get_key()
-        keyisvalid = conf.get_bool_value("Tianditu/keyisvalid")
-        if key == "" or keyisvalid is False:
+        if key == "":
             QMessageBox.warning(
                 self, "错误", "天地图Key未设置或Key无效", QMessageBox.Yes, QMessageBox.Yes
             )
@@ -65,6 +62,8 @@ class AddMapBtn(QToolButton):
             random_enabled = conf.get_bool_value("Tianditu/random")
             if random_enabled:
                 subdomain = f"t{random.randint(0, 7)}"
-                map_url = tianditu_map_url(maptype, key, subdomain)
-                uri = get_map_uri(map_url, 1, 18, TIANDITU_HOME_URL)
-                add_raster_layer(uri, tianditu_map_info[maptype])
+            else:
+                subdomain = conf.get_value("Tianditu/subdomain")
+            map_url = tianditu_map_url(maptype, key, subdomain)
+            uri = get_map_uri(map_url, 1, 18, TIANDITU_HOME_URL)
+            add_raster_layer(uri, tianditu_map_info[maptype])
