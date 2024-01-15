@@ -76,8 +76,8 @@ class PingUrlThread(QThread):
 class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
     def __init__(self, toolbar):
         super().__init__()
-        self.ping_thread = None
         self.check_thread = None
+        self.mapm = None
         self.toolbar = toolbar
         # 读取配置
         self.conf = PluginConfig()
@@ -134,6 +134,7 @@ class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
         filtered_items = [key for key in key_list if key.startswith(masked[:8])]
         if len(filtered_items) > 0:
             return filtered_items[0]
+        return ""
 
     def init_keyCombo(self):
         self.keyComboBox.clear()  # 先清除

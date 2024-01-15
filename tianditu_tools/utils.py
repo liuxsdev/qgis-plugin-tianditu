@@ -41,14 +41,21 @@ class PluginConfig:
             self.conf.setValue(f"{self.section_tianditu}/key", "")
             self.conf.setValue(f"{self.section_tianditu}/keyList", "")
             self.conf.setValue(f"{self.section_tianditu}/random", True)
+            self.conf.setValue(f"{self.section_tianditu}/random_key", False)
             self.conf.setValue(f"{self.section_tianditu}/subdomain", "t0")
         if not self.conf.contains("tianditu-tools/Other/extramap_status"):
             print("初始化 extra map 文件")
             self.conf.setValue(
                 f"{self.conf_name}/Other/extramap_status", str(get_extramap_status())
             )
+        # 升级到保存多个key的版本
         if not self.conf.contains(f"{self.section_tianditu}/keyList"):
-            self.conf.setValue(f"{self.section_tianditu}/keyList", "")
+            self.conf.setValue(f"{self.section_tianditu}/random_key", False)
+            # 保存原来的key
+            if self.get_key() != "":
+                self.conf.setValue(f"{self.section_tianditu}/keyList", self.get_key())
+            else:
+                self.conf.setValue(f"{self.section_tianditu}/keyList", "")
 
     def get_key_list(self):
         data_str = self.get_value("/Tianditu/keyList")
@@ -80,14 +87,11 @@ class PluginConfig:
 
     def get_random_key(self):
         key_list = self.get_key_list()
-        if len(key_list) > 0:
-            return choice(key_list)
+        return choice(key_list)
 
     def set_key(self, key):
         key_to_set = ""
-        if key is None:
-            key_to_set = ""
-        else:
+        if key is not None:
             key_to_set = key
         self.conf.setValue(f"{self.section_tianditu}/key", key_to_set)
 

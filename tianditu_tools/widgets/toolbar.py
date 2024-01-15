@@ -10,7 +10,7 @@ from .icons import icons
 
 class TiandituToolbar(QToolBar):
     def __init__(self, iface, parent=None) -> None:
-        super().__init__("Tianditu Tools 工具栏",parent)
+        super().__init__("Tianditu Tools 工具栏", parent)
         self.iface = iface
         self.icons = icons
         self.conf = PluginConfig()
