@@ -60,10 +60,13 @@ class AddMapBtn(QToolButton):
             )
         else:
             random_enabled = conf.get_bool_value("Tianditu/random")
+            key_random_enabled = conf.get_bool_value("Tianditu/random_key")
             if random_enabled:
                 subdomain = f"t{random.randint(0, 7)}"
             else:
                 subdomain = conf.get_value("Tianditu/subdomain")
+            if key_random_enabled:
+                key = conf.get_random_key()
             map_url = tianditu_map_url(maptype, key, subdomain)
             uri = get_map_uri(map_url, 1, 18, TIANDITU_HOME_URL)
             add_raster_layer(uri, tianditu_map_info[maptype])

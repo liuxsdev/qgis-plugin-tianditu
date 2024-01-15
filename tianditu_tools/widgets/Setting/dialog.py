@@ -100,6 +100,13 @@ class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
         self.pushButton_copy.clicked.connect(self.copy_key)
         self.pushButton_delete.clicked.connect(self.del_key)
         self.keyComboBox.currentIndexChanged.connect(self.select_key)
+        # 是否启用key随机
+        if self.conf.get_bool_value("Tianditu/random_key"):
+            self.checkBox_key_rand.setChecked(True)
+            self.keyComboBox.setEnabled(False)
+            self.pushButton_copy.setEnabled(False)
+            self.pushButton_delete.setEnabled(False)
+        self.checkBox_key_rand.stateChanged.connect(self.enable_key_random)
         # subdomain 选择
         self.checkBox_domain_rand.setChecked(
             self.conf.get_bool_value("Tianditu/random")
@@ -118,7 +125,7 @@ class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
         self.verticalLayout_6.addWidget(self.mapm)
         self.pushButton_2.clicked.connect(self.mapm.check_update)
 
-    def set_status_label(self, text):
+    def set_status_label(self, text: str):
         """
         创建提示
         """
@@ -241,6 +248,19 @@ class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
         else:
             self.conf.set_value("Tianditu/random", False)
             self.subdomainComboBox.setEnabled(True)
+
+    def enable_key_random(self):
+        if self.checkBox_key_rand.isChecked():
+            self.conf.set_value("Tianditu/random_key", True)
+            self.keyComboBox.setEnabled(False)
+            self.pushButton_copy.setEnabled(False)
+            self.pushButton_delete.setEnabled(False)
+            self.set_status_label("设置 key 为 随机")
+        else:
+            self.conf.set_value("Tianditu/random_key", False)
+            self.keyComboBox.setEnabled(True)
+            self.pushButton_copy.setEnabled(True)
+            self.pushButton_delete.setEnabled(True)
 
     def closeEvent(self, event):
         # 在对话框关闭时触发的事件
