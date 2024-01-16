@@ -46,7 +46,10 @@ def add_extra_map_menu(parent_menu: QMenu):
     maps = extra_maps.keys()
     extra_maps_status = conf.get_extra_maps_status()
     for map_name in maps:
-        if map_name in extra_maps_status["tianditu_province"]:
+        if (
+            map_name in extra_maps_status["tianditu_province"]
+            or map_name in extra_maps_status["extra"]
+        ):
             map_data = extra_maps[map_name]
             sub_menu = extra_root_menu.addAction(icons["other"], map_name)
             sub_sub_menu = QMenu()
