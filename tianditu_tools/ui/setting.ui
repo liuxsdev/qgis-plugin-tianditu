@@ -45,7 +45,7 @@
             <item>
              <widget class="QLabel" name="label">
               <property name="text">
-               <string>Key:</string>
+               <string>添加 Key:</string>
               </property>
              </widget>
             </item>
@@ -68,27 +68,62 @@
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="pushButton">
+             <widget class="QPushButton" name="saveButton">
               <property name="text">
-               <string>保存并检查有效性</string>
+               <string>保存</string>
               </property>
              </widget>
             </item>
            </layout>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,10,0,0,2">
             <item>
              <widget class="QLabel" name="label_2">
               <property name="text">
-               <string>Key状态:</string>
+               <string>选择 Key:</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="label_keystatus">
+             <widget class="QComboBox" name="keyComboBox">
+              <property name="font">
+               <font>
+                <family>Consolas</family>
+               </font>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="checkBox_key_rand">
               <property name="text">
-               <string>未知</string>
+               <string>随机</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_copy">
+              <property name="maximumSize">
+               <size>
+                <width>50</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>复制</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_delete">
+              <property name="maximumSize">
+               <size>
+                <width>50</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>删除</string>
               </property>
              </widget>
             </item>
@@ -99,7 +134,7 @@
             <item>
              <widget class="QLabel" name="label_3">
               <property name="text">
-               <string>子域:</string>
+               <string>子域 Subdomain:</string>
               </property>
              </widget>
             </item>
@@ -117,20 +152,10 @@
              </spacer>
             </item>
             <item>
-             <widget class="QCheckBox" name="checkBox_2">
-              <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;添加底图时随机选择子域名，可减轻服务器压力，&lt;/span&gt;提高可用性。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-              </property>
-              <property name="text">
-               <string>随机</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QComboBox" name="comboBox">
+             <widget class="QComboBox" name="subdomainComboBox">
               <property name="minimumSize">
                <size>
-                <width>90</width>
+                <width>80</width>
                 <height>0</height>
                </size>
               </property>
@@ -148,6 +173,16 @@
               </property>
              </widget>
             </item>
+            <item>
+             <widget class="QCheckBox" name="checkBox_domain_rand">
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;添加底图时随机选择子域名，可减轻服务器压力，&lt;/span&gt;提高可用性。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="text">
+               <string>随机</string>
+              </property>
+             </widget>
+            </item>
            </layout>
           </item>
           <item>
@@ -156,7 +191,7 @@
           <item>
            <widget class="QLabel" name="label_4">
             <property name="text">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;没有Key？&lt;/span&gt;&lt;a href=&quot;https://console.tianditu.gov.cn/api/key&quot;&gt;&lt;span style=&quot; font-size:8pt; text-decoration: underline; color:#0000ff;&quot;&gt;点击此处去申请&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; color:#808080;&quot;&gt;没有Key？&lt;/span&gt;&lt;a href=&quot;https://console.tianditu.gov.cn/api/key&quot;&gt;&lt;span style=&quot; font-weight:600; text-decoration: underline; color:#808080;&quot;&gt;点击此处去申请&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="openExternalLinks">
              <bool>true</bool>
@@ -175,6 +210,22 @@
              </size>
             </property>
            </spacer>
+          </item>
+          <item>
+           <widget class="QLabel" name="info_status">
+            <property name="font">
+             <font>
+              <family>微软雅黑</family>
+              <pointsize>8</pointsize>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">color: rgb(128, 128, 128);</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>

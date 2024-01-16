@@ -1,16 +1,39 @@
 from qgis.PyQt import QtWidgets
-from qgis.PyQt.QtCore import QThread, pyqtSignal
+from qgis.PyQt.QtCore import QThread, pyqtSignal, QTimer
+from qgis.PyQt.QtGui import QClipboard
+from qgis.PyQt.QtWidgets import QApplication
 
 from tianditu_tools.ui.setting import Ui_SettingDialog
 from tianditu_tools.utils import (
     tianditu_map_url,
     check_url_status,
     check_subdomains,
-    check_key_format,
     PluginConfig,
     PluginDir,
 )
 from .mapmanager import MapManager
+
+
+def check_key_format(key: str) -> object:
+    """检查key格式
+
+    Args:
+        key (str): 天地图key
+
+    Returns:
+        object:
+            "key_length_error": key的长度有误,
+            "has_special_character": 含有除字母数字外的其他字符
+    """
+    correct_length = 32
+    key_length = len(key)
+    key_length_error = False
+    if key_length != correct_length:
+        key_length_error = True
+    return {
+        "key_length_error": key_length_error,
+        "has_special_character": not key.isalnum(),
+    }
 
 
 class CheckThread(QThread):
@@ -53,44 +76,133 @@ class PingUrlThread(QThread):
 class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
     def __init__(self, toolbar):
         super().__init__()
-        self.ping_thread = None
         self.check_thread = None
+        self.mapm = None
         self.toolbar = toolbar
         # 读取配置
         self.conf = PluginConfig()
+        self.subdomain_list = [f"t{i}" for i in range(8)]
+        # 设置 status label 的定时器
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.clear_status_label)
         # 设置界面
         self.setupUi(self)
-        self.mLineEdit_key.setText(self.conf.get_key())
+        self.initUI()
+
+    def initUI(self):
+        self.init_keyCombo()
+        # 如果key输入框是空白的，则禁用保存按钮
         if len(self.mLineEdit_key.text()) == 0:
-            self.pushButton.setEnabled(False)
+            self.saveButton.setEnabled(False)
+        # 给控件添加事件
         self.mLineEdit_key.textChanged.connect(self.on_key_LineEdit_changed)
-        keyisvalid = self.conf.get_bool_value("Tianditu/keyisvalid")
-        if keyisvalid:
-            self.label_keystatus.setText("正常")
-        else:
-            self.label_keystatus.setText("无效")
-        self.pushButton.clicked.connect(self.check)
-        self.checkBox_2.setChecked(self.conf.get_bool_value("Tianditu/random"))
-        self.checkBox_2.stateChanged.connect(self.enable_random)
+        self.saveButton.clicked.connect(self.save_key)
+        self.pushButton_copy.clicked.connect(self.copy_key)
+        self.pushButton_delete.clicked.connect(self.del_key)
+        self.keyComboBox.currentIndexChanged.connect(self.select_key)
+        # 是否启用key随机
+        if self.conf.get_bool_value("Tianditu/random_key"):
+            self.checkBox_key_rand.setChecked(True)
+            self.keyComboBox.setEnabled(False)
+            self.pushButton_copy.setEnabled(False)
+            self.pushButton_delete.setEnabled(False)
+        self.checkBox_key_rand.stateChanged.connect(self.enable_key_random)
+        # subdomain 选择
+        self.checkBox_domain_rand.setChecked(
+            self.conf.get_bool_value("Tianditu/random")
+        )
+        self.checkBox_domain_rand.stateChanged.connect(self.enable_random)
         # subdomian 设置
-        self.subdomain_list = ["t0", "t1", "t2", "t3", "t4", "t5", "t6", "t7"]
-        self.comboBox.addItems(self.subdomain_list)
-        self.comboBox.setCurrentIndex(
+        self.subdomainComboBox.addItems(self.subdomain_list)
+        self.subdomainComboBox.setCurrentIndex(
             self.subdomain_list.index(self.conf.get_value("Tianditu/subdomain"))
         )
-        self.comboBox.setEnabled(not self.conf.get_value("Tianditu/random"))
-        self.comboBox.currentIndexChanged.connect(self.handle_comboBox_index_changed)
-        if not self.conf.get_bool_value("Tianditu/random") and self.conf.get_bool_value(
-            "Tianditu/keyisvalid"
-        ):
-            self.ping_thread = PingUrlThread(self.conf.get_key())
-            self.ping_thread.ping_finished.connect(self.handle_ping_finished)
-            self.ping_thread.start()
+        self.subdomainComboBox.setEnabled(not self.conf.get_value("Tianditu/random"))
+        self.subdomainComboBox.currentIndexChanged.connect(self.select_subdomain)
         # init map manager
         map_folder = PluginDir.joinpath("maps")
         self.mapm = MapManager(map_folder=map_folder, parent=self.tab_map)
         self.verticalLayout_6.addWidget(self.mapm)
         self.pushButton_2.clicked.connect(self.mapm.check_update)
+
+    def set_status_label(self, text: str):
+        """
+        创建提示
+        """
+        self.info_status.setText(text)
+        self.timer.start(2000)
+
+    def clear_status_label(self):
+        self.info_status.clear()
+        self.timer.stop()
+
+    def get_key_by_masked(self, masked):
+        key_list = self.conf.get_key_list()
+        filtered_items = [key for key in key_list if key.startswith(masked[:8])]
+        if len(filtered_items) > 0:
+            return filtered_items[0]
+        return ""
+
+    def init_keyCombo(self):
+        self.keyComboBox.clear()  # 先清除
+        # 如果 key 列表中没有值, keyComboBox 添加提示
+        key_list = self.conf.get_key_list()
+        if len(key_list) == 0:
+            self.keyComboBox.addItem("请添加 key")
+            self.pushButton_delete.setEnabled(False)
+            self.pushButton_copy.setEnabled(False)
+        else:
+            self.keyComboBox.addItems([f"{key[:8]}****" for key in key_list])
+            # 将 keyComboBox 的当前值改为当前选用的 key
+            current_key = self.conf.get_key()
+            index = key_list.index(current_key)
+            self.keyComboBox.setCurrentIndex(index)
+            self.pushButton_delete.setEnabled(True)
+            self.pushButton_copy.setEnabled(True)
+
+    def copy_key(self):
+        current_key = self.keyComboBox.currentText()
+        full_key = self.get_key_by_masked(current_key)
+        clipboard = QApplication.clipboard()
+        clipboard.setText(full_key, QClipboard.Clipboard)
+        self.set_status_label(f"已复制{current_key}到剪贴板")
+
+    def save_key(self):
+        key = self.mLineEdit_key.text()
+        key_list = self.conf.get_key_list()
+        if key not in key_list:
+            url = tianditu_map_url("vec", key, "t0")
+            tile_url = url.format(x=0, y=0, z=0)
+            check_msg = check_url_status(tile_url)
+            if check_msg["code"] == 0:
+                if self.keyComboBox.itemText(0) == "请添加 key":
+                    self.keyComboBox.removeItem(0)
+                self.mLineEdit_key.setText("")
+                key_list.append(key)
+                self.conf.save_key_list(key_list)
+                self.saveButton.setEnabled(False)
+                self.set_status_label("保存成功")
+                self.init_keyCombo()
+            else:
+                error_msg = f"{check_msg['msg']}: {check_msg['resolve']}"
+                self.set_status_label(error_msg)
+        else:
+            self.set_status_label("key 已存在")
+
+    def select_key(self):
+        if self.keyComboBox.count() > 0:
+            masked_key = self.keyComboBox.currentText()
+            key = self.get_key_by_masked(masked_key)
+            self.conf.set_key(key)
+            self.set_status_label(f"设置当前 key 为{masked_key}")
+
+    def del_key(self):
+        current_index = self.keyComboBox.currentIndex()
+        key_list = self.conf.get_key_list()
+        del key_list[current_index]
+        self.conf.save_key_list(key_list)
+        self.set_status_label("已删除")
+        self.init_keyCombo()
 
     def handle_ping_finished(self, status):
         min_time = min(status)
@@ -100,7 +212,6 @@ class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
         self.comboBox.setItemText(min_index, f"t{min_index} {status[min_index]}*")
 
     def on_key_LineEdit_changed(self):
-        # self.pushButton.setEnabled(True)
         current_text = self.mLineEdit_key.text()
         # 删除key中的空格以及非打印字符
         filtered_text = "".join(
@@ -109,42 +220,47 @@ class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
         if filtered_text != current_text:
             self.mLineEdit_key.setText(filtered_text)
         # 检查key格式
-        key_format = check_key_format(self.mLineEdit_key.text())
-        if key_format["key_length_error"]:
-            self.label_keystatus.setText("无效key: 格式错误(长度不对)")
-            self.pushButton.setEnabled(False)
-        elif key_format["has_special_character"]:
-            self.label_keystatus.setText("无效key: 含非常规字符")
-            self.pushButton.setEnabled(False)
+        if len(self.mLineEdit_key.text()) > 0:
+            key_format = check_key_format(self.mLineEdit_key.text())
+            if key_format["key_length_error"]:
+                self.info_status.setText("无效key: 格式错误(长度不对)")
+                self.saveButton.setEnabled(False)
+            elif key_format["has_special_character"]:
+                self.info_status.setText("无效key: 含非常规字符")
+                self.saveButton.setEnabled(False)
+            else:
+                self.info_status.setText("点击保存")
+                self.saveButton.setEnabled(True)
         else:
-            self.label_keystatus.setText("未知")
-            self.pushButton.setEnabled(True)
+            self.info_status.clear()
 
-    def check(self):
-        """检查key是否有效"""
-        self.conf.set_value("Tianditu/key", self.mLineEdit_key.text())
-        self.label_keystatus.setText("检查中...")
-        self.check_thread = CheckThread(self.conf)
-        self.check_thread.key = self.mLineEdit_key.text()
-        self.check_thread.check_finished.connect(self.label_keystatus.setText)
-        self.check_thread.start()
-
-    def handle_comboBox_index_changed(self):
-        selected_index = self.comboBox.currentIndex()
+    def select_subdomain(self):
+        selected_index = self.subdomainComboBox.currentIndex()
         selected_domain = self.subdomain_list[selected_index]
         self.conf.set_value("Tianditu/subdomain", selected_domain)
+        self.set_status_label(f"设置 subdomain 为 {selected_domain}")
 
     def enable_random(self):
-        if self.checkBox_2.isChecked():
+        if self.checkBox_domain_rand.isChecked():
             self.conf.set_value("Tianditu/random", True)
-            self.comboBox.setEnabled(False)
+            self.subdomainComboBox.setEnabled(False)
+            self.set_status_label("设置 subdomain 为 随机")
         else:
             self.conf.set_value("Tianditu/random", False)
-            self.comboBox.setEnabled(True)
-            if self.conf.get_bool_value("Tianditu/keyisvalid"):
-                self.ping_thread = PingUrlThread(self.conf.get_key())
-                self.ping_thread.ping_finished.connect(self.handle_ping_finished)
-                self.ping_thread.start()
+            self.subdomainComboBox.setEnabled(True)
+
+    def enable_key_random(self):
+        if self.checkBox_key_rand.isChecked():
+            self.conf.set_value("Tianditu/random_key", True)
+            self.keyComboBox.setEnabled(False)
+            self.pushButton_copy.setEnabled(False)
+            self.pushButton_delete.setEnabled(False)
+            self.set_status_label("设置 key 为 随机")
+        else:
+            self.conf.set_value("Tianditu/random_key", False)
+            self.keyComboBox.setEnabled(True)
+            self.pushButton_copy.setEnabled(True)
+            self.pushButton_delete.setEnabled(True)
 
     def closeEvent(self, event):
         # 在对话框关闭时触发的事件

@@ -14,9 +14,9 @@ class MapManager(QTreeWidget):
     """
 
     def __init__(
-            self,
-            map_folder: Path,
-            parent=None,
+        self,
+        map_folder: Path,
+        parent=None,
     ):
         super().__init__(parent)
         self.map_folder = map_folder
@@ -24,7 +24,7 @@ class MapManager(QTreeWidget):
         self.font.setFamily("微软雅黑")
         self.font.setPointSize(8)
         self.setFont(self.font)
-        self.update_host = "https://maps-tan-phi.vercel.app/dist/"
+        self.update_host = "https://maps.liuxs.pro/dist/"
         self.update_url = f"{self.update_host}summary.yml"
         self.conf = PluginConfig()
         # self.check_update()
@@ -57,9 +57,7 @@ class MapManager(QTreeWidget):
         return load_yaml(summary_path)
 
     def get_map_id_by_name(self, name):
-        """
-        通过地图名称获取id
-        """
+        """通过地图名称获取 id"""
         summary = self.get_summary()
         for item in summary.values():
             if item["name"] == name:
@@ -117,7 +115,7 @@ class MapManager(QTreeWidget):
         summary_data = got(self.update_url)
         if summary_data.ok:
             with open(
-                    self.map_folder.joinpath("summary.yml"), "w", encoding="utf-8"
+                self.map_folder.joinpath("summary.yml"), "w", encoding="utf-8"
             ) as f:
                 f.write(summary_data.text)
         conf_data = got(download_url)
@@ -139,7 +137,6 @@ class MapManager(QTreeWidget):
 
     def update_map_enable_state(self):
         top_level_item_count = self.topLevelItemCount()
-        checked_item = []
         current_status = {}
         for i in range(top_level_item_count):
             top_level_item = self.topLevelItem(i)
@@ -148,6 +145,7 @@ class MapManager(QTreeWidget):
             # 获取子项的数量
             child_count = top_level_item.childCount()
             # 遍历子项
+            checked_item = []
             for j in range(child_count):
                 child_item = top_level_item.child(j)
                 if child_item.checkState(0) == 2:

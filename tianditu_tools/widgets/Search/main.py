@@ -15,6 +15,7 @@ class SearchAction(QAction):
         parent=None,
     ):
         super().__init__(parent)
+        self.parent = parent
         self.iface = iface
         self.setIcon(icons["search"])
         self.setText("搜索")
@@ -26,10 +27,9 @@ class SearchAction(QAction):
 
     def openSearch(self):
         key = conf.get_key()
-        keyisvalid = conf.get_bool_value("Tianditu/keyisvalid")
-        if key == "" or keyisvalid is False:
+        if key == "":
             QMessageBox.warning(
-                self.toolbar, "错误", "天地图Key未设置或Key无效", QMessageBox.Yes, QMessageBox.Yes
+                self.parent, "错误", "天地图Key未设置或Key无效", QMessageBox.Yes, QMessageBox.Yes
             )
         else:
             if self.searchdockwidget.isHidden():
