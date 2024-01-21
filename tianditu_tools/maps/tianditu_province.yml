@@ -1,7 +1,7 @@
 info:
   id: tianditu_province
   name: 天地图省级节点
-  lastUpdated: '2024-01-11 21:08:33'
+  lastUpdated: '2024-01-21 13:43:43'
 maps:
   天地图-江苏:
     - name: 江苏-1966年影像地图
@@ -105,3 +105,6 @@ maps:
       uri: IgnoreGetMapUrl=1&crs=EPSG:4326&dpiMode=7&format=image/tile&layers=dom2017&styles=dom2017&tileMatrixSet=dom2017_Matrix_1&tilePixelRatio=0&url=https://anhui.tianditu.gov.cn/geostar/hf2017/wmts?SERVICE%3DWMTS%26REQUEST%3DGetCapabilities
     - name: 安徽-2020年影像
       uri: IgnoreGetMapUrl=1&crs=EPSG:4490&dpiMode=7&format=image/tile&layers=DOM2020&styles=DOM2020&tileMatrixSet=DOM2020_Matrix_1&tilePixelRatio=0&url=https://anhui.tianditu.gov.cn/geostar/AH2020/wmts?SERVICE%3DWMTS%26REQUEST%3DGetCapabilities
+  天地图-江西:
+    - name: 江西 - 2021年7-18级影像
+      uri: crs=EPSG:4490&dpiMode=7&format=image/tile&layers=JX_IMG_2021_7_18&styles=JX_IMG_2021_7_18&tileMatrixSet=JX_IMG_2021_7_18_Matrix_1&tilePixelRatio=0&url=https://maps.liuxs.pro/tweak/JX_2021_tweak.xml
