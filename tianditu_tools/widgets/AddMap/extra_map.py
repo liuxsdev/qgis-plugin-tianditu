@@ -1,7 +1,7 @@
 from qgis.PyQt.QtWidgets import QMenu
 
 from tianditu_tools.utils import PluginDir, load_yaml, PluginConfig
-from tianditu_tools.widgets.icons import icons
+from tianditu_tools.widgets.icons import icons, get_extra_map_icon
 from .utils import add_raster_layer, get_map_uri
 
 conf = PluginConfig()
@@ -47,15 +47,15 @@ def add_extra_map_menu(parent_menu: QMenu):
     extra_maps_status = conf.get_extra_maps_status()
     for map_name in maps:
         if (
-            map_name in extra_maps_status["tianditu_province"]
-            or map_name in extra_maps_status["extra"]
+                map_name in extra_maps_status["tianditu_province"]
+                or map_name in extra_maps_status["extra"]
         ):
             map_data = extra_maps[map_name]
             sub_menu = extra_root_menu.addAction(icons["other"], map_name)
             sub_sub_menu = QMenu()
             for sub_map in map_data:
                 sub_sub_menu.addAction(
-                    icons["other"],
+                    get_extra_map_icon(sub_map["icon"]),
                     sub_map["name"],
                     lambda m_=sub_map: add_extra_map(m_),
                 )
