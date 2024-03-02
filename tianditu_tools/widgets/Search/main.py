@@ -10,9 +10,9 @@ conf = PluginConfig()
 
 class SearchAction(QAction):
     def __init__(
-            self,
-            iface,
-            parent=None,
+        self,
+        iface,
+        parent=None,
     ):
         super().__init__(parent)
         self.parent = parent
