@@ -5,7 +5,7 @@ from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QPushButton, QTreeWidget, QTreeWidgetItem
 
-from tianditu_tools.utils import load_yaml, PluginConfig, got
+from ...utils import load_yaml, PluginConfig, got
 
 
 class MapManager(QTreeWidget):
@@ -14,9 +14,9 @@ class MapManager(QTreeWidget):
     """
 
     def __init__(
-        self,
-        map_folder: Path,
-        parent=None,
+            self,
+            map_folder: Path,
+            parent=None,
     ):
         super().__init__(parent)
         self.map_folder = map_folder
@@ -115,7 +115,7 @@ class MapManager(QTreeWidget):
         summary_data = got(self.update_url)
         if summary_data.ok:
             with open(
-                self.map_folder.joinpath("summary.yml"), "w", encoding="utf-8"
+                    self.map_folder.joinpath("summary.yml"), "w", encoding="utf-8"
             ) as f:
                 f.write(summary_data.text)
         conf_data = got(download_url)

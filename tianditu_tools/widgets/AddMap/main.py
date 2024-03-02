@@ -2,15 +2,11 @@ import random
 
 from qgis.PyQt.QtWidgets import QToolButton, QMenu, QMessageBox
 
-from tianditu_tools.utils import (
-    TIANDITU_HOME_URL,
-    PluginConfig,
-    tianditu_map_url,
-)
-from tianditu_tools.widgets.icons import icons
 from .extra_map import add_tianditu_province_menu, add_extra_map_menu
 from .utils import add_raster_layer
 from .utils import get_map_uri
+from ..icons import icons
+from ...utils import TIANDITU_HOME_URL, PluginConfig, tianditu_map_url
 
 tianditu_map_info = {
     "vec": "天地图-矢量地图",

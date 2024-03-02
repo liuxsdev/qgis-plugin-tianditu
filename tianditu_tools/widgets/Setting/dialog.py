@@ -3,15 +3,15 @@ from qgis.PyQt.QtCore import QThread, pyqtSignal, QTimer
 from qgis.PyQt.QtGui import QClipboard
 from qgis.PyQt.QtWidgets import QApplication
 
-from tianditu_tools.ui.setting import Ui_SettingDialog
-from tianditu_tools.utils import (
+from .mapmanager import MapManager
+from ...ui.setting import Ui_SettingDialog
+from ...utils import (
     tianditu_map_url,
     check_url_status,
     check_subdomains,
     PluginConfig,
     PluginDir,
 )
-from .mapmanager import MapManager
 
 
 def check_key_format(key: str) -> object:

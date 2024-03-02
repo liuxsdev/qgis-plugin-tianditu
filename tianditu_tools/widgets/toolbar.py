@@ -1,11 +1,11 @@
 from qgis.PyQt.QtWidgets import QToolBar
 
-from tianditu_tools.utils import PluginConfig
-from tianditu_tools.widgets.AddMap import AddMapBtn
-from tianditu_tools.widgets.FitZoom import FitZoomAction
-from tianditu_tools.widgets.Search import SearchAction
-from tianditu_tools.widgets.Setting import SettingAction
+from .AddMap import AddMapBtn
+from .FitZoom import FitZoomAction
+from .Search import SearchAction
+from .Setting import SettingAction
 from .icons import icons
+from ..utils import PluginConfig
 
 
 class TiandituToolbar(QToolBar):

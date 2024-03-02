@@ -1,7 +1,7 @@
 from qgis.PyQt.QtWidgets import QAction
 from qgis.core import QgsCoordinateReferenceSystem
 
-from tianditu_tools.widgets.icons import icons
+from ..icons import icons
 
 
 def find_nearest_number_index(numbers_list, target):
@@ -32,7 +32,7 @@ class FitZoomAction(QAction):
         crs = self.iface.mapCanvas().mapSettings().destinationCrs()
         if crs == QgsCoordinateReferenceSystem("EPSG:3857"):
             max_zoom_level = 23
-            mpp_3857 = [40075016.685 / (2**i * 256) for i in range(max_zoom_level)]
+            mpp_3857 = [40075016.685 / (2 ** i * 256) for i in range(max_zoom_level)]
             current_mpp = self.iface.mapCanvas().mapUnitsPerPixel()
             nearest_level = find_nearest_number_index(mpp_3857, current_mpp)
             zoom_factor = mpp_3857[nearest_level] / current_mpp

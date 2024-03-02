@@ -1,8 +1,8 @@
 from qgis.PyQt.QtWidgets import QMenu
 
-from tianditu_tools.utils import PluginDir, load_yaml, PluginConfig
-from tianditu_tools.widgets.icons import icons, get_extra_map_icon
 from .utils import add_raster_layer, get_map_uri
+from ..icons import icons, get_extra_map_icon
+from ...utils import PluginDir, load_yaml, PluginConfig
 
 conf = PluginConfig()
 

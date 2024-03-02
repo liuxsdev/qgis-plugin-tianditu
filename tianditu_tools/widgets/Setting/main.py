@@ -1,14 +1,14 @@
 from qgis.PyQt.QtWidgets import QAction
 
-from tianditu_tools.widgets.icons import icons
 from .dialog import SettingDialog
+from ..icons import icons
 
 
 class SettingAction(QAction):
     def __init__(
-        self,
-        toolbar,
-        parent=None,
+            self,
+            toolbar,
+            parent=None,
     ):
         super().__init__(parent)
         self.setIcon(icons["setting"])

@@ -1,18 +1,18 @@
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QAction, QMessageBox
 
-from tianditu_tools.utils import PluginConfig
-from tianditu_tools.widgets.icons import icons
 from .searchDock import SearchDockWidget
+from ..icons import icons
+from ...utils import PluginConfig
 
 conf = PluginConfig()
 
 
 class SearchAction(QAction):
     def __init__(
-        self,
-        iface,
-        parent=None,
+            self,
+            iface,
+            parent=None,
     ):
         super().__init__(parent)
         self.parent = parent
