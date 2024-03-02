@@ -7,7 +7,10 @@ from pathlib import Path
 cwd = Path.cwd()
 source_dir = cwd.joinpath("tianditu_tools")
 dist_dir = cwd.joinpath("dist")
-dist_source_dir = dist_dir.joinpath("tianditu-tools")  # same as original plugin package name (tianditu-tools).
+# same as original plugin package name (tianditu-tools).
+dist_source_dir = dist_dir.joinpath(
+    "tianditu-tools"
+)
 
 # Other necessary files
 other_files = ["README.md", "LICENSE"]
