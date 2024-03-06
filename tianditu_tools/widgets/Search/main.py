@@ -10,9 +10,9 @@ conf = PluginConfig()
 
 class SearchAction(QAction):
     def __init__(
-            self,
-            iface,
-            parent=None,
+        self,
+        iface,
+        parent=None,
     ):
         super().__init__(parent)
         self.parent = parent
@@ -30,7 +30,11 @@ class SearchAction(QAction):
         key = conf.get_key()
         if key == "":
             QMessageBox.warning(
-                self.parent, "错误", "天地图Key未设置或Key无效", QMessageBox.Yes, QMessageBox.Yes
+                self.parent,
+                "错误",
+                "天地图Key未设置或Key无效",
+                QMessageBox.Yes,
+                QMessageBox.Yes,
             )
         else:
             if self.searchdockwidget.isHidden():
