@@ -1,9 +1,16 @@
-import os
-
 from qgis.PyQt import QtWidgets
 from qgis.PyQt.QtCore import QThread, pyqtSignal
 from qgis.PyQt.QtWidgets import QTreeWidget, QTreeWidgetItem
-from qgis.core import QgsFeature, QgsPoint, QgsProject, QgsSettings, QgsVectorLayer
+from qgis.core import (
+    QgsFeature,
+    QgsProject,
+    QgsSettings,
+    QgsVectorLayer,
+    QgsPointXY,
+    QgsGeometry,
+    QgsCoordinateReferenceSystem,
+    QgsCoordinateTransform,
+)
 
 from ...ui.search import Ui_SearchDockWidget
 from ...utils import PluginDir, TiandituAPI
@@ -117,6 +124,16 @@ class SearchRequestThread(QThread):
             self.handle_response_api_regeocoder(r)
 
 
+def create_point_layer(name: str, point: QgsPointXY, crs: str):
+    layer = QgsVectorLayer(f"Point?crs={crs}&field=Name:string", name, "memory")
+    pr = layer.dataProvider()
+    point_feature = QgsFeature()
+    point_feature.setGeometry(QgsGeometry.fromPointXY(point))
+    point_feature.setAttributes([name])
+    pr.addFeature(point_feature)
+    return layer
+
+
 class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
     def __init__(self, iface):
         super().__init__()
@@ -175,22 +192,28 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
         if group is None:
             group = root.addGroup(group_name)
         # 定义图层
-        layer = QgsVectorLayer("point?crs=epsg:4326&field=Name:string", name, "memory")
-        pr = layer.dataProvider()
-        # 定义要素
-        point_feature = QgsFeature()
-        point_feature.setGeometry(QgsPoint(x, y))
-        point_feature.setAttributes([name])
-        # 添加要素到图层
-        pr.addFeature(point_feature)
-        group.addLayer(layer)
+        raw_point = QgsPointXY(x, y)
+        # 当前工程坐标系
+        current_project_crs = QgsProject.instance().crs()
+        # 定义坐标转换
+        coord_trans = QgsCoordinateTransform(
+            QgsCoordinateReferenceSystem("EPSG:4326"),
+            current_project_crs,
+            QgsProject.instance(),
+        )
+        projected_point = coord_trans.transform(raw_point)
+        raw_layer = create_point_layer(name, raw_point, "EPSG:4326")
+        # 此图层用于缩放到点
+        layer = create_point_layer(name, projected_point, current_project_crs.authid())
+        group.addLayer(raw_layer)
         # 加载图层样式
-        layer.loadNamedStyle(os.path.join(PluginDir, "PointStyle.qml"))
-        layer.updateExtents()
-        QgsProject.instance().addMapLayer(layer, False)
-        # 画布缩放到点 TODO：Bug 只能缩放到经纬度坐标，其他坐标系需要转成对应坐标系下的坐标
-        # rect = layer.extent()
-        # self.iface.mapCanvas().setExtent(rect)
+        raw_layer.loadNamedStyle(str(PluginDir.joinpath("PointStyle.qml")))
+        raw_layer.updateExtents()
+        QgsProject.instance().addMapLayer(raw_layer, False)
+        # 画布缩放到点
+        rect = layer.extent()
+        self.iface.mapCanvas().setExtent(rect)
+        self.iface.mapCanvas().zoomScale(18056)  # 设置缩放等级, setExtent的缩放等级太大
         self.iface.mapCanvas().refresh()
 
     def on_search_complete(self, data, item=None):
