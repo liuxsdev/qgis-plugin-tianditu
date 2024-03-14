@@ -3,6 +3,7 @@ import re
 from qgis.PyQt import QtWidgets
 from qgis.PyQt.QtCore import QThread, pyqtSignal
 from qgis.PyQt.QtWidgets import QTreeWidget, QTreeWidgetItem
+from qgis.core import Qgis
 from qgis.core import (
     QgsFeature,
     QgsProject,
@@ -210,7 +211,14 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
         layer = create_point_layer(name, projected_point, current_project_crs.authid())
         group.addLayer(raw_layer)
         # 加载图层样式
-        raw_layer.loadNamedStyle(str(PluginDir.joinpath("PointStyle.qml")))
+        # 根据QGIS版本设置不同的样式
+        current_qgis_version = Qgis.QGIS_VERSION_INT
+        if current_qgis_version <= 31616:
+            raw_layer.loadNamedStyle(
+                str(PluginDir.joinpath("./Styles/PointStyle_316.qml"))
+            )
+        else:
+            raw_layer.loadNamedStyle(str(PluginDir.joinpath("./Styles/PointStyle.qml")))
         raw_layer.updateExtents()
         QgsProject.instance().addMapLayer(raw_layer, False)
         # 画布缩放到点
