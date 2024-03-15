@@ -1,7 +1,7 @@
 info:
   id: extra
   name: 其他地图
-  lastUpdated: '2024-01-10 20:47:12'
+  lastUpdated: '2024-03-15 09:47:54'
 maps:
   谷歌地图中国:
     - name: Google Map (CN) - Satellite
@@ -78,3 +78,58 @@ maps:
       zmin: 0
       zmax: 18
       referer: ''
+  Stamen Maps:
+    - name: Alidade Smooth
+      icon: default.svg
+      url: https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}.png
+      zmin: 0
+      zmax: 20
+      referer: https://maps.stamen.com/
+    - name: Alidade Smooth Dark
+      icon: default.svg
+      url: https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}.png
+      zmin: 0
+      zmax: 20
+      referer: https://maps.stamen.com/
+    - name: Alidade Satellite
+      icon: default.svg
+      url: https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}.jpg
+      zmin: 0
+      zmax: 20
+      referer: https://maps.stamen.com/
+    - name: Stadia Outdoors
+      icon: default.svg
+      url: https://tiles.stadiamaps.com/tiles/outdoors/{z}/{x}/{y}.png
+      zmin: 0
+      zmax: 20
+      referer: https://maps.stamen.com/
+    - name: Stamen Toner
+      icon: default.svg
+      url: https://tiles.stadiamaps.com/tiles/stamen_toner/{z}/{x}/{y}.png
+      zmin: 0
+      zmax: 20
+      referer: https://maps.stamen.com/
+    - name: Stadia Outdoors
+      icon: default.svg
+      url: https://tiles.stadiamaps.com/tiles/outdoors/{z}/{x}/{y}.png
+      zmin: 0
+      zmax: 20
+      referer: https://maps.stamen.com/
+    - name: Stamen Terrain
+      icon: default.svg
+      url: https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}.png
+      zmin: 0
+      zmax: 20
+      referer: https://maps.stamen.com/
+    - name: Stamen Watercolor
+      icon: default.svg
+      url: https://tiles.stadiamaps.com/tiles/stamen_watercolor/{z}/{x}/{y}.jpg
+      zmin: 0
+      zmax: 16
+      referer: https://maps.stamen.com/
+    - name: OSM Bright
+      icon: default.svg
+      url: https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}.png
+      zmin: 0
+      zmax: 20
+      referer: https://maps.stamen.com/
