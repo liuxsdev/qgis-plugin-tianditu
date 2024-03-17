@@ -99,7 +99,6 @@ class MapManager(QTreeWidget):
         if sender_btn:
             item = self.itemFromIndex(self.indexAt(sender_btn.pos()))  # 获取包含按钮的项
             if item:
-                print("Button clicked in row:", self.indexOfTopLevelItem(item))
                 map_id = self.get_map_id_by_name(item.text(0))
                 self.download_map_conf(map_id)
                 # 重新禁用按钮
@@ -125,6 +124,9 @@ class MapManager(QTreeWidget):
 
     def check_update(self):
         r = got(self.update_url)
+        if r is None:
+            print("检查更新失败，请稍后重试")
+            return
         update_summary = yaml.safe_load(r.text)
         for _, map_sum in update_summary.items():
             name = map_sum["name"]
