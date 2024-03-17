@@ -1,7 +1,7 @@
 info:
   id: extra
   name: 其他地图
-  lastUpdated: '2024-03-15 09:47:54'
+  lastUpdated: '2024-03-17 16:35:59'
 maps:
   谷歌地图中国:
     - name: Google Map (CN) - Satellite
@@ -103,21 +103,15 @@ maps:
       zmin: 0
       zmax: 20
       referer: https://maps.stamen.com/
-    - name: Stamen Toner
+    - name: Stamen Toner Background
       icon: default.svg
-      url: https://tiles.stadiamaps.com/tiles/stamen_toner/{z}/{x}/{y}.png
+      url: https://tiles.stadiamaps.com/tiles/stamen_toner_background/{z}/{x}/{y}.png
       zmin: 0
       zmax: 20
       referer: https://maps.stamen.com/
-    - name: Stadia Outdoors
+    - name: Stamen Terrain Background
       icon: default.svg
-      url: https://tiles.stadiamaps.com/tiles/outdoors/{z}/{x}/{y}.png
-      zmin: 0
-      zmax: 20
-      referer: https://maps.stamen.com/
-    - name: Stamen Terrain
-      icon: default.svg
-      url: https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}.png
+      url: https://tiles.stadiamaps.com/tiles/stamen_terrain_background/{z}/{x}/{y}.png
       zmin: 0
       zmax: 20
       referer: https://maps.stamen.com/
