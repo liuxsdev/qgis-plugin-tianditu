@@ -124,6 +124,15 @@ class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
         self.mapm = MapManager(map_folder=map_folder, parent=self.tab_map)
         self.verticalLayout_6.addWidget(self.mapm)
         self.pushButton_2.clicked.connect(self.mapm.check_update)
+        #
+        self.tabWidget.currentChanged.connect(self.adjust_tab_height)
+
+    def adjust_tab_height(self):
+        current_index = self.tabWidget.currentIndex()
+        if current_index == 0:
+            self.setFixedHeight(312)
+        else:
+            self.setFixedHeight(500)  # 根据内容计算高度
 
     def set_status_label(self, text: str):
         """
