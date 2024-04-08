@@ -43,9 +43,6 @@ class MapManager(QTreeWidget):
         self.setColumnWidth(3, 90)
         self.load_map_summary()
         self.expandAll()
-        # 设置大小策略，使得 QTreeWidget 随窗口大小调整
-        # self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        # self.parent().setFixedHeight(300)
 
     def load_map_detail(self, map_id):
         mapfile_path = self.map_folder.joinpath(f"{map_id}.yml")
@@ -66,7 +63,7 @@ class MapManager(QTreeWidget):
 
     def load_map_summary(self):
         summary = self.get_summary()
-        for value in reversed(summary.values()):
+        for value in summary.values():
             update_btn = QPushButton("更新")
             update_btn.setStyleSheet("QPushButton{margin:2px 20px;}")
             update_btn.clicked.connect(self.update_btn_clicked)
