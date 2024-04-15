@@ -107,11 +107,8 @@
         </item>
         <item>
          <widget class="QLabel" name="label_2">
-          <property name="text">
-           <string/>
-          </property>
           <property name="textFormat">
-           <enum>Qt::MarkdownText</enum>
+           <enum>Qt::RichText</enum>
           </property>
           <property name="textInteractionFlags">
            <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>

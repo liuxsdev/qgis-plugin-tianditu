@@ -1,6 +1,9 @@
+import re
+
 from qgis.PyQt import QtWidgets
 from qgis.PyQt.QtCore import QThread, pyqtSignal
 from qgis.PyQt.QtWidgets import QTreeWidget, QTreeWidgetItem
+from qgis.core import Qgis
 from qgis.core import (
     QgsFeature,
     QgsProject,
@@ -76,10 +79,11 @@ class SearchRequestThread(QThread):
                 location = data["location"]
                 level = location["level"]
                 score = location["score"]
-                lon = round(location["lon"], 6)
-                lat = round(location["lat"], 6)
-                t = f"关键词: {location['keyWord']}\n\nScore:{score}\n\n类别名称: {level}\n\n"
-                t += f"经纬度: {lon},{lat}  [添加到地图中](#)"
+                lon = round(float(location["lon"]), 6)
+                lat = round(float(location["lat"]), 6)
+                t = f"<p>关键词: {location['keyWord']}</p><p>Score:{score}</p><p>类别名称: {level}</p>"
+                _link = '<a href="#">添加到地图中</a>'
+                t += f"经纬度: {lon},{lat} {_link} "
             else:
                 t = "请求失败"
                 self.request_finished.emit({"text": "请求失败！"})
@@ -207,7 +211,14 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
         layer = create_point_layer(name, projected_point, current_project_crs.authid())
         group.addLayer(raw_layer)
         # 加载图层样式
-        raw_layer.loadNamedStyle(str(PluginDir.joinpath("PointStyle.qml")))
+        # 根据QGIS版本设置不同的样式
+        current_qgis_version = Qgis.QGIS_VERSION_INT
+        if current_qgis_version <= 31616:
+            raw_layer.loadNamedStyle(
+                str(PluginDir.joinpath("./Styles/PointStyle_316.qml"))
+            )
+        else:
+            raw_layer.loadNamedStyle(str(PluginDir.joinpath("./Styles/PointStyle.qml")))
         raw_layer.updateExtents()
         QgsProject.instance().addMapLayer(raw_layer, False)
         # 画布缩放到点
@@ -309,12 +320,18 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
 
     def geocoder_result_link_clicked(self):
         text = self.label_2.text()
-        a_ = text.split("Score:")[0]
-        name = a_.split("关键词: ")[1].strip()
-        b_ = text.split("经纬度: ")[1]
-        lonlat = b_.split("  [添加到地图中](#)")[0]
-        lon, lat = map(float, lonlat.split(","))
-        self.addPoint(name, lon, lat)
+        name = text.split("关键词:")[1].split("<")[0].strip()
+        pattern = r"经纬度: ([\d\.]+),([\d\.]+)"
+        match = re.search(pattern, text)
+        # 如果匹配成功，则提取经纬度信息
+        if match:
+            longitude = float(match.group(1))
+            latitude = float(match.group(2))
+            self.addPoint(name, longitude, latitude)
+        else:
+            self.iface.messageBar().pushWarning(
+                title="天地图API - Error: ", message="添加地图点失败"
+            )
 
     def regeocoder(self):
         lonlat = self.lineEdit_3.text()
@@ -332,5 +349,5 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
             self.search_request_thread.start()
         except ValueError as e:
             self.iface.messageBar().pushWarning(
-                title="天地图API - Error：经纬度输入有误", message=str(e)
+                title="天地图API - Error: 经纬度输入有误", message=str(e)
             )

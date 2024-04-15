@@ -1,28 +1,47 @@
 info:
   id: extra
   name: 其他地图
-  lastUpdated: '2024-01-10 20:47:12'
+  lastUpdated: '2024-04-07 18:57:45'
 maps:
-  谷歌地图中国:
+  谷歌地图:
+    - name: Google Map - Satellite
+      icon: googlemap_satellite.png
+      url: https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}
+      zmin: 0
+      zmax: 21
+      referer: ''
+    - name: Google Map - Roadmap
+      icon: googlemap_default.png
+      url: https://mt1.google.com/vt/lyrs=r&x={x}&y={y}&z={z}
+      zmin: 0
+      zmax: 21
+      referer: ''
+    - name: Google Map - Terrain Background
+      icon: googlemap_terrain.png
+      url: http://mt1.google.com/vt/lyrs=p&x={x}&y={y}&z={z}&apistyle=s.e:l|p.v:off,s.t:1|s.e.g|p.v:off,s.t:3|s.e.g|p.v:off,s.t:2|s.e.g|p.v:off,s.t:4|s.e.g|p.v:off
+      zmin: 0
+      zmax: 21
+      referer: ''
+  谷歌地图CN:
     - name: Google Map (CN) - Satellite
       icon: googlemap_satellite.png
-      url: https://gac-geo.googlecnapps.cn/maps/vt?lyrs=s&x={x}&y={y}&z={z}
+      url: https://gac-geo.googlecnapps.club/maps/vt?lyrs=s&x={x}&y={y}&z={z}
       zmin: 0
       zmax: 21
       referer: ''
     - name: Google Map (CN) - Roadmap
       icon: googlemap_default.png
-      url: https://gac-geo.googlecnapps.cn/maps/vt?lyrs=r&x={x}&y={y}&z={z}
+      url: https://gac-geo.googlecnapps.club/maps/vt?lyrs=r&x={x}&y={y}&z={z}
       zmin: 0
       zmax: 21
       referer: ''
     - name: Google Map (CN) - Terrain
       icon: googlemap_terrain.png
-      url: https://gac-geo.googlecnapps.cn/maps/vt?lyrs=p&x={x}&y={y}&z={z}
+      url: https://gac-geo.googlecnapps.club/maps/vt?lyrs=p&x={x}&y={y}&z={z}&apistyle=s.e:l|p.v:off,s.t:1|s.e.g|p.v:off,s.t:3|s.e.g|p.v:off,s.t:2|s.e.g|p.v:off,s.t:4|s.e.g|p.v:off
       zmin: 0
       zmax: 21
       referer: ''
-  ESRI - 中国地图:
+  ESRI:
     - name: ESRI - 中国地图彩色版
       icon: ESRI.webp
       url: https://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineCommunity/MapServer/tile/{z}/{y}/{x}
@@ -46,6 +65,24 @@ maps:
       url: https://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer/tile/{z}/{y}/{x}
       zmin: 0
       zmax: 18
+      referer: ''
+    - name: ESRI - World Imagery
+      icon: ESRI.webp
+      url: https://server.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}
+      zmin: 0
+      zmax: 18
+      referer: ''
+    - name: ESRI - World Ocean Base
+      icon: ESRI.webp
+      url: https://server.arcgisonline.com/arcgis/rest/services/Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}
+      zmin: 0
+      zmax: 10
+      referer: ''
+    - name: ESRI - World Terrain Base
+      icon: ESRI.webp
+      url: https://server.arcgisonline.com/arcgis/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}
+      zmin: 0
+      zmax: 9
       referer: ''
   高德地图:
     - name: 高德地图 - 影像地图
@@ -78,3 +115,52 @@ maps:
       zmin: 0
       zmax: 18
       referer: ''
+  Stamen Maps:
+    - name: Alidade Smooth
+      icon: default.svg
+      url: https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}.png
+      zmin: 0
+      zmax: 20
+      referer: https://maps.stamen.com/
+    - name: Alidade Smooth Dark
+      icon: default.svg
+      url: https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}.png
+      zmin: 0
+      zmax: 20
+      referer: https://maps.stamen.com/
+    - name: Alidade Satellite
+      icon: default.svg
+      url: https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}.jpg
+      zmin: 0
+      zmax: 20
+      referer: https://maps.stamen.com/
+    - name: Stadia Outdoors
+      icon: default.svg
+      url: https://tiles.stadiamaps.com/tiles/outdoors/{z}/{x}/{y}.png
+      zmin: 0
+      zmax: 20
+      referer: https://maps.stamen.com/
+    - name: Stamen Toner Background
+      icon: default.svg
+      url: https://tiles.stadiamaps.com/tiles/stamen_toner_background/{z}/{x}/{y}.png
+      zmin: 0
+      zmax: 20
+      referer: https://maps.stamen.com/
+    - name: Stamen Terrain Background
+      icon: default.svg
+      url: https://tiles.stadiamaps.com/tiles/stamen_terrain_background/{z}/{x}/{y}.png
+      zmin: 0
+      zmax: 20
+      referer: https://maps.stamen.com/
+    - name: Stamen Watercolor
+      icon: default.svg
+      url: https://tiles.stadiamaps.com/tiles/stamen_watercolor/{z}/{x}/{y}.jpg
+      zmin: 0
+      zmax: 16
+      referer: https://maps.stamen.com/
+    - name: OSM Bright
+      icon: default.svg
+      url: https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}.png
+      zmin: 0
+      zmax: 20
+      referer: https://maps.stamen.com/

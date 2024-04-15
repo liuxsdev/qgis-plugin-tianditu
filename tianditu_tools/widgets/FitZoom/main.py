@@ -4,19 +4,6 @@ from qgis.core import QgsCoordinateReferenceSystem
 from ..icons import icons
 
 
-def find_nearest_number_index(numbers_list, target):
-    min_difference = float("inf")
-    nearest_index = None
-
-    for i, number in enumerate(numbers_list):
-        difference = abs(number - target)
-        if difference < min_difference:
-            min_difference = difference
-            nearest_index = i
-
-    return nearest_index
-
-
 class FitZoomAction(QAction):
     def __init__(self, iface, parent=None):
         self.iface = iface
@@ -34,10 +21,21 @@ class FitZoomAction(QAction):
             max_zoom_level = 23
             mpp_3857 = [40075016.685 / (2**i * 256) for i in range(max_zoom_level)]
             current_mpp = self.iface.mapCanvas().mapUnitsPerPixel()
-            nearest_level = find_nearest_number_index(mpp_3857, current_mpp)
+            nearest_level = self.find_nearest_number_index(mpp_3857, current_mpp)
             zoom_factor = mpp_3857[nearest_level] / current_mpp
             if not abs(1 - zoom_factor) < 1e-5:
                 self.iface.mapCanvas().zoomByFactor(zoom_factor)
+
+    @staticmethod
+    def find_nearest_number_index(numbers_list, target):
+        min_difference = float("inf")
+        nearest_index = None
+        for i, number in enumerate(numbers_list):
+            difference = abs(number - target)
+            if difference < min_difference:
+                min_difference = difference
+                nearest_index = i
+        return nearest_index
 
     def check_crs(self):
         crs = self.iface.mapCanvas().mapSettings().destinationCrs()

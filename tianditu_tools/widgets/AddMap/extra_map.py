@@ -55,7 +55,7 @@ def add_extra_map_menu(parent_menu: QMenu):
             sub_sub_menu = QMenu()
             for sub_map in map_data:
                 sub_sub_menu.addAction(
-                    get_extra_map_icon(sub_map["icon"]),
+                    get_extra_map_icon(sub_map.get("icon", "default.svg")),
                     sub_map["name"],
                     lambda m_=sub_map: add_extra_map(m_),
                 )

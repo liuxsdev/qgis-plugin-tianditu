@@ -43,9 +43,6 @@ class MapManager(QTreeWidget):
         self.setColumnWidth(3, 90)
         self.load_map_summary()
         self.expandAll()
-        # 设置大小策略，使得 QTreeWidget 随窗口大小调整
-        # self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        # self.parent().setFixedHeight(300)
 
     def load_map_detail(self, map_id):
         mapfile_path = self.map_folder.joinpath(f"{map_id}.yml")
@@ -66,7 +63,7 @@ class MapManager(QTreeWidget):
 
     def load_map_summary(self):
         summary = self.get_summary()
-        for value in reversed(summary.values()):
+        for value in summary.values():
             update_btn = QPushButton("更新")
             update_btn.setStyleSheet("QPushButton{margin:2px 20px;}")
             update_btn.clicked.connect(self.update_btn_clicked)
@@ -99,7 +96,6 @@ class MapManager(QTreeWidget):
         if sender_btn:
             item = self.itemFromIndex(self.indexAt(sender_btn.pos()))  # 获取包含按钮的项
             if item:
-                print("Button clicked in row:", self.indexOfTopLevelItem(item))
                 map_id = self.get_map_id_by_name(item.text(0))
                 self.download_map_conf(map_id)
                 # 重新禁用按钮
@@ -125,6 +121,9 @@ class MapManager(QTreeWidget):
 
     def check_update(self):
         r = got(self.update_url)
+        if r is None:
+            print("检查更新失败，请稍后重试")
+            return
         update_summary = yaml.safe_load(r.text)
         for _, map_sum in update_summary.items():
             name = map_sum["name"]
