@@ -1,7 +1,7 @@
 info:
   id: extra
   name: 其他地图
-  lastUpdated: '2024-04-07 18:57:45'
+  lastUpdated: '2024-04-15 10:17:17'
 maps:
   谷歌地图:
     - name: Google Map - Satellite
@@ -35,7 +35,7 @@ maps:
       zmin: 0
       zmax: 21
       referer: ''
-    - name: Google Map (CN) - Terrain
+    - name: Google Map (CN) - Terrain Background
       icon: googlemap_terrain.png
       url: https://gac-geo.googlecnapps.club/maps/vt?lyrs=p&x={x}&y={y}&z={z}&apistyle=s.e:l|p.v:off,s.t:1|s.e.g|p.v:off,s.t:3|s.e.g|p.v:off,s.t:2|s.e.g|p.v:off,s.t:4|s.e.g|p.v:off
       zmin: 0
@@ -83,6 +83,12 @@ maps:
       url: https://server.arcgisonline.com/arcgis/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}
       zmin: 0
       zmax: 9
+      referer: ''
+    - name: ESRI - World Physical Map
+      icon: ESRI.webp
+      url: https://server.arcgisonline.com/arcgis/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}
+      zmin: 0
+      zmax: 8
       referer: ''
   高德地图:
     - name: 高德地图 - 影像地图

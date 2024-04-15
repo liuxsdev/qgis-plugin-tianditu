@@ -3,7 +3,7 @@ name=TianDiTu Tools
 qgisMinimumVersion=3.4
 description=天地图底图加载
 about=QGIS 天地图工具，方便进行天地图瓦片底图的添加以及简单实现了部分天地图 Web 服务 API（地名搜索、地理编码查询、逆地理编码查询） 
-version=0.4.0
+version=0.4.1
 tags=basemap, xyz, tianditu, geocoder, 天地图
 icon=images/icon.png
 experimental=False
@@ -14,6 +14,8 @@ homepage=https://qgis-plugin-tianditu.liuxs.pro/
 tracker=https://github.com/liuxsdev/qgis-plugin-tianditu/issues
 repository=https://github.com/liuxsdev/qgis-plugin-tianditu
 changelog=
+  Version 0.4.1 2024/04/15:
+  * 🐛 修复3.18及以下版本上无法加载插件
   Version 0.4.0 2024/01/16:
   * ✨ 新增功能: 支持多个天地图key
   * ✨ 新增功能: 地图管理和更新
