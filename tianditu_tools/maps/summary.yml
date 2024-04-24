@@ -1,8 +1,8 @@
-tianditu_province:
-  id: tianditu_province
-  name: 天地图省级节点
-  lastUpdated: '2024-01-21 13:43:43'
 extra:
   id: extra
   name: 其他地图
   lastUpdated: '2024-04-15 10:17:17'
+tianditu_province:
+  id: tianditu_province
+  name: 天地图省级节点
+  lastUpdated: '2024-04-22 22:13:31'
