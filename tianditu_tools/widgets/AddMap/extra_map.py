@@ -1,6 +1,6 @@
 from qgis.PyQt.QtWidgets import QMenu
 
-from .utils import add_raster_layer, get_map_uri
+from .utils import add_raster_layer, get_xyz_uri
 from ..icons import icons, get_extra_map_icon
 from ...utils import PluginDir, load_yaml, PluginConfig
 
@@ -9,7 +9,7 @@ conf = PluginConfig()
 
 def add_extra_map(mapdata):
     name = mapdata["name"]
-    uri = get_map_uri(
+    uri = get_xyz_uri(
         mapdata["url"], mapdata["zmin"], mapdata["zmax"], mapdata.get("referer", "")
     )
     add_raster_layer(uri, name)

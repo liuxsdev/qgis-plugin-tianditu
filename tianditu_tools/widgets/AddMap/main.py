@@ -4,7 +4,7 @@ from qgis.PyQt.QtWidgets import QToolButton, QMenu, QMessageBox
 
 from .extra_map import add_tianditu_province_menu, add_extra_map_menu
 from .utils import add_raster_layer
-from .utils import get_map_uri
+from .utils import get_xyz_uri
 from ..icons import icons
 from ...utils import TIANDITU_HOME_URL, PluginConfig, tianditu_map_url
 
@@ -62,5 +62,5 @@ class AddMapBtn(QToolButton):
             if key_random_enabled:
                 key = conf.get_random_key()
             map_url = tianditu_map_url(maptype, key, subdomain)
-            uri = get_map_uri(map_url, 1, 18, TIANDITU_HOME_URL)
+            uri = get_xyz_uri(map_url, 1, 18, TIANDITU_HOME_URL)
             add_raster_layer(uri, tianditu_map_info[maptype])
