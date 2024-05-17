@@ -199,7 +199,7 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
             group = root.addGroup(group_name)
         # 确保图层组在第一位置
         if group:
-            group_index = root.Children().index(group)
+            group_index = root.children().index(group)
             if group_index != 0:
                 root.insertChildNode(0, group.clone())
                 root.removeChildNode(group)
