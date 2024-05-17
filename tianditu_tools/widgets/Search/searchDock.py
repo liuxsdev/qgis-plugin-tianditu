@@ -203,6 +203,7 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
             if group_index != 0:
                 root.insertChildNode(0, group.clone())
                 root.removeChildNode(group)
+        group = root.findGroup(group_name) # 重新拿到 group
         # 定义图层
         raw_point = QgsPointXY(x, y)
         # 当前工程坐标系
