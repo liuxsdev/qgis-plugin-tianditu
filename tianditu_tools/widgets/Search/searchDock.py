@@ -57,7 +57,9 @@ class SearchRequestThread(QThread):
                             {"type": "api_search_v2:2", "all_admins": all_admins}
                         )
                 else:
-                    self.request_finished.emit({"type": "no_result", "message": "无结果"})
+                    self.request_finished.emit(
+                        {"type": "no_result", "message": "无结果"}
+                    )
         else:
             self.request_finished.emit(
                 {"type": "error", "message": response["message"]}
@@ -195,6 +197,13 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
         group = root.findGroup(group_name)
         if group is None:
             group = root.addGroup(group_name)
+        # 确保图层组在第一位置
+        if group:
+            group_index = root.children().index(group)
+            if group_index != 0:
+                root.insertChildNode(0, group.clone())
+                root.removeChildNode(group)
+        group = root.findGroup(group_name) # 重新拿到 group
         # 定义图层
         raw_point = QgsPointXY(x, y)
         # 当前工程坐标系
