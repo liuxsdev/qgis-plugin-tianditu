@@ -1,7 +1,12 @@
+import json
+from functools import partial
+
 from qgis.PyQt import QtWidgets
 from qgis.PyQt.QtCore import QThread, pyqtSignal, QTimer
 from qgis.PyQt.QtGui import QClipboard
+from qgis.PyQt.QtNetwork import QNetworkReply, QNetworkRequest
 from qgis.PyQt.QtWidgets import QApplication
+from qgis.core import QgsNetworkAccessManager
 
 from .mapmanager import MapManager
 from ...ui.setting import Ui_SettingDialog
@@ -11,6 +16,8 @@ from ...utils import (
     check_subdomains,
     PluginConfig,
     PluginDir,
+    make_request,
+    HEADER,
 )
 
 
@@ -121,9 +128,14 @@ class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
         self.subdomainComboBox.currentIndexChanged.connect(self.select_subdomain)
         # init map manager
         map_folder = PluginDir.joinpath("maps")
-        self.mapm = MapManager(map_folder=map_folder, parent=self.tab_map)
+        self.mapm = MapManager(
+            map_folder=map_folder,
+            parent=self.tab_map,
+            update_btn=self.btn_checkupdate,
+            status_label=self.label_checkstatus,
+        )
         self.verticalLayout_6.addWidget(self.mapm)
-        self.pushButton_2.clicked.connect(self.mapm.check_update)
+        self.btn_checkupdate.clicked.connect(self.mapm.check_update)
         #
         self.tabWidget.currentChanged.connect(self.adjust_tab_height)
 
@@ -176,14 +188,14 @@ class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
         clipboard.setText(full_key, QClipboard.Clipboard)
         self.set_status_label(f"已复制{current_key}到剪贴板")
 
-    def save_key(self):
-        key = self.mLineEdit_key.text()
+    def handle_key_check(self, reply, key):
         key_list = self.conf.get_key_list()
-        if key not in key_list:
-            url = tianditu_map_url("vec", key, "t0")
-            tile_url = url.format(x=0, y=0, z=0)
-            check_msg = check_url_status(tile_url)
-            if check_msg["code"] == 0:
+        # 获取状态码
+        status_code = reply.attribute(QNetworkRequest.HttpStatusCodeAttribute)
+        if reply.error() == QNetworkReply.NoError:
+            response_data = reply.readAll()
+            png_signature = b"\x89\x50\x4E\x47\x0D\x0A\x1A\x0A"
+            if response_data[:8] == png_signature:
                 if self.keyComboBox.itemText(0) == "请添加 key":
                     self.keyComboBox.removeItem(0)
                 self.mLineEdit_key.setText("")
@@ -192,11 +204,38 @@ class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
                 self.saveButton.setEnabled(False)
                 self.set_status_label("保存成功")
                 self.init_keyCombo()
-            else:
-                error_msg = f"{check_msg['msg']}: {check_msg['resolve']}"
-                self.set_status_label(error_msg)
         else:
+            if status_code == 403:
+                """
+                当期 2024-06-09 似乎不需要设置 Referer 也能正常访问
+                {'msg': '非法Key', 'resolve': '请到API控制台重新申请Key', 'code': 1}
+                {'msg': '域名不匹配', 'resolve': '请到API控制台查看域名配置并修改', 'code': 7}
+                {'msg': '权限类型错误', 'resolve': 'Key权限类型为:服务端，请使用服务端访问！', 'code': 12}
+                {'msg': '权限类型错误', 'resolve': '不支持的key类型！', 'code': 18}
+                """
+                response_data = str(reply.readAll(), "utf-8", "ignore")
+                json_data = json.loads(response_data)
+                print(json_data)
+                self.set_status_label(
+                    f"错误: {json_data.get('msg')} {json_data.get('resolve')}"
+                )
+            elif status_code == 418:
+                self.set_status_label("错误: 疑似攻击")
+            else:
+                self.set_status_label("未知错误")
+
+    def save_key(self):
+        key = self.mLineEdit_key.text()
+        key_list = self.conf.get_key_list()
+        if key in key_list:
             self.set_status_label("key 已存在")
+            return
+        url = tianditu_map_url("vec", key, "t0")
+        tile_url = url.format(x=0, y=0, z=0)
+        network_manager = QgsNetworkAccessManager.instance()
+        request = make_request(tile_url, HEADER.get("Referer"))
+        reply = network_manager.get(request)
+        reply.finished.connect(partial(self.handle_key_check, reply, key))
 
     def select_key(self):
         if self.keyComboBox.count() > 0:

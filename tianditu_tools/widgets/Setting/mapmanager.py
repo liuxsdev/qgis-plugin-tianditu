@@ -1,11 +1,14 @@
+from functools import partial
 from pathlib import Path
 
 import yaml
-from PyQt5.QtCore import QSize, Qt
+from PyQt5.QtCore import QSize, Qt, QTimer
 from PyQt5.QtGui import QFont
+from PyQt5.QtNetwork import QNetworkReply
 from PyQt5.QtWidgets import QPushButton, QTreeWidget, QTreeWidgetItem
+from qgis.core import QgsNetworkAccessManager
 
-from ...utils import load_yaml, PluginConfig, got
+from ...utils import load_yaml, PluginConfig, got, make_request, HEADER
 
 
 class MapManager(QTreeWidget):
@@ -14,12 +17,12 @@ class MapManager(QTreeWidget):
     """
 
     def __init__(
-        self,
-        map_folder: Path,
-        parent=None,
+        self, map_folder: Path, parent=None, update_btn=None, status_label=None
     ):
         super().__init__(parent)
         self.map_folder = map_folder
+        self.update_btn = update_btn
+        self.status_label = status_label
         self.font = QFont()
         self.font.setFamily("微软雅黑")
         self.font.setPointSize(8)
@@ -28,6 +31,9 @@ class MapManager(QTreeWidget):
         self.update_url = f"{self.update_host}summary.yml"
         self.conf = PluginConfig()
         # self.check_update()
+        # 设置 status label 的定时器
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.clear_status_label)
         self.setupUI()
 
     def setupUI(self):
@@ -94,7 +100,9 @@ class MapManager(QTreeWidget):
         """
         sender_btn = self.sender()  # 获取发出信号的按钮
         if sender_btn:
-            item = self.itemFromIndex(self.indexAt(sender_btn.pos()))  # 获取包含按钮的项
+            item = self.itemFromIndex(
+                self.indexAt(sender_btn.pos())
+            )  # 获取包含按钮的项
             if item:
                 map_id = self.get_map_id_by_name(item.text(0))
                 self.download_map_conf(map_id)
@@ -119,20 +127,42 @@ class MapManager(QTreeWidget):
             with open(mapfile_path, "w", encoding="utf-8") as f:
                 f.write(conf_data.text)
 
+    def handle_check_update_response(self, reply: QNetworkReply):
+        if reply.error() == QNetworkReply.NoError:
+            response_data = str(reply.readAll(), "utf-8", "ignore")
+            self.set_status_label("检查更新成功")
+            self.update_btn.setEnabled(True)
+            # print("response_data:", response_data)
+            update_summary = yaml.safe_load(response_data)
+            for _, map_sum in update_summary.items():
+                name = map_sum["name"]
+                item = self.findItems(name, Qt.MatchExactly)[0]
+                item.setText(2, map_sum["lastUpdated"])
+                if item.text(1) != item.text(2):
+                    # 将按钮设置为启用状态
+                    update_btn = self.itemWidget(item, 3)
+                    update_btn.setEnabled(True)
+        else:
+            self.set_status_label("检查更新失败，请稍后重试...")
+            # print(f"错误: {reply.errorString()},{reply.readAll()}")
+            self.update_btn.setEnabled(True)
+        reply.deleteLater()
+
+    def set_status_label(self, text: str):
+        self.status_label.setText(text)
+        self.timer.start(2000)
+
+    def clear_status_label(self):
+        self.status_label.clear()
+        self.timer.stop()
+
     def check_update(self):
-        r = got(self.update_url)
-        if r is None:
-            print("检查更新失败，请稍后重试")
-            return
-        update_summary = yaml.safe_load(r.text)
-        for _, map_sum in update_summary.items():
-            name = map_sum["name"]
-            item = self.findItems(name, Qt.MatchExactly)[0]
-            item.setText(2, map_sum["lastUpdated"])
-            if item.text(1) != item.text(2):
-                # 将按钮设置为启用状态
-                update_btn = self.itemWidget(item, 3)
-                update_btn.setEnabled(True)
+        self.status_label.setText("检查更新中...")
+        self.update_btn.setEnabled(False)
+        network_manager = QgsNetworkAccessManager.instance()
+        request = make_request(self.update_url, HEADER["Referer"])
+        reply = network_manager.get(request)
+        reply.finished.connect(partial(self.handle_check_update_response, reply))
 
     def update_map_enable_state(self):
         top_level_item_count = self.topLevelItemCount()
