@@ -5,7 +5,9 @@ from random import choice
 
 import requests
 import yaml
-from qgis.core import QgsSettings
+from PyQt5.QtCore import QUrl
+from PyQt5.QtNetwork import QNetworkRequest
+from qgis.core import QgsNetworkAccessManager, QgsSettings
 
 TIANDITU_HOME_URL = "https://www.tianditu.gov.cn/"
 PLUGIN_NAME = "tianditu-tools"
@@ -96,6 +98,14 @@ class PluginConfig:
         self.conf.setValue(f"{self.section_tianditu}/key", key_to_set)
 
 
+def make_request(url: str, referer: str = None):
+    request = QNetworkRequest(QUrl(url))
+    # request.setHeader(QNetworkRequest.UserAgentHeader, headers["User-Agent"]) # 设置 User-Agent 无效
+    if referer:
+        request.setRawHeader(b"Referer", referer.encode("utf-8"))
+    return request
+
+
 def got(url, headers=None, timeout=6):
     try:
         response = requests.get(url, headers=headers, timeout=timeout)
@@ -156,6 +166,12 @@ def check_url_status(url: str) -> object:
     else:
         msg = {"code": -1, "msg": "网络错误", "resolve": "请检查网络连接"}
     return msg
+
+
+def check_url_status2(url: str):
+    network_manager = QgsNetworkAccessManager.instance()
+    request = make_request(url, "https://www.tianditu.gov.cn/")
+    reply = network_manager.get(request)
 
 
 def check_subdomain(url: str) -> int:
