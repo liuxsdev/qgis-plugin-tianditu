@@ -10,6 +10,10 @@ from qgis.core import QgsNetworkAccessManager
 
 from ...utils import load_yaml, PluginConfig, got, make_request, HEADER
 
+ui_font = QFont()
+ui_font.setFamily("微软雅黑")
+ui_font.setPointSize(8)
+
 
 class MapManager(QTreeWidget):
     """
@@ -23,10 +27,7 @@ class MapManager(QTreeWidget):
         self.map_folder = map_folder
         self.update_btn = update_btn
         self.status_label = status_label
-        self.font = QFont()
-        self.font.setFamily("微软雅黑")
-        self.font.setPointSize(8)
-        self.setFont(self.font)
+        self.setFont(ui_font)
         self.update_host = "https://maps.liuxs.pro/dist/"
         self.update_url = f"{self.update_host}summary.yml"
         self.conf = PluginConfig()

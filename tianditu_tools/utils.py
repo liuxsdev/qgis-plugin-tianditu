@@ -7,7 +7,7 @@ import requests
 import yaml
 from PyQt5.QtCore import QUrl
 from PyQt5.QtNetwork import QNetworkRequest
-from qgis.core import QgsNetworkAccessManager, QgsSettings
+from qgis.core import QgsSettings
 
 TIANDITU_HOME_URL = "https://www.tianditu.gov.cn/"
 PLUGIN_NAME = "tianditu-tools"
@@ -166,12 +166,6 @@ def check_url_status(url: str) -> object:
     else:
         msg = {"code": -1, "msg": "网络错误", "resolve": "请检查网络连接"}
     return msg
-
-
-def check_url_status2(url: str):
-    network_manager = QgsNetworkAccessManager.instance()
-    request = make_request(url, "https://www.tianditu.gov.cn/")
-    reply = network_manager.get(request)
 
 
 def check_subdomain(url: str) -> int:

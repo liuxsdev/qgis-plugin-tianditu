@@ -206,13 +206,11 @@ class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
                 self.init_keyCombo()
         else:
             if status_code == 403:
-                """
-                当期 2024-06-09 似乎不需要设置 Referer 也能正常访问
-                {'msg': '非法Key', 'resolve': '请到API控制台重新申请Key', 'code': 1}
-                {'msg': '域名不匹配', 'resolve': '请到API控制台查看域名配置并修改', 'code': 7}
-                {'msg': '权限类型错误', 'resolve': 'Key权限类型为:服务端，请使用服务端访问！', 'code': 12}
-                {'msg': '权限类型错误', 'resolve': '不支持的key类型！', 'code': 18}
-                """
+                # 当期 2024-06-09 似乎不需要设置 Referer 也能正常访问
+                # {'msg': '非法Key', 'resolve': '请到API控制台重新申请Key', 'code': 1}
+                # {'msg': '域名不匹配', 'resolve': '请到API控制台查看域名配置并修改', 'code': 7}
+                # {'msg': '权限类型错误', 'resolve': 'Key权限类型为:服务端，请使用服务端访问！', 'code': 12}
+                # {'msg': '权限类型错误', 'resolve': '不支持的key类型！', 'code': 18}
                 response_data = str(reply.readAll(), "utf-8", "ignore")
                 json_data = json.loads(response_data)
                 print(json_data)
