@@ -8,7 +8,7 @@ from PyQt5.QtNetwork import QNetworkReply
 from PyQt5.QtWidgets import QPushButton, QTreeWidget, QTreeWidgetItem
 from qgis.core import QgsNetworkAccessManager
 
-from ...utils import load_yaml, PluginConfig, got, make_request, HEADER
+from ...utils import load_yaml, PluginConfig, make_request, HEADER
 
 ui_font = QFont()
 ui_font.setFamily("微软雅黑")
@@ -116,17 +116,18 @@ class MapManager(QTreeWidget):
     def download_map_conf(self, map_id):
         download_url = f"{self.update_host}{map_id}.yml"
         mapfile_path = self.map_folder.joinpath(f"{map_id}.yml")
-        # 更新summary
-        summary_data = got(self.update_url)
-        if summary_data.ok:
-            with open(
-                self.map_folder.joinpath("summary.yml"), "w", encoding="utf-8"
-            ) as f:
-                f.write(summary_data.text)
-        conf_data = got(download_url)
-        if conf_data.ok:
-            with open(mapfile_path, "w", encoding="utf-8") as f:
-                f.write(conf_data.text)
+        # 更新 summary
+        network_manager = QgsNetworkAccessManager.instance()
+        request = make_request(self.update_url)
+        reply = network_manager.blockingGet(request)
+        if reply.error() == QNetworkReply.NoError:
+            with open(self.map_folder.joinpath("summary.yml"), "wb") as f:
+                f.write(reply.content())
+        request = make_request(download_url)
+        reply = network_manager.blockingGet(request)
+        if reply.error() == QNetworkReply.NoError:
+            with open(mapfile_path, "wb") as f:
+                f.write(reply.content())
 
     def handle_check_update_response(self, reply: QNetworkReply):
         if reply.error() == QNetworkReply.NoError:

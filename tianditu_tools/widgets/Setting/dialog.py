@@ -1,8 +1,7 @@
 import json
-from functools import partial
 
 from qgis.PyQt import QtWidgets
-from qgis.PyQt.QtCore import QThread, pyqtSignal, QTimer
+from qgis.PyQt.QtCore import QTimer
 from qgis.PyQt.QtGui import QClipboard
 from qgis.PyQt.QtNetwork import QNetworkReply, QNetworkRequest
 from qgis.PyQt.QtWidgets import QApplication
@@ -12,8 +11,6 @@ from .mapmanager import MapManager
 from ...ui.setting import Ui_SettingDialog
 from ...utils import (
     tianditu_map_url,
-    check_url_status,
-    check_subdomains,
     PluginConfig,
     PluginDir,
     make_request,
@@ -41,43 +38,6 @@ def check_key_format(key: str) -> object:
         "key_length_error": key_length_error,
         "has_special_character": not key.isalnum(),
     }
-
-
-class CheckThread(QThread):
-    check_finished = pyqtSignal(str)
-
-    def __init__(self, conf):
-        super().__init__()
-        self.conf = conf
-        self.key = ""
-
-    def run(self):
-        url = tianditu_map_url("vec", self.key, "t0")
-        tile_url = url.format(x=0, y=0, z=0)
-        check_msg = check_url_status(tile_url)
-        if check_msg["code"] == 0:
-            self.check_finished.emit("正常")
-            self.conf.set_value("Tianditu/keyisvalid", True)
-        else:
-            error_msg = f"{check_msg['msg']}: {check_msg['resolve']}"
-            self.check_finished.emit(error_msg)
-            self.conf.set_value("Tianditu/keyisvalid", False)
-
-
-class PingUrlThread(QThread):
-    ping_finished = pyqtSignal(list)
-
-    def __init__(self, key):
-        super().__init__()
-        self.key = key
-
-    def run(self):
-        subdomain_list = ["t0", "t1", "t2", "t3", "t4", "t5", "t6", "t7"]
-        urls = [
-            tianditu_map_url("vec", self.key, subdomain) for subdomain in subdomain_list
-        ]
-        status = check_subdomains(urls)
-        self.ping_finished.emit(status)
 
 
 class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
@@ -233,7 +193,8 @@ class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
         network_manager = QgsNetworkAccessManager.instance()
         request = make_request(tile_url, HEADER.get("Referer"))
         reply = network_manager.get(request)
-        reply.finished.connect(partial(self.handle_key_check, reply, key))
+        # reply.finished.connect(partial(self.handle_key_check, reply, key))
+        reply.finished.connect(lambda: self.handle_key_check(reply, key))
 
     def select_key(self):
         if self.keyComboBox.count() > 0:

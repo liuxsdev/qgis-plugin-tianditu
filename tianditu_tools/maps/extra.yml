@@ -1,7 +1,7 @@
 info:
   id: extra
   name: 其他地图
-  lastUpdated: '2024-04-15 10:17:17'
+  lastUpdated: '2024-04-29 15:48:48'
 maps:
   谷歌地图:
     - name: Google Map - Satellite
@@ -170,3 +170,34 @@ maps:
       zmin: 0
       zmax: 20
       referer: https://maps.stamen.com/
+  OpenRailwayMap:
+    - name: OpenRailwayMap Standard
+      icon: default.svg
+      url: https://a.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png
+      zmin: 0
+      zmax: 19
+      referer: ''
+    - name: OpenRailwayMap Maxspeed
+      icon: default.svg
+      url: https://a.tiles.openrailwaymap.org/maxspeed/{z}/{x}/{y}.png
+      zmin: 0
+      zmax: 19
+      referer: ''
+    - name: OpenRailwayMap Signals
+      icon: default.svg
+      url: https://a.tiles.openrailwaymap.org/signals/{z}/{x}/{y}.png
+      zmin: 0
+      zmax: 19
+      referer: ''
+    - name: OpenRailwayMap Electrified
+      icon: default.svg
+      url: https://a.tiles.openrailwaymap.org/electrified/{z}/{x}/{y}.png
+      zmin: 0
+      zmax: 19
+      referer: ''
+    - name: OpenRailwayMap Gauge
+      icon: default.svg
+      url: https://a.tiles.openrailwaymap.org/gauge/{z}/{x}/{y}.png
+      zmin: 0
+      zmax: 19
+      referer: ''

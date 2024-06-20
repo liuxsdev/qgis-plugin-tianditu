@@ -1,7 +1,8 @@
+import json
 import re
 
 from qgis.PyQt import QtWidgets
-from qgis.PyQt.QtCore import QThread, pyqtSignal
+from qgis.PyQt.QtNetwork import QNetworkReply, QNetworkRequest
 from qgis.PyQt.QtWidgets import QTreeWidget, QTreeWidgetItem
 from qgis.core import Qgis
 from qgis.core import (
@@ -13,121 +14,11 @@ from qgis.core import (
     QgsGeometry,
     QgsCoordinateReferenceSystem,
     QgsCoordinateTransform,
+    QgsNetworkAccessManager,
 )
 
 from ...ui.search import Ui_SearchDockWidget
-from ...utils import PluginDir, TiandituAPI
-
-
-class SearchRequestThread(QThread):
-    request_finished = pyqtSignal(dict)
-
-    def __init__(self, search_type, api, data):
-        super().__init__()
-        self.search_type = search_type  # 搜索类型
-        self.data = data  # 搜索参数
-        self.api = api
-
-    def handle_response_api_search_v2(self, response):
-        if response["code"] == 1:
-            data = response["data"]
-            if data["status"]["infocode"] != 0:
-                # 直接返回POI的情况
-                if data["resultType"] == 1:
-                    pois = data["pois"]
-                    # 获取当前搜索结果所在的行政区,作为根节点
-                    if "prompt" in data:  # prompt不一定存在
-                        admins = data["prompt"][0]["admins"][0]["adminName"]
-                    else:
-                        admins = "全国"
-                    self.request_finished.emit(
-                        {"type": "api_search_v2:1", "admins": admins, "pois": pois}
-                    )
-                # 返回统计集合的情况
-                elif data["resultType"] == 2:
-                    all_admins = data["statistics"]["allAdmins"]
-                    first = all_admins[0]
-                    if not first["isleaf"]:
-                        # 地点不精确的时候，返回的统计集合为省级。不往下继续搜索了
-                        self.request_finished.emit(
-                            {"type": "no_result", "message": "请输入更为详细的地名"}
-                        )
-                    else:
-                        self.request_finished.emit(
-                            {"type": "api_search_v2:2", "all_admins": all_admins}
-                        )
-                else:
-                    self.request_finished.emit(
-                        {"type": "no_result", "message": "无结果"}
-                    )
-        else:
-            self.request_finished.emit(
-                {"type": "error", "message": response["message"]}
-            )
-
-    def handle_response_api_search_v2_admincode(self, response):
-        if response["code"] == 1:
-            data = response["data"]
-            if data["resultType"] == 1:
-                pois = data["pois"]
-                self.request_finished.emit(
-                    {"type": "api_search_v2_admincode", "pois": pois}
-                )
-
-    def handle_response_api_geocoder(self, response):
-        if response["code"] == 1:
-            data = response["data"]
-            if data["msg"] == "ok":
-                location = data["location"]
-                level = location["level"]
-                score = location["score"]
-                lon = round(float(location["lon"]), 6)
-                lat = round(float(location["lat"]), 6)
-                t = f"<p>关键词: {location['keyWord']}</p><p>Score:{score}</p><p>类别名称: {level}</p>"
-                _link = '<a href="#">添加到地图中</a>'
-                t += f"经纬度: {lon},{lat} {_link} "
-            else:
-                t = "请求失败"
-                self.request_finished.emit({"text": "请求失败！"})
-        else:
-            t = f"请求失败！{response['message']}"
-        self.request_finished.emit({"type": "api_geocoder", "text": t})
-
-    def handle_response_api_regeocoder(self, response):
-        if response["code"] == 1:
-            data = response["data"]
-            if data["status"] == "0":
-                result = data["result"]
-                formatted_address = result["formatted_address"]
-                if formatted_address != "":
-                    text = formatted_address
-                else:
-                    text = "无结果"
-            else:
-                text = "请求失败"
-        else:
-            text = f"请求失败！{response['message']}"
-        self.request_finished.emit({"type": "api_regeocoder", "text": text})
-
-    def run(self):
-        if self.search_type == "api_search_v2":
-            keyword = self.data["keyword"]
-            r = self.api.api_search_v2(keyword)
-            self.handle_response_api_search_v2(r)
-        elif self.search_type == "api_search_v2_admincode":
-            keyword = self.data["keyword"]
-            admin_code = self.data["admin_code"]
-            r = self.api.api_search_v2(keyword, specify=admin_code)
-            self.handle_response_api_search_v2_admincode(r)
-        elif self.search_type == "api_geocoder":
-            keyword = self.data["keyword"]
-            r = self.api.api_geocoder(keyword)
-            self.handle_response_api_geocoder(r)
-        elif self.search_type == "api_regeocoder":
-            lon = self.data["lon"]
-            lat = self.data["lat"]
-            r = self.api.api_regeocoder(lon, lat)
-            self.handle_response_api_regeocoder(r)
+from ...utils import PluginDir, make_request, HEADER
 
 
 def create_point_layer(name: str, point: QgsPointXY, crs: str):
@@ -146,11 +37,11 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
         self.search_request_thread = None
         self.setupUi(self)
         self.iface = iface
+        self.nwm = QgsNetworkAccessManager.instance()
         self.qset = QgsSettings()
-        # 读取token
+        # 读取 token
         self.token = self.qset.value("tianditu-tools/Tianditu/key")
-        self.api = TiandituAPI(self.token)
-        # 初始化treeWidget
+        # 初始化 treeWidget
         self.treeWidget = QTreeWidget(self.tab)
         self.treeWidget.setObjectName("treeWidget")
         self.treeWidget.setColumnCount(4)
@@ -175,20 +66,45 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
                 keyword = self.lineEdit.text()
                 search_progress_tip_item = QTreeWidgetItem(item)
                 search_progress_tip_item.setText(1, "搜索中...")
-                self.search_request_thread = SearchRequestThread(
-                    search_type="api_search_v2_admincode",
-                    api=self.api,
-                    data={"keyword": keyword, "admin_code": admin_code},
-                )
-                self.search_request_thread.request_finished.connect(
-                    lambda data: self.on_search_complete(data, item)
-                )
-                self.search_request_thread.start()
+                network_manager = QgsNetworkAccessManager.instance()
+                data = {
+                    "keyWord": keyword,  # 搜索的关键字
+                    "mapBound": "-180,-90,180,90",  # 查询的地图范围(minx,miny,maxx,maxy) | -180,-90至180,90
+                    "level": 18,  # 目前查询的级别 | 1-18级
+                    "queryType": 1,  # 搜索类型 | 1:普通搜索（含地铁公交） 7：地名搜索
+                    "start": 0,  # 返回结果起始位（用于分页和缓存）默认0 | 0-300，表示返回结果的起始位置。
+                    "count": 10,  # 返回的结果数量（用于分页和缓存）| 1-300，返回结果的条数。
+                    "show": 1,  # 返回poi结果信息类别 | 取值为1，则返回基本poi信息;取值为2，则返回详细poi信息
+                    "specify": admin_code,  # 在指定的行政区内搜索
+                }
+                payload = {"postStr": str(data), "type": "query", "tk": self.token}
+                url = "http://api.tianditu.gov.cn/v2/search"
+                request = make_request(url, referer=HEADER["Referer"], params=payload)
+                reply = network_manager.get(request)
+                reply.finished.connect(lambda: self.onAdminSearchFinished(reply, item))
+
             else:
                 name = item.text(1)
                 lonlat = item.text(2)
                 lon, lat = map(float, lonlat.split(","))
                 self.addPoint(name, lon, lat)
+
+    @staticmethod
+    def onAdminSearchFinished(reply: QNetworkReply, item):
+        response_data = None
+        if reply.error() == QNetworkReply.NoError:
+            response_data = json.loads(str(reply.readAll(), "utf-8", "ignore"))
+            pois = response_data["pois"]
+            for index, poi in enumerate(pois):
+                child = QTreeWidgetItem(item)
+                child.setText(0, str(index + 1))
+                child.setText(1, poi["name"])
+                child.setText(2, poi["lonlat"])
+            item.removeChild(item.child(0))
+        else:
+            child = QTreeWidgetItem(item)
+            child.setText(0, f"搜索失败{reply.errorString()}")
+        reply.deleteLater()
 
     def addPoint(self, name, x, y):
         # 创建一个图层组，用于存放地名搜索结果
@@ -203,7 +119,7 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
             if group_index != 0:
                 root.insertChildNode(0, group.clone())
                 root.removeChildNode(group)
-        group = root.findGroup(group_name) # 重新拿到 group
+        group = root.findGroup(group_name)  # 重新拿到 group
         # 定义图层
         raw_point = QgsPointXY(x, y)
         # 当前工程坐标系
@@ -236,14 +152,27 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
         self.iface.mapCanvas().zoomScale(18056)  # 设置缩放等级, setExtent的缩放等级太大
         self.iface.mapCanvas().refresh()
 
-    def on_search_complete(self, data, item=None):
-        search_type = data["type"]
-        if search_type == "api_search_v2:1":
-            self.treeWidget.takeTopLevelItem(0)  # 移除"搜索中..."
-            admins = data["admins"]
-            pois = data["pois"]
+    def onSearchRequestFinished(self, reply: QNetworkReply):
+        self.treeWidget.takeTopLevelItem(0)  # 移除"搜索中..."
+        if reply.error() == QNetworkReply.NoError:
+            response_data = json.loads(str(reply.readAll(), "utf-8", "ignore"))
+        else:
+            print(reply.attribute(QNetworkRequest.HttpStatusCodeAttribute))
+            print(reply.errorString())
             root = QTreeWidgetItem(self.treeWidget)
-            root.setText(0, admins)
+            root.setText(0, "错误")
+            root.setText(1, f"{reply.errorString()}")
+            return
+
+        if response_data["resultType"] == 1:
+            # 获取当前搜索结果所在的行政区,作为根节点
+            if "prompt" in response_data:  # prompt不一定存在
+                admins = response_data["prompt"][0]["admins"][0]["adminName"]
+            else:
+                admins = "全国"
+            pois = response_data["pois"]
+            root = QTreeWidgetItem(self.treeWidget)
+            root.setText(0, f"{admins}")
             for index, poi in enumerate(pois):
                 child = QTreeWidgetItem(root)
                 child.setText(0, f"{index + 1}")
@@ -255,9 +184,11 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
             self.treeWidget.itemDoubleClicked.connect(
                 self.on_treeWidget_item_double_clicked
             )
-        elif search_type == "api_search_v2:2":
-            self.treeWidget.takeTopLevelItem(0)  # 移除"搜索中..."
-            all_admins = data["all_admins"]
+
+        if response_data["resultType"] == 2:
+            # 有多个搜索结果, 返回统计集合的情况
+            # 行政区+结果数,双击item在当前行政区搜索
+            all_admins = response_data["statistics"]["allAdmins"]
             for index, admins in enumerate(all_admins):
                 root = QTreeWidgetItem(self.treeWidget)
                 root.setText(0, f"{index + 1} {admins['adminName']}")
@@ -266,37 +197,13 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
             self.treeWidget.itemDoubleClicked.connect(
                 self.on_treeWidget_item_double_clicked
             )
-        elif search_type == "api_search_v2_admincode":
-            pois = data["pois"]
-            for index, poi in enumerate(pois):
-                child = QTreeWidgetItem(item)
-                child.setText(0, str(index + 1))
-                child.setText(1, poi["name"])
-                child.setText(2, poi["lonlat"])
-            item.removeChild(item.child(0))
-        elif search_type == "api_geocoder":
-            text = data["text"]
-            self.label_2.setText(text)
-        elif search_type == "api_regeocoder":
-            text = data["text"]
-            self.label_4.setText(text)
-        elif search_type == "no_result":
-            self.treeWidget.takeTopLevelItem(0)  # 移除"搜索中..."
-            root = QTreeWidgetItem(self.treeWidget)
-            root.setText(1, data["message"])
-        elif search_type == "error":
-            self.treeWidget.takeTopLevelItem(0)  # 移除"搜索中..."
-            root = QTreeWidgetItem(self.treeWidget)
-            root.setText(1, data["message"])
-            self.iface.messageBar().pushWarning(
-                title="天地图API - Error", message=data["message"]
-            )
-        else:
-            self.treeWidget.takeTopLevelItem(0)  # 移除"搜索中..."
-            root = QTreeWidgetItem(self.treeWidget)
-            root.setText(0, "无结果")
+        reply.deleteLater()
 
     def search(self):
+        """
+        天地图地名搜索V2.0 http://lbs.tianditu.gov.cn/server/search2.html
+        暂时只实现了 普通搜索服务
+        """
         keyword = self.lineEdit.text()
         if len(keyword) == 0:
             return
@@ -310,22 +217,59 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
         # 搜索
         search_progress_tip = QTreeWidgetItem(self.treeWidget)
         search_progress_tip.setText(1, "搜索中...")
-        self.search_request_thread = SearchRequestThread(
-            search_type="api_search_v2", api=self.api, data={"keyword": keyword}
-        )
-        self.search_request_thread.request_finished.connect(self.on_search_complete)
-        self.search_request_thread.start()
+        # network_manager = QgsNetworkAccessManager.instance()
+        data = {
+            "keyWord": keyword,  # 搜索的关键字
+            "mapBound": "-180,-90,180,90",  # 查询的地图范围(minx,miny,maxx,maxy) | -180,-90至180,90
+            "level": 18,  # 目前查询的级别 | 1-18级
+            "queryType": 1,  # 搜索类型 | 1:普通搜索（含地铁公交） 7：地名搜索
+            "start": 0,  # 返回结果起始位（用于分页和缓存）默认0 | 0-300，表示返回结果的起始位置。
+            "count": 10,  # 返回的结果数量（用于分页和缓存）| 1-300，返回结果的条数。
+            "show": 1,  # 返回poi结果信息类别 | 取值为1，则返回基本poi信息;取值为2，则返回详细poi信息
+        }
+        payload = {"postStr": str(data), "type": "query", "tk": self.token}
+        url = "http://api.tianditu.gov.cn/v2/search"
+        request = make_request(url, referer=HEADER["Referer"], params=payload)
+        reply = self.nwm.get(request)
+        reply.finished.connect(lambda: self.onSearchRequestFinished(reply))
+
+    def onGeocoderRequestFinished(self, reply: QNetworkReply):
+        """
+        天地图地理编码接口
+        API说明: http://lbs.tianditu.gov.cn/server/geocodinginterface.html
+        返回结果示例
+        {'msg': '无结果', 'searchVersion': '6.4.9V', 'status': '404'}
+        {'msg': 'ok', 'location': {...}, 'searchVersion': '6.4.9V', 'status': '0'}
+        """
+        t = "请求失败"
+        if reply.error() == QNetworkReply.NoError:
+            response_data = json.loads(str(reply.readAll(), "utf-8", "ignore"))
+            if response_data["msg"] == "ok":
+                location = response_data["location"]
+                level = location["level"]
+                score = location["score"]
+                lon = round(float(location["lon"]), 6)
+                lat = round(float(location["lat"]), 6)
+                t = f"<p>关键词: {location['keyWord']}</p><p>Score:{score}</p><p>类别名称: {level}</p>"
+                _link = '<a href="#">添加到地图中</a>'
+                t += f"经纬度: {lon},{lat} {_link} "
+            elif response_data["msg"] == "无结果":
+                t = "无结果"
+        self.label_2.setText(t)
+        reply.deleteLater()
 
     def geocoder(self):
         keyword = self.lineEdit_2.text()
         if len(keyword) == 0:
             return
         self.label_2.setText("搜索中...")
-        self.search_request_thread = SearchRequestThread(
-            search_type="api_geocoder", api=self.api, data={"keyword": keyword}
-        )
-        self.search_request_thread.request_finished.connect(self.on_search_complete)
-        self.search_request_thread.start()
+        url = "http://api.tianditu.gov.cn/geocoder"
+        # network_manager = QgsNetworkAccessManager.instance()
+        data = {"keyWord": keyword}
+        payload = {"ds": str(data), "tk": self.token}
+        request = make_request(url, referer=HEADER["Referer"], params=payload)
+        reply = self.nwm.get(request)
+        reply.finished.connect(lambda: self.onGeocoderRequestFinished(reply))
 
     def geocoder_result_link_clicked(self):
         text = self.label_2.text()
@@ -342,6 +286,24 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
                 title="天地图API - Error: ", message="添加地图点失败"
             )
 
+    def onRegeocoderRequestFinished(self, reply: QNetworkReply):
+        """
+        天地图逆地理编码接口
+        API说明: http://lbs.tianditu.gov.cn/server/geocoding.html
+        """
+        text = "请求失败"
+        if reply.error() == QNetworkReply.NoError:
+            response_data = json.loads(str(reply.readAll(), "utf-8", "ignore"))
+            if response_data["status"] == "0":
+                result = response_data["result"]
+                formatted_address = result["formatted_address"]
+                if formatted_address != "":
+                    text = formatted_address
+                else:
+                    text = "无结果"
+        self.label_4.setText(text)
+        reply.deleteLater()
+
     def regeocoder(self):
         lonlat = self.lineEdit_3.text()
         if len(lonlat) == 0:
@@ -349,13 +311,13 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
         try:
             lon, lat = map(float, lonlat.split(","))
             self.label_4.setText("搜索中...")
-            self.search_request_thread = SearchRequestThread(
-                search_type="api_regeocoder",
-                api=self.api,
-                data={"lon": lon, "lat": lat},
-            )
-            self.search_request_thread.request_finished.connect(self.on_search_complete)
-            self.search_request_thread.start()
+            # network_manager = QgsNetworkAccessManager.instance()
+            url = "http://api.tianditu.gov.cn/geocoder"
+            data = {"lon": lon, "lat": lat, "ver": 1}
+            payload = {"postStr": str(data), "type": "geocode", "tk": self.token}
+            request = make_request(url, referer=HEADER["Referer"], params=payload)
+            reply = self.nwm.get(request)
+            reply.finished.connect(lambda: self.onRegeocoderRequestFinished(reply))
         except ValueError as e:
             self.iface.messageBar().pushWarning(
                 title="天地图API - Error: 经纬度输入有误", message=str(e)
