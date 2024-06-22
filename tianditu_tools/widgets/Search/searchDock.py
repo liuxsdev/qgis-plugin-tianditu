@@ -2,7 +2,7 @@ import json
 import re
 
 from qgis.PyQt import QtWidgets
-from qgis.PyQt.QtNetwork import QNetworkReply, QNetworkRequest
+from qgis.PyQt.QtNetwork import QNetworkReply
 from qgis.PyQt.QtWidgets import QTreeWidget, QTreeWidgetItem
 from qgis.core import Qgis
 from qgis.core import (
@@ -91,7 +91,6 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
 
     @staticmethod
     def onAdminSearchFinished(reply: QNetworkReply, item):
-        response_data = None
         if reply.error() == QNetworkReply.NoError:
             response_data = json.loads(str(reply.readAll(), "utf-8", "ignore"))
             pois = response_data["pois"]
@@ -157,8 +156,6 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
         if reply.error() == QNetworkReply.NoError:
             response_data = json.loads(str(reply.readAll(), "utf-8", "ignore"))
         else:
-            print(reply.attribute(QNetworkRequest.HttpStatusCodeAttribute))
-            print(reply.errorString())
             root = QTreeWidgetItem(self.treeWidget)
             root.setText(0, "错误")
             root.setText(1, f"{reply.errorString()}")
@@ -217,7 +214,6 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
         # 搜索
         search_progress_tip = QTreeWidgetItem(self.treeWidget)
         search_progress_tip.setText(1, "搜索中...")
-        # network_manager = QgsNetworkAccessManager.instance()
         data = {
             "keyWord": keyword,  # 搜索的关键字
             "mapBound": "-180,-90,180,90",  # 查询的地图范围(minx,miny,maxx,maxy) | -180,-90至180,90
@@ -264,7 +260,6 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
             return
         self.label_2.setText("搜索中...")
         url = "http://api.tianditu.gov.cn/geocoder"
-        # network_manager = QgsNetworkAccessManager.instance()
         data = {"keyWord": keyword}
         payload = {"ds": str(data), "tk": self.token}
         request = make_request(url, referer=HEADER["Referer"], params=payload)
@@ -311,7 +306,6 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
         try:
             lon, lat = map(float, lonlat.split(","))
             self.label_4.setText("搜索中...")
-            # network_manager = QgsNetworkAccessManager.instance()
             url = "http://api.tianditu.gov.cn/geocoder"
             data = {"lon": lon, "lat": lat, "ver": 1}
             payload = {"postStr": str(data), "type": "geocode", "tk": self.token}

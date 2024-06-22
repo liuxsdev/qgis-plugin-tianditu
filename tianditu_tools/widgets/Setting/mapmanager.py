@@ -134,7 +134,6 @@ class MapManager(QTreeWidget):
             response_data = str(reply.readAll(), "utf-8", "ignore")
             self.set_status_label("检查更新成功")
             self.update_btn.setEnabled(True)
-            # print("response_data:", response_data)
             update_summary = yaml.safe_load(response_data)
             for _, map_sum in update_summary.items():
                 name = map_sum["name"]
@@ -146,7 +145,6 @@ class MapManager(QTreeWidget):
                     update_btn.setEnabled(True)
         else:
             self.set_status_label("检查更新失败，请稍后重试...")
-            # print(f"错误: {reply.errorString()},{reply.readAll()}")
             self.update_btn.setEnabled(True)
         reply.deleteLater()
 

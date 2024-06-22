@@ -173,7 +173,6 @@ class SettingDialog(QtWidgets.QDialog, Ui_SettingDialog):
                 # {'msg': '权限类型错误', 'resolve': '不支持的key类型！', 'code': 18}
                 response_data = str(reply.readAll(), "utf-8", "ignore")
                 json_data = json.loads(response_data)
-                print(json_data)
                 self.set_status_label(
                     f"错误: {json_data.get('msg')} {json_data.get('resolve')}"
                 )
