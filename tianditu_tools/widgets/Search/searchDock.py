@@ -85,21 +85,29 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
 
             else:
                 name = item.text(1)
+                if name == "无结果,请换关键词重试":
+                    return
                 lonlat = item.text(2)
                 lon, lat = map(float, lonlat.split(","))
                 self.addPoint(name, lon, lat)
 
     @staticmethod
     def onAdminSearchFinished(reply: QNetworkReply, item):
+        item.removeChild(item.child(0))  # 移除搜索中
         if reply.error() == QNetworkReply.NoError:
             response_data = json.loads(str(reply.readAll(), "utf-8", "ignore"))
-            pois = response_data["pois"]
+            pois = response_data.get("pois", None)
+            if pois is None:
+                # 即使普通搜索已经返回某行政区内有 n 个结果,但是继续在行政区搜索时,可能出现没有结果的情况
+                # 如搜索 北京大 ,继续在河南省搜索结果为 0
+                child = QTreeWidgetItem(item)
+                child.setText(1, "无结果,请换关键词重试")
+                return
             for index, poi in enumerate(pois):
                 child = QTreeWidgetItem(item)
                 child.setText(0, str(index + 1))
                 child.setText(1, poi["name"])
                 child.setText(2, poi["lonlat"])
-            item.removeChild(item.child(0))
         else:
             child = QTreeWidgetItem(item)
             child.setText(0, f"搜索失败{reply.errorString()}")
