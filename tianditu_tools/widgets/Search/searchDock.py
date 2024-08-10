@@ -163,6 +163,7 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
         self.treeWidget.takeTopLevelItem(0)  # 移除"搜索中..."
         if reply.error() == QNetworkReply.NoError:
             response_data = json.loads(str(reply.readAll(), "utf-8", "ignore"))
+            print(response_data)
         else:
             root = QTreeWidgetItem(self.treeWidget)
             root.setText(0, "错误")
@@ -175,8 +176,11 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
                 admins = response_data["prompt"][0]["admins"][0]["adminName"]
             else:
                 admins = "全国"
-            pois = response_data["pois"]
+            pois = response_data.get("pois", None)  # POI 可能不存在
             root = QTreeWidgetItem(self.treeWidget)
+            if pois is None:
+                root.setText(0, f"无结果")
+                return
             root.setText(0, f"{admins}")
             for index, poi in enumerate(pois):
                 child = QTreeWidgetItem(root)
@@ -189,8 +193,7 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
             self.treeWidget.itemDoubleClicked.connect(
                 self.on_treeWidget_item_double_clicked
             )
-
-        if response_data["resultType"] == 2:
+        elif response_data["resultType"] == 2:
             # 有多个搜索结果, 返回统计集合的情况
             # 行政区+结果数,双击item在当前行政区搜索
             all_admins = response_data["statistics"]["allAdmins"]
@@ -202,6 +205,26 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
             self.treeWidget.itemDoubleClicked.connect(
                 self.on_treeWidget_item_double_clicked
             )
+        elif response_data.get("resultType") == 3:
+            # 行政区划类型
+            # 返回的是行政区划政府所在点
+            area_data = response_data["area"]
+            root = QTreeWidgetItem(self.treeWidget)
+            root.setText(0, "行政区")
+
+            child = QTreeWidgetItem(root)
+            child.setText(0, "1")
+            child.setText(1, area_data["name"])
+            child.setText(2, area_data["lonlat"])
+
+            self.treeWidget.expandAll()
+            self.treeWidget.itemDoubleClicked.connect(
+                self.on_treeWidget_item_double_clicked
+            )
+        else:
+            root = QTreeWidgetItem(self.treeWidget)
+            root.setText(0, "未知类型")
+            print(response_data)
         reply.deleteLater()
 
     def search(self):
