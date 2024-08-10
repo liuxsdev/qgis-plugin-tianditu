@@ -163,7 +163,6 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
         self.treeWidget.takeTopLevelItem(0)  # 移除"搜索中..."
         if reply.error() == QNetworkReply.NoError:
             response_data = json.loads(str(reply.readAll(), "utf-8", "ignore"))
-            print(response_data)
         else:
             root = QTreeWidgetItem(self.treeWidget)
             root.setText(0, "错误")
@@ -179,7 +178,7 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
             pois = response_data.get("pois", None)  # POI 可能不存在
             root = QTreeWidgetItem(self.treeWidget)
             if pois is None:
-                root.setText(0, f"无结果")
+                root.setText(0, "无结果")
                 return
             root.setText(0, f"{admins}")
             for index, poi in enumerate(pois):
@@ -277,9 +276,14 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
                 score = location["score"]
                 lon = round(float(location["lon"]), 6)
                 lat = round(float(location["lat"]), 6)
-                t = f"<p>关键词: {location['keyWord']}</p><p>Score:{score}</p><p>类别名称: {level}</p>"
+                style = (
+                    "<style>p { margin: 0; padding: 5px 0;} span {color:blue}</style>"
+                )
+                t = f"{style}<p><span>关键词</span>: {location['keyWord']}"
+                t += f"<p><span>Score</span>:{score}</p>"
+                t += f"<p><span>类别名称</span>: {level}</p>"
                 _link = '<a href="#">添加到地图中</a>'
-                t += f"经纬度: {lon},{lat} {_link} "
+                t += f"<span>经纬度</span>: {lon},{lat} {_link} "
             elif response_data["msg"] == "无结果":
                 t = "无结果"
         self.label_2.setText(t)
@@ -299,8 +303,8 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
 
     def geocoder_result_link_clicked(self):
         text = self.label_2.text()
-        name = text.split("关键词:")[1].split("<")[0].strip()
-        pattern = r"经纬度: ([\d\.]+),([\d\.]+)"
+        name = text.split("<span>关键词</span>:")[1].split("<")[0].strip()
+        pattern = r"经纬度</span>: ([\d\.]+),([\d\.]+)"
         match = re.search(pattern, text)
         # 如果匹配成功，则提取经纬度信息
         if match:
