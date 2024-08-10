@@ -30,7 +30,7 @@ features:
     details: 在QGIS中进行天地图地名搜索、地理编码查询、逆地理编码查询
   - title: 其他图源
     icon: 🌍️
-    details: 收集了部分QGIS能加载的天地图省级节点图源以及常见的第三方图源（谷歌、高德、ESRI等）
+    details: 收集了部分 QGIS 能加载的天地图省级节点图源以及常见的第三方图源（谷歌、高德、ESRI等）
   - title: 完全开源
     icon: ☕
     details: 代码已经在 Github 开源，喜欢的话，可以点个 Star ✨
