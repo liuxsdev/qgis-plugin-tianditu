@@ -1,7 +1,7 @@
 info:
   id: extra
   name: 其他地图
-  lastUpdated: '2024-04-29 15:48:48'
+  lastUpdated: '2024-07-01 09:45:32'
 maps:
   谷歌地图:
     - name: Google Map - Satellite
@@ -19,25 +19,6 @@ maps:
     - name: Google Map - Terrain Background
       icon: googlemap_terrain.png
       url: http://mt1.google.com/vt/lyrs=p&x={x}&y={y}&z={z}&apistyle=s.e:l|p.v:off,s.t:1|s.e.g|p.v:off,s.t:3|s.e.g|p.v:off,s.t:2|s.e.g|p.v:off,s.t:4|s.e.g|p.v:off
-      zmin: 0
-      zmax: 21
-      referer: ''
-  谷歌地图CN:
-    - name: Google Map (CN) - Satellite
-      icon: googlemap_satellite.png
-      url: https://gac-geo.googlecnapps.club/maps/vt?lyrs=s&x={x}&y={y}&z={z}
-      zmin: 0
-      zmax: 21
-      referer: ''
-    - name: Google Map (CN) - Roadmap
-      icon: googlemap_default.png
-      url: https://gac-geo.googlecnapps.club/maps/vt?lyrs=r&x={x}&y={y}&z={z}
-      zmin: 0
-      zmax: 21
-      referer: ''
-    - name: Google Map (CN) - Terrain Background
-      icon: googlemap_terrain.png
-      url: https://gac-geo.googlecnapps.club/maps/vt?lyrs=p&x={x}&y={y}&z={z}&apistyle=s.e:l|p.v:off,s.t:1|s.e.g|p.v:off,s.t:3|s.e.g|p.v:off,s.t:2|s.e.g|p.v:off,s.t:4|s.e.g|p.v:off
       zmin: 0
       zmax: 21
       referer: ''
