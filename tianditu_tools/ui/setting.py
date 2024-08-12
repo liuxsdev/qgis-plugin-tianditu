@@ -101,6 +101,7 @@ class Ui_SettingDialog(object):
         self.horizontalLayout_4.setObjectName("horizontalLayout_4")
         self.verticalLayout_2.addLayout(self.horizontalLayout_4)
         self.label_4 = QtWidgets.QLabel(self.groupBox)
+        self.label_4.setTextFormat(QtCore.Qt.RichText)
         self.label_4.setOpenExternalLinks(True)
         self.label_4.setObjectName("label_4")
         self.verticalLayout_2.addWidget(self.label_4)
@@ -171,7 +172,8 @@ class Ui_SettingDialog(object):
         self.label_3.setText(_translate("SettingDialog", "子域 Subdomain:"))
         self.checkBox_domain_rand.setToolTip(_translate("SettingDialog", "<html><head/><body><p><span style=\" font-size:10pt;\">添加底图时随机选择子域名，可减轻服务器压力，</span>提高可用性。</p></body></html>"))
         self.checkBox_domain_rand.setText(_translate("SettingDialog", "随机"))
-        self.label_4.setText(_translate("SettingDialog", "<html><head/><body><p><a href=\"https://console.tianditu.gov.cn/api/key\"><span style=\" font-weight:600; text-decoration: underline; color:#808080;\">点击此处前往天地图申请 Key</span></a></p><p><span style=\" color:#808080;\">Key 类型建议选择为“</span><span style=\" text-decoration: underline; color:#808080;\">浏览器端</span><span style=\" color:#808080;\">” 或者 “</span><span style=\" text-decoration: underline; color:#808080;\">Android平台</span><span style=\" color:#808080;\">”</span></p><p><span style=\" color:#808080;\">如果工程同步到QField中使用，选择“</span><span style=\" text-decoration: underline; color:#808080;\">Android平台</span><span style=\" color:#808080;\">”</span></p></body></html>"))
+        self.label_4.setText(_translate("SettingDialog", "<html><head/><body><style>p { margin: 0.5px;font-size:10px} </style><a href=\"https://console.tianditu.gov.cn/api/key\"><span style=\" font-weight:600; text-decoration: underline; color:#808080;\">点击此处前往天地图申请 Key</span></a>\n"
+"<p><span style=\" color:#808080;margin: 0; padding: 5px 0;\">Key 类型建议选择为“</span><span style=\" text-decoration: underline; color:#808080;\">浏览器端</span><span style=\" color:#808080;\">” 或者 “</span><span style=\" text-decoration: underline; color:#808080;\">Android 平台</span><span style=\" color:#808080;\">”</span></p><p style=\"margin: 0; padding: 5px 0;\"><span style=\" color:#808080;\">如果工程同步到 QField 中使用，选择“</span><span style=\" text-decoration: underline; color:#808080;\">Android 平台</span><span style=\" color:#808080;\">”</span></p></body></html>"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_keyset), _translate("SettingDialog", "天地图设置"))
         self.btn_checkupdate.setText(_translate("SettingDialog", "检查更新"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_map), _translate("SettingDialog", "地图管理"))

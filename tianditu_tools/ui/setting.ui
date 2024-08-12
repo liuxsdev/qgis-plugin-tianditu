@@ -191,7 +191,11 @@
           <item>
            <widget class="QLabel" name="label_4">
             <property name="text">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://console.tianditu.gov.cn/api/key&quot;&gt;&lt;span style=&quot; font-weight:600; text-decoration: underline; color:#808080;&quot;&gt;点击此处前往天地图申请 Key&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; color:#808080;&quot;&gt;Key 类型建议选择为“&lt;/span&gt;&lt;span style=&quot; text-decoration: underline; color:#808080;&quot;&gt;浏览器端&lt;/span&gt;&lt;span style=&quot; color:#808080;&quot;&gt;” 或者 “&lt;/span&gt;&lt;span style=&quot; text-decoration: underline; color:#808080;&quot;&gt;Android平台&lt;/span&gt;&lt;span style=&quot; color:#808080;&quot;&gt;”&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; color:#808080;&quot;&gt;如果工程同步到QField中使用，选择“&lt;/span&gt;&lt;span style=&quot; text-decoration: underline; color:#808080;&quot;&gt;Android平台&lt;/span&gt;&lt;span style=&quot; color:#808080;&quot;&gt;”&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;style&gt;p { margin: 0.5px;font-size:10px} &lt;/style&gt;&lt;a href=&quot;https://console.tianditu.gov.cn/api/key&quot;&gt;&lt;span style=&quot; font-weight:600; text-decoration: underline; color:#808080;&quot;&gt;点击此处前往天地图申请 Key&lt;/span&gt;&lt;/a&gt;
+&lt;p&gt;&lt;span style=&quot; color:#808080;margin: 0; padding: 5px 0;&quot;&gt;Key 类型建议选择为“&lt;/span&gt;&lt;span style=&quot; text-decoration: underline; color:#808080;&quot;&gt;浏览器端&lt;/span&gt;&lt;span style=&quot; color:#808080;&quot;&gt;” 或者 “&lt;/span&gt;&lt;span style=&quot; text-decoration: underline; color:#808080;&quot;&gt;Android 平台&lt;/span&gt;&lt;span style=&quot; color:#808080;&quot;&gt;”&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0; padding: 5px 0;&quot;&gt;&lt;span style=&quot; color:#808080;&quot;&gt;如果工程同步到 QField 中使用，选择“&lt;/span&gt;&lt;span style=&quot; text-decoration: underline; color:#808080;&quot;&gt;Android 平台&lt;/span&gt;&lt;span style=&quot; color:#808080;&quot;&gt;”&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="textFormat">
+             <enum>Qt::RichText</enum>
             </property>
             <property name="openExternalLinks">
              <bool>true</bool>
