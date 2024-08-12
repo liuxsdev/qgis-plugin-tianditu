@@ -70,7 +70,9 @@ class MapManager(QTreeWidget):
 
     def load_map_summary(self):
         summary = self.get_summary()
-        for value in summary.values():
+        sorted_summary_list = ["tianditu_province", "extra"]  # 按照此顺序组织列表
+        for value_key in sorted_summary_list:
+            value = summary[value_key]
             update_btn = QPushButton("更新")
             update_btn.setStyleSheet("QPushButton{margin:2px 20px;}")
             update_btn.clicked.connect(self.update_btn_clicked)
