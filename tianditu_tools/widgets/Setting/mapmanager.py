@@ -1,11 +1,18 @@
+from functools import partial
 from pathlib import Path
 
 import yaml
-from PyQt5.QtCore import QSize, Qt
+from PyQt5.QtCore import QSize, Qt, QTimer
 from PyQt5.QtGui import QFont
+from PyQt5.QtNetwork import QNetworkReply
 from PyQt5.QtWidgets import QPushButton, QTreeWidget, QTreeWidgetItem
+from qgis.core import QgsNetworkAccessManager
 
-from ...utils import load_yaml, PluginConfig, got
+from ...utils import load_yaml, PluginConfig, make_request, HEADER
+
+ui_font = QFont()
+ui_font.setFamily("微软雅黑")
+ui_font.setPointSize(8)
 
 
 class MapManager(QTreeWidget):
@@ -14,20 +21,20 @@ class MapManager(QTreeWidget):
     """
 
     def __init__(
-        self,
-        map_folder: Path,
-        parent=None,
+        self, map_folder: Path, parent=None, update_btn=None, status_label=None
     ):
         super().__init__(parent)
         self.map_folder = map_folder
-        self.font = QFont()
-        self.font.setFamily("微软雅黑")
-        self.font.setPointSize(8)
-        self.setFont(self.font)
+        self.update_btn = update_btn
+        self.status_label = status_label
+        self.setFont(ui_font)
         self.update_host = "https://maps.liuxs.pro/dist/"
         self.update_url = f"{self.update_host}summary.yml"
         self.conf = PluginConfig()
         # self.check_update()
+        # 设置 status label 的定时器
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.clear_status_label)
         self.setupUI()
 
     def setupUI(self):
@@ -63,7 +70,9 @@ class MapManager(QTreeWidget):
 
     def load_map_summary(self):
         summary = self.get_summary()
-        for value in summary.values():
+        sorted_summary_list = ["tianditu_province", "extra"]  # 按照此顺序组织列表
+        for value_key in sorted_summary_list:
+            value = summary[value_key]
             update_btn = QPushButton("更新")
             update_btn.setStyleSheet("QPushButton{margin:2px 20px;}")
             update_btn.clicked.connect(self.update_btn_clicked)
@@ -94,7 +103,9 @@ class MapManager(QTreeWidget):
         """
         sender_btn = self.sender()  # 获取发出信号的按钮
         if sender_btn:
-            item = self.itemFromIndex(self.indexAt(sender_btn.pos()))  # 获取包含按钮的项
+            item = self.itemFromIndex(
+                self.indexAt(sender_btn.pos())
+            )  # 获取包含按钮的项
             if item:
                 map_id = self.get_map_id_by_name(item.text(0))
                 self.download_map_conf(map_id)
@@ -107,32 +118,53 @@ class MapManager(QTreeWidget):
     def download_map_conf(self, map_id):
         download_url = f"{self.update_host}{map_id}.yml"
         mapfile_path = self.map_folder.joinpath(f"{map_id}.yml")
-        # 更新summary
-        summary_data = got(self.update_url)
-        if summary_data.ok:
-            with open(
-                self.map_folder.joinpath("summary.yml"), "w", encoding="utf-8"
-            ) as f:
-                f.write(summary_data.text)
-        conf_data = got(download_url)
-        if conf_data.ok:
-            with open(mapfile_path, "w", encoding="utf-8") as f:
-                f.write(conf_data.text)
+        # 更新 summary
+        network_manager = QgsNetworkAccessManager.instance()
+        request = make_request(self.update_url)
+        reply = network_manager.blockingGet(request)
+        if reply.error() == QNetworkReply.NoError:
+            with open(self.map_folder.joinpath("summary.yml"), "wb") as f:
+                f.write(reply.content())
+        request = make_request(download_url)
+        reply = network_manager.blockingGet(request)
+        if reply.error() == QNetworkReply.NoError:
+            with open(mapfile_path, "wb") as f:
+                f.write(reply.content())
+
+    def handle_check_update_response(self, reply: QNetworkReply):
+        if reply.error() == QNetworkReply.NoError:
+            response_data = str(reply.readAll(), "utf-8", "ignore")
+            self.set_status_label("检查更新成功")
+            self.update_btn.setEnabled(True)
+            update_summary = yaml.safe_load(response_data)
+            for _, map_sum in update_summary.items():
+                name = map_sum["name"]
+                item = self.findItems(name, Qt.MatchExactly)[0]
+                item.setText(2, map_sum["lastUpdated"])
+                if item.text(1) != item.text(2):
+                    # 将按钮设置为启用状态
+                    update_btn = self.itemWidget(item, 3)
+                    update_btn.setEnabled(True)
+        else:
+            self.set_status_label("检查更新失败，请稍后重试...")
+            self.update_btn.setEnabled(True)
+        reply.deleteLater()
+
+    def set_status_label(self, text: str):
+        self.status_label.setText(text)
+        self.timer.start(2000)
+
+    def clear_status_label(self):
+        self.status_label.clear()
+        self.timer.stop()
 
     def check_update(self):
-        r = got(self.update_url)
-        if r is None:
-            print("检查更新失败，请稍后重试")
-            return
-        update_summary = yaml.safe_load(r.text)
-        for _, map_sum in update_summary.items():
-            name = map_sum["name"]
-            item = self.findItems(name, Qt.MatchExactly)[0]
-            item.setText(2, map_sum["lastUpdated"])
-            if item.text(1) != item.text(2):
-                # 将按钮设置为启用状态
-                update_btn = self.itemWidget(item, 3)
-                update_btn.setEnabled(True)
+        self.status_label.setText("检查更新中...")
+        self.update_btn.setEnabled(False)
+        network_manager = QgsNetworkAccessManager.instance()
+        request = make_request(self.update_url, HEADER["Referer"])
+        reply = network_manager.get(request)
+        reply.finished.connect(partial(self.handle_check_update_response, reply))
 
     def update_map_enable_state(self):
         top_level_item_count = self.topLevelItemCount()
