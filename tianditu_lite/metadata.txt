@@ -1,8 +1,8 @@
 [general]
 name=TianDiTu Lite
-qgisMinimumVersion=3.4
+qgisMinimumVersion=3.14
 description=天地图底图加载
-about=仅供测试用, 请勿大量下载地图
+about=仅供测试, 请勿大量下载地图
 version=0.1.0-dev
 tags=basemap, xyz, tianditu, 天地图
 icon=images/icon.png
