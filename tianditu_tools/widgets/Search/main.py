@@ -36,6 +36,7 @@ class SearchAction(QAction):
                 QMessageBox.Yes,
                 QMessageBox.Yes,
             )
+            self.setChecked(False)
         else:
             if self.searchdockwidget.isHidden():
                 self.searchdockwidget.show()
