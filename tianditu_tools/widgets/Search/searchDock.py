@@ -40,7 +40,8 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
         self.nwm = QgsNetworkAccessManager.instance()
         self.qset = QgsSettings()
         # 读取 token
-        self.token = self.qset.value("tianditu-tools/Tianditu/key")
+        self.token = ""
+        self.get_token()
         # 初始化 treeWidget
         self.treeWidget = QTreeWidget(self.tab)
         self.treeWidget.setObjectName("treeWidget")
@@ -57,6 +58,10 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
         self.label_2.linkActivated.connect(self.geocoder_result_link_clicked)
         # 逆地理编码查询
         self.pushButton_3.clicked.connect(self.regeocoder)
+
+    def get_token(self):
+        if self.token == "":
+            self.token = self.qset.value("tianditu-tools/Tianditu/key")
 
     def on_treeWidget_item_double_clicked(self, item, _):
         # 没有子节点的根节点,根据根节点的行政区划进行搜索,行政区划代码在第4列(index=3)
@@ -253,6 +258,7 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
             "count": 10,  # 返回的结果数量（用于分页和缓存）| 1-300，返回结果的条数。
             "show": 1,  # 返回poi结果信息类别 | 取值为1，则返回基本poi信息;取值为2，则返回详细poi信息
         }
+        self.get_token()  # 重新获取一下token
         payload = {"postStr": str(data), "type": "query", "tk": self.token}
         url = "http://api.tianditu.gov.cn/v2/search"
         request = make_request(url, referer=HEADER["Referer"], params=payload)
@@ -296,6 +302,7 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
         self.label_2.setText("搜索中...")
         url = "http://api.tianditu.gov.cn/geocoder"
         data = {"keyWord": keyword}
+        self.get_token()  # 重新获取一下token
         payload = {"ds": str(data), "tk": self.token}
         request = make_request(url, referer=HEADER["Referer"], params=payload)
         reply = self.nwm.get(request)
@@ -335,6 +342,7 @@ class SearchDockWidget(QtWidgets.QDockWidget, Ui_SearchDockWidget):
         reply.deleteLater()
 
     def regeocoder(self):
+        self.get_token()  # 重新获取一下token
         lonlat = self.lineEdit_3.text()
         if len(lonlat) == 0:
             return
