@@ -1,7 +1,7 @@
 info:
   id: tianditu_province
   name: 天地图省级节点
-  lastUpdated: '2024-04-22 22:13:31'
+  lastUpdated: '2024-08-21 16:25:59'
 maps:
   天地图-江苏:
     - name: 江苏-1966年影像地图
@@ -48,6 +48,8 @@ maps:
       uri: crs=EPSG:4490&dpiMode=7&format=image/jpgpng&layers=History_js_yxdt_2021&styles=default&tileMatrixSet=default&url=http://jiangsu.tianditu.gov.cn/historyraster/rest/services/History/js_yxdt_2021/MapServer/WMTS/1.0.0/WMTSCapabilities.xml
     - name: 江苏-2022年影像地图
       uri: crs=EPSG:4490&dpiMode=7&format=image/jpgpng&layers=tdtjs_js_img2022_r05&styles=default&tileMatrixSet=default&url=http://jiangsu.tianditu.gov.cn/tdtsite05/rest/services/tdtjs/js_img2022_r05/MapServer/WMTS/1.0.0/WMTSCapabilities.xml
+    - name: 江苏-2023年影像地图
+      uri: crs=EPSG:4490&dpiMode=7&format=image/jpgpng&layers=MapJS_js_yxdt_latest&styles=default&tileMatrixSet=default&tilePixelRatio=0&url=https://jiangsu.tianditu.gov.cn/mapjs2/rest/services/MapJS/js_yxdt_latest/MapServer/WMTS/1.0.0/WMTSCapabilities.xml
   天地图-湖北:
     - name: 湖北-2015年影像地图
       uri: crs='EPSG:4490' format='PNG32' layer='0' url='http://27.17.60.13:6080/arcgis/rest/services/IMG_2015/MapServer'
@@ -142,3 +144,58 @@ maps:
   天地图-江西:
     - name: 江西 - 2021年7-18级影像
       uri: crs=EPSG:4490&dpiMode=7&format=image/tile&layers=JX_IMG_2021_7_18&styles=JX_IMG_2021_7_18&tileMatrixSet=JX_IMG_2021_7_18_Matrix_1&tilePixelRatio=0&url=https://maps.liuxs.pro/tweak/JX_2021_tweak.xml
+  天地图-上海:
+    - name: 上海-1999年影像
+      type: arcgismapserver
+      uri: crs='EPSG:4490' format='PNG32' layer='0' url='https://map4.shanghai-map.net/arcgis/rest/services/shyx1999/MapServer'
+        http-header:referer='https://www.shanghai-map.net/' referer='https://www.shanghai-map.net/'
+    - name: 上海-2017年影像
+      type: arcgismapserver
+      uri: crs='EPSG:4490' format='PNG32' layer='0' url='https://map4.shanghai-map.net/arcgis/rest/services/shyx2017/MapServer'
+        http-header:referer='https://www.shanghai-map.net/' referer='https://www.shanghai-map.net/'
+    - name: 上海-2018年影像
+      type: arcgismapserver
+      uri: crs='EPSG:4490' format='PNG32' layer='0' url='https://map4.shanghai-map.net/arcgis/rest/services/shyx2018/MapServer'
+        http-header:referer='https://www.shanghai-map.net/' referer='https://www.shanghai-map.net/'
+    - name: 上海-2019年影像
+      type: arcgismapserver
+      uri: crs='EPSG:4490' format='PNG32' layer='0' url='https://map4.shanghai-map.net/arcgis/rest/services/shyx2019/MapServer'
+        http-header:referer='https://www.shanghai-map.net/' referer='https://www.shanghai-map.net/'
+    - name: 上海-2020年影像
+      type: arcgismapserver
+      uri: crs='EPSG:4490' format='PNG32' layer='0' url='https://map4.shanghai-map.net/arcgis/rest/services/shyx2020/MapServer'
+        http-header:referer='https://www.shanghai-map.net/' referer='https://www.shanghai-map.net/'
+    - name: 上海-2021年影像
+      type: arcgismapserver
+      uri: crs='EPSG:4490' format='PNG32' layer='0' url='https://map4.shanghai-map.net/arcgis/rest/services/shyx2021/MapServer'
+        http-header:referer='https://www.shanghai-map.net/' referer='https://www.shanghai-map.net/'
+    - name: 上海-2022年影像
+      type: arcgismapserver
+      uri: crs='EPSG:4490' format='PNG32' layer='0' url='https://map4.shanghai-map.net/arcgis/rest/services/shyx2022/MapServer'
+        http-header:referer='https://www.shanghai-map.net/' referer='https://www.shanghai-map.net/'
+    - name: 上海-2023年影像
+      type: arcgismapserver
+      uri: crs='EPSG:4490' format='PNG32' layer='0' url='https://map4.shanghai-map.net/arcgis/rest/services/shyx2023/MapServer'
+        http-header:referer='https://www.shanghai-map.net/' referer='https://www.shanghai-map.net/'
+  天地图-广东:
+    - name: 广东省50万水文地质图
+      uri: IgnoreGetMapUrl=1&crs=EPSG:4490&dpiMode=7&featureCount=10&format=image/tile&layers=SWDZT_50W&styles=SWDZT_50W&tileMatrixSet=SWDZT_50W_Matrix_1&tilePixelRatio=0&url=https://guangdong.tianditu.gov.cn/geostar/SWDTZ_50W/wmts?USERECENT%3Dfalse%26SERVICE%3DWMTS%26REQUEST%3DGetCapabilities
+    - name: 广东省50万基础地质图
+      uri: IgnoreGetMapUrl=1&crs=EPSG:4490&dpiMode=7&featureCount=10&format=image/tile&layers=JCDZT_50W&styles=JCDZT_50W&tileMatrixSet=JCDZT_50W_Matrix_1&tilePixelRatio=0&url=https://guangdong.tianditu.gov.cn/geostar/JCDTZ_50W/wmts?USERECENT%3Dfalse%26SERVICE%3DWMTS%26REQUEST%3DGetCapabilities
+    - name: 广东省生态保护红线
+      uri: IgnoreGetMapUrl=1&crs=EPSG:4490&dpiMode=7&featureCount=10&format=image/tile&layers=GDSTBHHX&styles=GDSTBHHX&tileMatrixSet=GDSTBHHX_Matrix_1&tilePixelRatio=0&url=https://guangdong.tianditu.gov.cn/geostar/GDSTBHHX/wmts?USERECENT%3Dfalse%26SERVICE%3DWMTS%26REQUEST%3DGetCapabilities
+  天地图-福建:
+    - name: 福建 - 2016年影像
+      uri: crs=EPSG:4490&dpiMode=7&featureCount=10&format=tiles&layers=IMG_FJ&styles=default&tileMatrixSet=default028mm&tilePixelRatio=0&url=https://maps.liuxs.pro/tweak/FJ/2016.xml
+    - name: 福建 - 2017年影像
+      uri: crs=EPSG:4490&dpiMode=7&featureCount=10&format=tiles&layers=IMG_FJ&styles=default&tileMatrixSet=default028mm&tilePixelRatio=0&url=https://maps.liuxs.pro/tweak/FJ/2017.xml
+    - name: 福建 - 2018年影像
+      uri: crs=EPSG:4490&dpiMode=7&featureCount=10&format=tiles&layers=IMG_FJ&styles=default&tileMatrixSet=default028mm&tilePixelRatio=0&url=https://maps.liuxs.pro/tweak/FJ/2018.xml
+    - name: 福建 - 2019年影像
+      uri: crs=EPSG:4490&dpiMode=7&featureCount=10&format=tiles&layers=IMG_FJ&styles=default&tileMatrixSet=default028mm&tilePixelRatio=0&url=https://maps.liuxs.pro/tweak/FJ/2019.xml
+    - name: 福建 - 2020年影像
+      uri: crs=EPSG:4490&dpiMode=7&featureCount=10&format=tiles&layers=IMG_FJ&styles=default&tileMatrixSet=default028mm&tilePixelRatio=0&url=https://maps.liuxs.pro/tweak/FJ/2020.xml
+    - name: 福建 - 2021年影像
+      uri: crs=EPSG:4490&dpiMode=7&featureCount=10&format=tiles&layers=IMG_FJ&styles=default&tileMatrixSet=default028mm&tilePixelRatio=0&url=https://maps.liuxs.pro/tweak/FJ/2021.xml
+    - name: 福建 - 2022年影像
+      uri: crs=EPSG:4490&dpiMode=7&featureCount=10&format=tiles&layers=img_fj&styles=default&tileMatrixSet=default028mm&tilePixelRatio=0&url=https://maps.liuxs.pro/tweak/FJ/2022.xml
