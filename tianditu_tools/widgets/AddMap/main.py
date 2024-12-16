@@ -22,8 +22,9 @@ conf = PluginConfig()
 
 
 class AddMapBtn(QToolButton):
-    def __init__(self, parent=None):
+    def __init__(self, iface, parent=None):
         super().__init__(parent)
+        self.iface = iface
         self.icons = icons
         self.setToolTip("添加地图")
         self.setup_action()
@@ -39,7 +40,7 @@ class AddMapBtn(QToolButton):
             )
         menu.addSeparator()
         # 天地图省级节点
-        add_tianditu_province_menu(menu)
+        add_tianditu_province_menu(menu, self.iface)
         # 其他图源
         add_extra_map_menu(menu)
         self.setMenu(menu)
@@ -50,7 +51,11 @@ class AddMapBtn(QToolButton):
         key = conf.get_key()
         if key == "":
             QMessageBox.warning(
-                self, "错误", "天地图Key未设置或Key无效", QMessageBox.Yes, QMessageBox.Yes
+                self,
+                "错误",
+                "天地图Key未设置或Key无效",
+                QMessageBox.Yes,
+                QMessageBox.Yes,
             )
         else:
             random_enabled = conf.get_bool_value("Tianditu/random")
