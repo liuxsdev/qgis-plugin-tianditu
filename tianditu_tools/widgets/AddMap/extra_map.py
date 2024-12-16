@@ -1,5 +1,6 @@
 from qgis.PyQt.QtWidgets import QMenu
 
+from .sd import SdAction
 from .utils import add_raster_layer, get_xyz_uri
 from ..icons import icons, get_extra_map_icon
 from ...utils import PluginDir, load_yaml, PluginConfig
@@ -15,7 +16,12 @@ def add_extra_map(mapdata):
     add_raster_layer(uri, name)
 
 
-def add_tianditu_province_menu(parent_menu: QMenu):
+def add_tianditu_province_menu(parent_menu: QMenu, iface):
+    # 增加山东天地图
+    sd = SdAction(iface, parent=parent_menu)
+    parent_menu.addAction(sd)
+    parent_menu.addSeparator()
+    # 其他省份
     tianditu_province_path = PluginDir.joinpath("maps/tianditu_province.yml")
     tianditu_province = load_yaml(tianditu_province_path)["maps"]
     maps = tianditu_province.keys()
