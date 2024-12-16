@@ -17,7 +17,7 @@ class SdDock(QtWidgets.QDockWidget, Ui_SdDockWidget):
         super().__init__()
         self.setupUi(self)
         self.pushButton_search.clicked.connect(self.get_his_maps)
-        self.initTreeWidget()
+        self.init_tree_widget()
         self.conf = PluginConfig()
         self.tk = None
         self.pushButton_save.clicked.connect(self.save_tk)
@@ -32,16 +32,17 @@ class SdDock(QtWidgets.QDockWidget, Ui_SdDockWidget):
             "sdrasterpubmap": "SDRasterPubMap",
         }
         self.init_tk()
-        self.init_listWidget()
+        self.init_list_widget()
 
     def init_tk(self):
         self.tk = self.conf.get_value("Other/sd_tk")
         if self.tk is None:
             self.pushButton_search.setEnabled(False)
+            self.listWidget.setEnabled(False)
         else:
             self.mLineEdit_sdtk.setText(self.tk)
 
-    def initTreeWidget(self):
+    def init_tree_widget(self):
         self.treeWidget.setColumnWidth(0, 160)
         self.treeWidget.setColumnWidth(1, 100)
         self.treeWidget.setColumnWidth(2, 60)
@@ -57,18 +58,15 @@ class SdDock(QtWidgets.QDockWidget, Ui_SdDockWidget):
         tk = self.mLineEdit_sdtk.text()
         if tk != "":
             self.conf.set_value("Other/sd_tk", tk)
+            self.init_tk()
             self.pushButton_search.setEnabled(True)
+            self.listWidget.setEnabled(True)
 
-    def init_listWidget(self):
+    def init_list_widget(self):
         self.listWidget.adjustSize()
         self.listWidget.itemDoubleClicked.connect(self.on_listitem_double_clicked)
 
-        # sd_tile_data = [
-        #     {"name": "山东省影像注记", "id": "sdrasterpubmapdj"},
-        #     {"name": "山东省线划电子地图", "id": "sdpubmap"},
-        #     {"name": "山东省影像地图", "id": "sdrasterpubmap"},
-        # ]
-        for name in self.sd_tile_data.keys():
+        for name in self.sd_tile_data:
             item = QListWidgetItem(name)
             self.listWidget.addItem(item)
 
@@ -84,9 +82,9 @@ class SdDock(QtWidgets.QDockWidget, Ui_SdDockWidget):
         add_raster_layer(uri, item_name)
 
     def get_his_maps(self):
-        # TODO 获取画布中心坐标
+        # 获取画布中心坐标
 
-        # TODO 获取 Zoom Level
+        # 获取 Zoom Level
 
         # 构建查询
         network_manager = QgsNetworkAccessManager.instance()
@@ -135,7 +133,8 @@ class SdDock(QtWidgets.QDockWidget, Ui_SdDockWidget):
         cap_url = (
             f"{his_wmts_server}sdhis/{mapid}/{el}?tk%3Dee5c67bbafffd91385530796fb58d0f6"
         )
-        uri = f"crs=EPSG:4490&format=image/png&layers={mapid}&styles=default&tileMatrixSet=default028mm&url={cap_url}"
+        uri = f"crs=EPSG:4490&format=image/png&layers={mapid}"
+        uri += f"&styles=default&tileMatrixSet=default028mm&url={cap_url}"
 
         add_raster_layer(uri, name)
 
