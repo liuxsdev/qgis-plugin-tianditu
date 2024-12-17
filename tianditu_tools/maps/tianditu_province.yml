@@ -1,8 +1,23 @@
 info:
   id: tianditu_province
   name: 天地图省级节点
-  lastUpdated: '2024-08-21 16:25:59'
+  lastUpdated: '2024-12-12 11:00:02'
 maps:
+  天地图-北京:
+    - name: 北京 - 2024年01月影像
+      uri: crs=EPSG:3857&dpiMode=7&featureCount=10&format=image/png&layers=bj_202401&styles=default&tileMatrixSet=GLOBAL_WEBMERCATOR&tilePixelRatio=0&url=https://maps.liuxs.pro/wmts/beijing.xml
+    - name: 北京 - 2023年06月影像
+      uri: crs=EPSG:3857&dpiMode=7&featureCount=10&format=image/png&layers=bj_202306&styles=default&tileMatrixSet=GLOBAL_WEBMERCATOR&tilePixelRatio=0&url=https://maps.liuxs.pro/wmts/beijing.xml
+    - name: 北京 - 2023年03月影像
+      uri: crs=EPSG:3857&dpiMode=7&featureCount=10&format=image/png&layers=bj_202303&styles=default&tileMatrixSet=GLOBAL_WEBMERCATOR&tilePixelRatio=0&url=https://maps.liuxs.pro/wmts/beijing.xml
+    - name: 北京 - 2022年12月影像
+      uri: crs=EPSG:3857&dpiMode=7&featureCount=10&format=image/png&layers=bj_202212&styles=default&tileMatrixSet=GLOBAL_WEBMERCATOR&tilePixelRatio=0&url=https://maps.liuxs.pro/wmts/beijing.xml
+    - name: 北京 - 2022年09月影像
+      uri: crs=EPSG:3857&dpiMode=7&featureCount=10&format=image/png&layers=bj_202209&styles=default&tileMatrixSet=GLOBAL_WEBMERCATOR&tilePixelRatio=0&url=https://maps.liuxs.pro/wmts/beijing.xml
+    - name: 北京 - 2022年06月影像
+      uri: crs=EPSG:3857&dpiMode=7&featureCount=10&format=image/png&layers=bj_202206&styles=default&tileMatrixSet=GLOBAL_WEBMERCATOR&tilePixelRatio=0&url=https://maps.liuxs.pro/wmts/beijing.xml
+    - name: 北京 - 2022年03月影像
+      uri: crs=EPSG:3857&dpiMode=7&featureCount=10&format=image/png&layers=bj_202203&styles=default&tileMatrixSet=GLOBAL_WEBMERCATOR&tilePixelRatio=0&url=https://maps.liuxs.pro/wmts/beijing.xml
   天地图-江苏:
     - name: 江苏-1966年影像地图
       uri: crs=EPSG:4326&dpiMode=7&format=image/jpgpng&layers=History_yxdt_js_1966&styles=default&tileMatrixSet=default&tilePixelRatio=0&url=http://jiangsu.tianditu.gov.cn/historyraster/rest/services/History/yxdt_js_1966/MapServer/WMTS/1.0.0/WMTSCapabilities.xml
@@ -178,12 +193,28 @@ maps:
       uri: crs='EPSG:4490' format='PNG32' layer='0' url='https://map4.shanghai-map.net/arcgis/rest/services/shyx2023/MapServer'
         http-header:referer='https://www.shanghai-map.net/' referer='https://www.shanghai-map.net/'
   天地图-广东:
-    - name: 广东省50万水文地质图
-      uri: IgnoreGetMapUrl=1&crs=EPSG:4490&dpiMode=7&featureCount=10&format=image/tile&layers=SWDZT_50W&styles=SWDZT_50W&tileMatrixSet=SWDZT_50W_Matrix_1&tilePixelRatio=0&url=https://guangdong.tianditu.gov.cn/geostar/SWDTZ_50W/wmts?USERECENT%3Dfalse%26SERVICE%3DWMTS%26REQUEST%3DGetCapabilities
-    - name: 广东省50万基础地质图
-      uri: IgnoreGetMapUrl=1&crs=EPSG:4490&dpiMode=7&featureCount=10&format=image/tile&layers=JCDZT_50W&styles=JCDZT_50W&tileMatrixSet=JCDZT_50W_Matrix_1&tilePixelRatio=0&url=https://guangdong.tianditu.gov.cn/geostar/JCDTZ_50W/wmts?USERECENT%3Dfalse%26SERVICE%3DWMTS%26REQUEST%3DGetCapabilities
+    - name: 广东省 2015 年影像电子地图
+      uri: crs=EPSG:4326&dpiMode=7&featureCount=10&format=image/png&layers=广东省2015年影像电子地图&styles=default&tileMatrixSet=default028mm&tilePixelRatio=0&url=https://maps.liuxs.pro/tweak/GD/gd_dom.xml
+    - name: 广东省 2018 年影像电子地图
+      uri: crs=EPSG:4326&dpiMode=7&featureCount=10&format=image/png&layers=广东省2018年影像电子地图&styles=default&tileMatrixSet=default028mm&tilePixelRatio=0&url=https://maps.liuxs.pro/tweak/GD/gd_dom.xml
+    - name: 广东省 2019 年影像电子地图
+      uri: crs=EPSG:4326&dpiMode=7&featureCount=10&format=image/png&layers=广东省2019年影像电子地图&styles=default&tileMatrixSet=default028mm&tilePixelRatio=0&url=https://maps.liuxs.pro/tweak/GD/gd_dom.xml
+    - name: 广东省 2020 年影像电子地图
+      uri: crs=EPSG:4326&dpiMode=7&featureCount=10&format=image/png&layers=广东省2020年影像电子地图&styles=default&tileMatrixSet=default028mm&tilePixelRatio=0&url=https://maps.liuxs.pro/tweak/GD/gd_dom.xml
+    - name: 广东省 2021 年影像电子地图
+      uri: crs=EPSG:4326&dpiMode=7&featureCount=10&format=image/png&layers=广东省2021年影像电子地图&styles=default&tileMatrixSet=default028mm&tilePixelRatio=0&url=https://maps.liuxs.pro/tweak/GD/gd_dom.xml
+    - name: 广东省 2022 年影像电子地图
+      uri: crs=EPSG:4326&dpiMode=7&featureCount=10&format=image/png&layers=广东省2022年影像电子地图&styles=default&tileMatrixSet=default028mm&tilePixelRatio=0&url=https://maps.liuxs.pro/tweak/GD/gd_dom.xml
+    - name: 广东省 50 万水文地质图
+      uri: crs=EPSG:4326&dpiMode=7&featureCount=10&format=image/png&layers=广东省50万水文地质图&styles=default&tileMatrixSet=default028mm&tilePixelRatio=0&url=https://maps.liuxs.pro/tweak/GD/gd_dz.xml
+    - name: 广东省 50 万基础地质图
+      uri: crs=EPSG:4326&dpiMode=7&featureCount=10&format=image/png&layers=广东省50万基础地质图&styles=default&tileMatrixSet=default028mm&tilePixelRatio=0&url=https://maps.liuxs.pro/tweak/GD/gd_dz.xml
     - name: 广东省生态保护红线
-      uri: IgnoreGetMapUrl=1&crs=EPSG:4490&dpiMode=7&featureCount=10&format=image/tile&layers=GDSTBHHX&styles=GDSTBHHX&tileMatrixSet=GDSTBHHX_Matrix_1&tilePixelRatio=0&url=https://guangdong.tianditu.gov.cn/geostar/GDSTBHHX/wmts?USERECENT%3Dfalse%26SERVICE%3DWMTS%26REQUEST%3DGetCapabilities
+      uri: crs=EPSG:4326&dpiMode=7&featureCount=10&format=image/png&layers=广东省生态保护红线&styles=default&tileMatrixSet=default028mm&tilePixelRatio=0&url=https://maps.liuxs.pro/tweak/GD/gd.xml
+    - name: 广东省永久基本农田保护图斑
+      uri: crs=EPSG:4326&dpiMode=7&featureCount=10&format=image/png&layers=广东省永久基本农田保护图斑&styles=default&tileMatrixSet=default028mm&tilePixelRatio=0&url=https://maps.liuxs.pro/tweak/GD/gd.xml
+    - name: 广东省三区三线专题图
+      uri: crs=EPSG:4326&dpiMode=7&featureCount=10&format=image/png&layers=广东省三区三线专题图&styles=default&tileMatrixSet=default028mm&tilePixelRatio=0&url=https://maps.liuxs.pro/tweak/GD/gd.xml
   天地图-福建:
     - name: 福建 - 2016年影像
       uri: crs=EPSG:4490&dpiMode=7&featureCount=10&format=tiles&layers=IMG_FJ&styles=default&tileMatrixSet=default028mm&tilePixelRatio=0&url=https://maps.liuxs.pro/tweak/FJ/2016.xml
