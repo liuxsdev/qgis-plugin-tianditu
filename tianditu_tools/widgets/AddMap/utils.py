@@ -5,15 +5,11 @@ from qgis.core import QgsProject, QgsRasterLayer
 
 
 def parse_referer(referer):
-    current_qgis_version = Qgis.QGIS_VERSION_INT
-    referer_string = ""
-    if referer == "":
-        return referer_string
-    if current_qgis_version >= 32600:
-        referer_string = f"&http-header:referer={referer}"
-    else:
-        referer_string = f"&referer={referer}"
-    return referer_string
+    if not referer:
+        return ""
+    # Determine the correct parameter name based on the QGIS version
+    param_name = "http-header:referer" if Qgis.QGIS_VERSION_INT >= 32600 else "referer"
+    return f"&{param_name}={referer}"
 
 
 def add_raster_layer(uri: str, name: str, provider_type: str = "wms") -> None:
@@ -29,7 +25,7 @@ def add_raster_layer(uri: str, name: str, provider_type: str = "wms") -> None:
     if raster_layer.isValid():
         QgsProject.instance().addMapLayer(raster_layer)
     else:
-        print("add layer field")
+        print(f"无效的图层 invalid Layer\n{uri}")
 
 
 def get_xyz_uri(url: str, zmin: int = 0, zmax: int = 18, referer: str = "") -> str:

@@ -22,7 +22,7 @@ class TiandituToolbar(QToolBar):
         self.setup_action()
 
     def setup_action(self):
-        self.add_button = AddMapBtn(self)
+        self.add_button = AddMapBtn(iface=self.iface, parent=self)
         self.addWidget(self.add_button)
         # 添加 Action
         action_setting = SettingAction(self)

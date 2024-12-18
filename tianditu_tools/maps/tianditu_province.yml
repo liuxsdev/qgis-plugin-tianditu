@@ -1,8 +1,23 @@
 info:
   id: tianditu_province
   name: 天地图省级节点
-  lastUpdated: '2024-04-22 22:13:31'
+  lastUpdated: '2024-12-17 15:41:42'
 maps:
+  天地图-北京:
+    - name: 北京 - 2024年01月影像
+      uri: crs=EPSG:3857&dpiMode=7&featureCount=10&format=image/png&layers=bj_202401&styles=default&tileMatrixSet=GLOBAL_WEBMERCATOR&tilePixelRatio=0&url=https://maps.liuxs.pro/wmts/static/beijing.xml
+    - name: 北京 - 2023年06月影像
+      uri: crs=EPSG:3857&dpiMode=7&featureCount=10&format=image/png&layers=bj_202306&styles=default&tileMatrixSet=GLOBAL_WEBMERCATOR&tilePixelRatio=0&url=https://maps.liuxs.pro/wmts/static/beijing.xml
+    - name: 北京 - 2023年03月影像
+      uri: crs=EPSG:3857&dpiMode=7&featureCount=10&format=image/png&layers=bj_202303&styles=default&tileMatrixSet=GLOBAL_WEBMERCATOR&tilePixelRatio=0&url=https://maps.liuxs.pro/wmts/static/beijing.xml
+    - name: 北京 - 2022年12月影像
+      uri: crs=EPSG:3857&dpiMode=7&featureCount=10&format=image/png&layers=bj_202212&styles=default&tileMatrixSet=GLOBAL_WEBMERCATOR&tilePixelRatio=0&url=https://maps.liuxs.pro/wmts/static/beijing.xml
+    - name: 北京 - 2022年09月影像
+      uri: crs=EPSG:3857&dpiMode=7&featureCount=10&format=image/png&layers=bj_202209&styles=default&tileMatrixSet=GLOBAL_WEBMERCATOR&tilePixelRatio=0&url=https://maps.liuxs.pro/wmts/static/beijing.xml
+    - name: 北京 - 2022年06月影像
+      uri: crs=EPSG:3857&dpiMode=7&featureCount=10&format=image/png&layers=bj_202206&styles=default&tileMatrixSet=GLOBAL_WEBMERCATOR&tilePixelRatio=0&url=https://maps.liuxs.pro/wmts/static/beijing.xml
+    - name: 北京 - 2022年03月影像
+      uri: crs=EPSG:3857&dpiMode=7&featureCount=10&format=image/png&layers=bj_202203&styles=default&tileMatrixSet=GLOBAL_WEBMERCATOR&tilePixelRatio=0&url=https://maps.liuxs.pro/wmts/static/beijing.xml
   天地图-江苏:
     - name: 江苏-1966年影像地图
       uri: crs=EPSG:4326&dpiMode=7&format=image/jpgpng&layers=History_yxdt_js_1966&styles=default&tileMatrixSet=default&tilePixelRatio=0&url=http://jiangsu.tianditu.gov.cn/historyraster/rest/services/History/yxdt_js_1966/MapServer/WMTS/1.0.0/WMTSCapabilities.xml
@@ -48,6 +63,8 @@ maps:
       uri: crs=EPSG:4490&dpiMode=7&format=image/jpgpng&layers=History_js_yxdt_2021&styles=default&tileMatrixSet=default&url=http://jiangsu.tianditu.gov.cn/historyraster/rest/services/History/js_yxdt_2021/MapServer/WMTS/1.0.0/WMTSCapabilities.xml
     - name: 江苏-2022年影像地图
       uri: crs=EPSG:4490&dpiMode=7&format=image/jpgpng&layers=tdtjs_js_img2022_r05&styles=default&tileMatrixSet=default&url=http://jiangsu.tianditu.gov.cn/tdtsite05/rest/services/tdtjs/js_img2022_r05/MapServer/WMTS/1.0.0/WMTSCapabilities.xml
+    - name: 江苏-2023年影像地图
+      uri: crs=EPSG:4490&dpiMode=7&format=image/jpgpng&layers=MapJS_js_yxdt_latest&styles=default&tileMatrixSet=default&tilePixelRatio=0&url=https://jiangsu.tianditu.gov.cn/mapjs2/rest/services/MapJS/js_yxdt_latest/MapServer/WMTS/1.0.0/WMTSCapabilities.xml
   天地图-湖北:
     - name: 湖北-2015年影像地图
       uri: crs='EPSG:4490' format='PNG32' layer='0' url='http://27.17.60.13:6080/arcgis/rest/services/IMG_2015/MapServer'
@@ -142,3 +159,74 @@ maps:
   天地图-江西:
     - name: 江西 - 2021年7-18级影像
       uri: crs=EPSG:4490&dpiMode=7&format=image/tile&layers=JX_IMG_2021_7_18&styles=JX_IMG_2021_7_18&tileMatrixSet=JX_IMG_2021_7_18_Matrix_1&tilePixelRatio=0&url=https://maps.liuxs.pro/tweak/JX_2021_tweak.xml
+  天地图-上海:
+    - name: 上海-1999年影像
+      type: arcgismapserver
+      uri: crs='EPSG:4490' format='PNG32' layer='0' url='https://map4.shanghai-map.net/arcgis/rest/services/shyx1999/MapServer'
+        http-header:referer='https://www.shanghai-map.net/' referer='https://www.shanghai-map.net/'
+    - name: 上海-2017年影像
+      type: arcgismapserver
+      uri: crs='EPSG:4490' format='PNG32' layer='0' url='https://map4.shanghai-map.net/arcgis/rest/services/shyx2017/MapServer'
+        http-header:referer='https://www.shanghai-map.net/' referer='https://www.shanghai-map.net/'
+    - name: 上海-2018年影像
+      type: arcgismapserver
+      uri: crs='EPSG:4490' format='PNG32' layer='0' url='https://map4.shanghai-map.net/arcgis/rest/services/shyx2018/MapServer'
+        http-header:referer='https://www.shanghai-map.net/' referer='https://www.shanghai-map.net/'
+    - name: 上海-2019年影像
+      type: arcgismapserver
+      uri: crs='EPSG:4490' format='PNG32' layer='0' url='https://map4.shanghai-map.net/arcgis/rest/services/shyx2019/MapServer'
+        http-header:referer='https://www.shanghai-map.net/' referer='https://www.shanghai-map.net/'
+    - name: 上海-2020年影像
+      type: arcgismapserver
+      uri: crs='EPSG:4490' format='PNG32' layer='0' url='https://map4.shanghai-map.net/arcgis/rest/services/shyx2020/MapServer'
+        http-header:referer='https://www.shanghai-map.net/' referer='https://www.shanghai-map.net/'
+    - name: 上海-2021年影像
+      type: arcgismapserver
+      uri: crs='EPSG:4490' format='PNG32' layer='0' url='https://map4.shanghai-map.net/arcgis/rest/services/shyx2021/MapServer'
+        http-header:referer='https://www.shanghai-map.net/' referer='https://www.shanghai-map.net/'
+    - name: 上海-2022年影像
+      type: arcgismapserver
+      uri: crs='EPSG:4490' format='PNG32' layer='0' url='https://map4.shanghai-map.net/arcgis/rest/services/shyx2022/MapServer'
+        http-header:referer='https://www.shanghai-map.net/' referer='https://www.shanghai-map.net/'
+    - name: 上海-2023年影像
+      type: arcgismapserver
+      uri: crs='EPSG:4490' format='PNG32' layer='0' url='https://map4.shanghai-map.net/arcgis/rest/services/shyx2023/MapServer'
+        http-header:referer='https://www.shanghai-map.net/' referer='https://www.shanghai-map.net/'
+  天地图-广东:
+    - name: 广东省 2015 年影像电子地图
+      uri: crs=EPSG:4326&dpiMode=7&featureCount=10&format=image/png&layers=广东省2015年影像电子地图&styles=default&tileMatrixSet=default028mm&tilePixelRatio=0&url=https://maps.liuxs.pro/tweak/GD/gd_dom.xml
+    - name: 广东省 2018 年影像电子地图
+      uri: crs=EPSG:4326&dpiMode=7&featureCount=10&format=image/png&layers=广东省2018年影像电子地图&styles=default&tileMatrixSet=default028mm&tilePixelRatio=0&url=https://maps.liuxs.pro/tweak/GD/gd_dom.xml
+    - name: 广东省 2019 年影像电子地图
+      uri: crs=EPSG:4326&dpiMode=7&featureCount=10&format=image/png&layers=广东省2019年影像电子地图&styles=default&tileMatrixSet=default028mm&tilePixelRatio=0&url=https://maps.liuxs.pro/tweak/GD/gd_dom.xml
+    - name: 广东省 2020 年影像电子地图
+      uri: crs=EPSG:4326&dpiMode=7&featureCount=10&format=image/png&layers=广东省2020年影像电子地图&styles=default&tileMatrixSet=default028mm&tilePixelRatio=0&url=https://maps.liuxs.pro/tweak/GD/gd_dom.xml
+    - name: 广东省 2021 年影像电子地图
+      uri: crs=EPSG:4326&dpiMode=7&featureCount=10&format=image/png&layers=广东省2021年影像电子地图&styles=default&tileMatrixSet=default028mm&tilePixelRatio=0&url=https://maps.liuxs.pro/tweak/GD/gd_dom.xml
+    - name: 广东省 2022 年影像电子地图
+      uri: crs=EPSG:4326&dpiMode=7&featureCount=10&format=image/png&layers=广东省2022年影像电子地图&styles=default&tileMatrixSet=default028mm&tilePixelRatio=0&url=https://maps.liuxs.pro/tweak/GD/gd_dom.xml
+    - name: 广东省 50 万水文地质图
+      uri: crs=EPSG:4326&dpiMode=7&featureCount=10&format=image/png&layers=广东省50万水文地质图&styles=default&tileMatrixSet=default028mm&tilePixelRatio=0&url=https://maps.liuxs.pro/tweak/GD/gd_dz.xml
+    - name: 广东省 50 万基础地质图
+      uri: crs=EPSG:4326&dpiMode=7&featureCount=10&format=image/png&layers=广东省50万基础地质图&styles=default&tileMatrixSet=default028mm&tilePixelRatio=0&url=https://maps.liuxs.pro/tweak/GD/gd_dz.xml
+    - name: 广东省生态保护红线
+      uri: crs=EPSG:4326&dpiMode=7&featureCount=10&format=image/png&layers=广东省生态保护红线&styles=default&tileMatrixSet=default028mm&tilePixelRatio=0&url=https://maps.liuxs.pro/tweak/GD/gd.xml
+    - name: 广东省永久基本农田保护图斑
+      uri: crs=EPSG:4326&dpiMode=7&featureCount=10&format=image/png&layers=广东省永久基本农田保护图斑&styles=default&tileMatrixSet=default028mm&tilePixelRatio=0&url=https://maps.liuxs.pro/tweak/GD/gd.xml
+    - name: 广东省三区三线专题图
+      uri: crs=EPSG:4326&dpiMode=7&featureCount=10&format=image/png&layers=广东省三区三线专题图&styles=default&tileMatrixSet=default028mm&tilePixelRatio=0&url=https://maps.liuxs.pro/tweak/GD/gd.xml
+  天地图-福建:
+    - name: 福建 - 2016年影像
+      uri: crs=EPSG:4490&dpiMode=7&featureCount=10&format=tiles&layers=IMG_FJ&styles=default&tileMatrixSet=default028mm&tilePixelRatio=0&url=https://maps.liuxs.pro/tweak/FJ/2016.xml
+    - name: 福建 - 2017年影像
+      uri: crs=EPSG:4490&dpiMode=7&featureCount=10&format=tiles&layers=IMG_FJ&styles=default&tileMatrixSet=default028mm&tilePixelRatio=0&url=https://maps.liuxs.pro/tweak/FJ/2017.xml
+    - name: 福建 - 2018年影像
+      uri: crs=EPSG:4490&dpiMode=7&featureCount=10&format=tiles&layers=IMG_FJ&styles=default&tileMatrixSet=default028mm&tilePixelRatio=0&url=https://maps.liuxs.pro/tweak/FJ/2018.xml
+    - name: 福建 - 2019年影像
+      uri: crs=EPSG:4490&dpiMode=7&featureCount=10&format=tiles&layers=IMG_FJ&styles=default&tileMatrixSet=default028mm&tilePixelRatio=0&url=https://maps.liuxs.pro/tweak/FJ/2019.xml
+    - name: 福建 - 2020年影像
+      uri: crs=EPSG:4490&dpiMode=7&featureCount=10&format=tiles&layers=IMG_FJ&styles=default&tileMatrixSet=default028mm&tilePixelRatio=0&url=https://maps.liuxs.pro/tweak/FJ/2020.xml
+    - name: 福建 - 2021年影像
+      uri: crs=EPSG:4490&dpiMode=7&featureCount=10&format=tiles&layers=IMG_FJ&styles=default&tileMatrixSet=default028mm&tilePixelRatio=0&url=https://maps.liuxs.pro/tweak/FJ/2021.xml
+    - name: 福建 - 2022年影像
+      uri: crs=EPSG:4490&dpiMode=7&featureCount=10&format=tiles&layers=img_fj&styles=default&tileMatrixSet=default028mm&tilePixelRatio=0&url=https://maps.liuxs.pro/tweak/FJ/2022.xml
