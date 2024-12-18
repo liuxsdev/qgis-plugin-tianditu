@@ -117,7 +117,7 @@ class SdDock(QtWidgets.QDockWidget, Ui_SdDockWidget):
         # 构建查询
         network_manager = QgsNetworkAccessManager.instance()
 
-        url = f"https://service.sdmap.gov.cn/imgmeta?"
+        url = "https://service.sdmap.gov.cn/imgmeta?"
         url += f"wktpoint=POINT({point[0]} {point[1]})&level={level}&tk={self.tk}"
         request = make_request(url)
         reply = network_manager.blockingGet(request)
