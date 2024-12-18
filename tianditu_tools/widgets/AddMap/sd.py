@@ -117,18 +117,26 @@ class SdDock(QtWidgets.QDockWidget, Ui_SdDockWidget):
         # 构建查询
         network_manager = QgsNetworkAccessManager.instance()
 
-        url = f"https://service.sdmap.gov.cn/imgmeta?wktpoint=POINT({point[0]} {point[1]})&level={level}&tk={self.tk}"
+        url = f"https://service.sdmap.gov.cn/imgmeta?"
+        url += f"wktpoint=POINT({point[0]} {point[1]})&level={level}&tk={self.tk}"
         request = make_request(url)
         reply = network_manager.blockingGet(request)
         if reply.error() == QNetworkReply.NoError:
             try:
                 raw_data = json.loads(reply.content().data())
             except json.decoder.JSONDecodeError:
-                self.iface.messageBar().pushWarning(
-                    title="天地图·山东 - 查询出错",
-                    message="请检查画布范围是否在山东省境内！",
-                )
                 raw_data = []
+                if level > 18:
+                    self.iface.messageBar().pushInfo(
+                        title="天地图·山东 - 查询出错",
+                        message="缩放层级不能超过18级",
+                    )
+                else:
+                    self.iface.messageBar().pushInfo(
+                        title="天地图·山东 - 查询出错",
+                        message="请检查画布中心是否在山东省境内！",
+                    )
+
             # 筛选出历史影像
             # tileservice/sdrasterpubmap 添加方式不同
             his_data = [d for d in raw_data if "hisimage" in d["url"]]
