@@ -1,9 +1,11 @@
 import json
+import math
 
 from qgis.PyQt import QtWidgets
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtNetwork import QNetworkReply
 from qgis.PyQt.QtWidgets import QAction, QTreeWidgetItem, QListWidgetItem
+from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject
 from qgis.core import QgsNetworkAccessManager
 
 from .utils import add_raster_layer
@@ -13,8 +15,9 @@ from ...utils import PluginConfig, make_request
 
 
 class SdDock(QtWidgets.QDockWidget, Ui_SdDockWidget):
-    def __init__(self):
+    def __init__(self, iface):
         super().__init__()
+        self.iface = iface
         self.setupUi(self)
         self.pushButton_search.clicked.connect(self.get_his_maps)
         self.init_tree_widget()
@@ -81,19 +84,51 @@ class SdDock(QtWidgets.QDockWidget, Ui_SdDockWidget):
 
         add_raster_layer(uri, item_name)
 
-    def get_his_maps(self):
-        # 获取画布中心坐标
+    def get_center_point(self):
+        canvas = self.iface.mapCanvas()
+        center_point = canvas.center()
+        source_crs = canvas.mapSettings().destinationCrs()
+        target_crs = QgsCoordinateReferenceSystem("EPSG:4326")
+        transform = QgsCoordinateTransform(
+            source_crs, target_crs, QgsProject.instance()
+        )
+        center_point_4326 = transform.transform(center_point)
+        return center_point_4326.x(), center_point_4326.y()
 
-        # 获取 Zoom Level
+    def get_zoom_level(self):
+        canvas = self.iface.mapCanvas()
+        current_scale = canvas.scale()
+        scale_list = [
+            2 * math.pi * 6378137 / (256 * pow(2, x) * 0.00028) for x in range(22)
+        ]
+        level = min(
+            range(len(scale_list)), key=lambda i: abs(scale_list[i] - current_scale)
+        )
+        return level
+
+    def get_his_maps(self):
+        point = (117.7, 36)
+        level = 7
+        # 是否根据画布范围查询
+        if self.checkBox.isChecked():
+            point = self.get_center_point()
+            level = self.get_zoom_level()
 
         # 构建查询
         network_manager = QgsNetworkAccessManager.instance()
 
-        url = f"https://service.sdmap.gov.cn/imgmeta?wktpoint=POINT(117.7 36)&level=7&tk={self.tk}"
+        url = f"https://service.sdmap.gov.cn/imgmeta?wktpoint=POINT({point[0]} {point[1]})&level={level}&tk={self.tk}"
         request = make_request(url)
         reply = network_manager.blockingGet(request)
         if reply.error() == QNetworkReply.NoError:
-            raw_data = json.loads(reply.content().data())
+            try:
+                raw_data = json.loads(reply.content().data())
+            except json.decoder.JSONDecodeError:
+                self.iface.messageBar().pushWarning(
+                    title="天地图·山东 - 查询出错",
+                    message="请检查画布范围是否在山东省境内！",
+                )
+                raw_data = []
             # 筛选出历史影像
             # tileservice/sdrasterpubmap 添加方式不同
             his_data = [d for d in raw_data if "hisimage" in d["url"]]
@@ -144,7 +179,7 @@ class SdAction(QAction):
         super().__init__(parent)
         self.parent = parent
         self.iface = iface
-        self.dock = SdDock()
+        self.dock = SdDock(iface)
         self.setIcon(icons["map"])
         self.setText("天地图·山东")
         self.triggered.connect(self.open_dock)

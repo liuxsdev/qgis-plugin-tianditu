@@ -128,11 +128,22 @@
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
-        <widget class="QPushButton" name="pushButton_search">
-         <property name="text">
-          <string>查询历史影像</string>
-         </property>
-        </widget>
+        <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,4">
+         <item>
+          <widget class="QCheckBox" name="checkBox">
+           <property name="text">
+            <string>根据当前画布范围</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_search">
+           <property name="text">
+            <string>查询历史影像</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item>
         <widget class="QTreeWidget" name="treeWidget">
